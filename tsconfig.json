@@ -1,0 +1,41 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    // 基本设置
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    // 严谨性检查
+    "strict": true,
+    "skipLibCheck": true,
+    // 路径别名：让你用 @components 代替复杂的相对路径 ../../../
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@layouts/*": [
+        "src/layouts/*"
+      ],
+      "@content/*": [
+        "src/content/*"
+      ]
+    },
+    // 允许 TypeScript 识别 .astro 文件
+    "plugins": [
+      {
+        "name": "@astrojs/ts-plugin"
+      }
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
