@@ -1,0 +1,110 @@
+# Itsuki Digital Garden - 全局核心配置文件
+# 这个文件是站点的“大脑”，存放所有非内容类的静态设置。
+
+# 1. 品牌信息 (Brand Info)
+brand:
+  logo: "樹のデジタルガーデン"
+  favicon: "/favicon.svg"
+  email: "itsuki@erzhiqian.cc"
+  footer: "© 2025 itsuki"
+  webring:
+    label: "An IndieWeb Webring"
+    home: "https://xn--sr8hvo.ws/"
+    prev: "https://xn--sr8hvo.ws/previous"
+    next: "https://xn--sr8hvo.ws/next"
+
+# 2. 导航配置 (Navigation)
+navigation:
+  - id: "nav-home"
+    href: "/"
+    label: { ja: "ホーム", en: "Home" }
+    color: "hover:text-accent"
+  - id: "nav-blog"
+    href: "/blog"
+    label: { ja: "ブログ", en: "Blog" }
+    color: "hover:text-accent"
+  - id: "nav-photo"
+    href: "/photos"
+    label: { ja: "写真", en: "Photos" }
+    color: "hover:text-peach"
+  - id: "nav-yt"
+    href: "/videos"
+    label: { ja: "動画", en: "Videos" }
+    color: "hover:text-red"
+  - id: "nav-now"
+    href: "/now"
+    label: { ja: "現在", en: "Now" }
+    color: "hover:text-green"
+  - id: "nav-about"
+    href: "/about"
+    label: { ja: "私について", en: "About" }
+    color: "hover:text-accent"
+  - id: "nav-jp"
+    href: "/japanese"
+    label: { ja: "日本語学習", en: "Japanese" }
+    color: "hover:text-pink"
+
+# 3. 社交链接 (Socials)
+socials:
+  - id: "github"
+    label: "GitHub"
+    handle: "@erzhiqianyi"
+    href: "https://github.com/erzhiqianyi"
+    icon: "github"
+    color: "hover:bg-white/10"
+  - id: "youtube"
+    label: "YouTube"
+    handle: "@Itsuki-no-Nihonggo"
+    href: "https://www.youtube.com/@Itsuki-no-Nihonggo"
+    icon: "youtube"
+    color: "hover:bg-red/10"
+    activeColor: "group-hover:text-red"
+  - id: "instagram"
+    label: "Instagram"
+    handle: "@yininoqian"
+    href: "https://www.instagram.com/yininoqian/#"
+    icon: "instagram"
+    color: "hover:bg-pink/10"
+    activeColor: "group-hover:text-pink"
+
+# 4. 主题配色 (Theme - Catppuccin Mocha)
+theme:
+  colors:
+    bg: "#1e1e2e"
+    card: "#313244"
+    text: "#cdd6f4"
+    subtext: "#a6adc8"
+    accent: "#89b4fa"
+    pink: "#f5c2e7"
+    green: "#a6e3a1"
+    peach: "#fab387"
+    red: "#f38ba8"
+
+# 5. 全局 UI 文本 (UI Translation Dictionary)
+ui:
+  headings:
+    connect: { ja: "SNS・連絡先", en: "Connect" }
+    blog: { ja: "最新記事", en: "Recent Writing" }
+    youtube: { ja: "動画", en: "YouTube" }
+    photos: { ja: "写真画廊", en: "Photo Gallery" }
+    projects: { ja: "進行中のプロジェクト", en: "Ongoing Project" }
+    jlpt: { ja: "日本語学习", en: "JLPT Status" }
+    topics: { ja: "トピック", en: "Topics" }
+    archive: { ja: "アーカイブ & ログ", en: "Archive & Logs" }
+    ai: { ja: "花园之灵 ✨", en: "Garden Spirit ✨" }
+    resources: { ja: "学習リソース", en: "Resources" }
+    wordOfDay: { ja: "今日の単語", en: "Word of the Day" }
+  labels:
+    viewAll: { ja: "すべて見る ->", en: "View All ->" }
+    gallery: { ja: "ギャラリー ->", en: "Gallery ->" }
+    readMore: { ja: "続きを読む", en: "Read More" }
+    watchNow: { ja: "今すぐ見る", en: "Watch Now" }
+    back: { ja: "一覧に戻る", en: "Back to List" }
+    loading: { ja: "思考を読み込み中...", en: "Loading thoughts..." }
+    countdown: { ja: "東京留学まであと", en: "Days to Tokyo" }
+    passed: { ja: "合格済み", en: "Passed" }
+    target: { ja: "目標", en: "Target" }
+    views: { ja: "回視聴", en: "views" }
+  webring:
+    prev: { ja: "前へ", en: "Prev" }
+    next: { ja: "次へ", en: "Next" }

@@ -316,3 +316,122 @@ npm run preview
 端口冲突：如果 3000 端口被占用，Astro 会自动尝试 3001 或其他端口，请留意终端输出。
 
 依赖报错：如果安装失败，请尝试删除 package-lock.json 后重新运行 npm install。
+
+
+Itsuki Digital Garden: Astro 原生架构设计
+
+为了实现“通过修改 Markdown 维护网站”的目标，我们将废弃 Demo 阶段的单一 data.json，转而采用 Astro 的 Content Collections 架构。
+
+1. 目录结构设计 (Project Structure)
+
+src/
+├── components/          # 可复用的 UI 组件 (BentoCard, Button, etc.)
+├── content/             # 核心内容区 (重点)
+│   ├── blog/            # 博客文章 (.md)
+│   ├── photos/          # 摄影作品元数据 (.md 或 .yaml)
+│   ├── now/             # 状态更新 (.md)
+│   ├── journey/         # 个人历程 (.md)
+│   └── config.ts        # 内容集合 Schema 定义 (Zod 验证)
+├── data/                # 非 Markdown 的结构化数据
+│   └── site-config.ts   # 导航、UI 样式、社交链接配置
+├── layouts/             # 页面模板
+└── pages/               # 路由页面
+
+
+2. 静态配置 (src/data/site-config.ts)
+
+这里存放“核心页面配置”，不经常变动，不建议使用 Markdown，直接用 TypeScript 对象，享受代码补全。
+
+export const SITE_CONFIG = {
+  brand: {
+    logo: "樹のデジタルガーデン",
+    footer: "© 2025 itsuki.garden."
+  },
+  navigation: [
+    { id: "blog", label: { ja: "ブログ", en: "Blog" }, href: "/blog" },
+    { id: "photos", label: { ja: "写真", en: "Photos" }, href: "/photos" },
+    // ... 其他导航
+  ],
+  theme: {
+    colors: {
+      accent: "#89b4fa",
+      pink: "#f5c2e7",
+      // ... Catppuccin 变量
+    }
+  }
+};
+
+
+3. 内容集合设计 (src/content/config.ts)
+
+使用 zod 强制约束 Markdown 的 Frontmatter，确保你在增加 .md 文件时，如果漏写了日期或分类，构建会报错。
+
+博客 (Blog)
+
+const blog = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    date: z.date(),
+    category: z.string(),
+    tags: z.array(z.string()),
+    cover: z.string(),
+    summary: z.string(),
+    language: z.enum(['en', 'ja']),
+  }),
+});
+
+
+摄影 (Photos)
+
+摄影作品不再写在 JSON，而是每个作品一个 .md（或者一个包含所有信息的 .yaml）。
+
+const photos = defineCollection({
+  schema: z.object({
+    title: z.string(),
+    location: z.string(),
+    gear: z.string(),
+    exif: z.string(),
+    image: z.string(), // 指向本地资源路径
+    year: z.number(),
+    collection: z.string(),
+  }),
+});
+
+
+4. 如何维护网站内容？
+
+增加一篇博客
+
+只需在 src/content/blog/ 下新建 my-post.md：
+
+---
+title: "我的第一篇 Astro 博客"
+date: 2025-12-23
+category: "Tech"
+tags: ["Astro", "Web"]
+cover: "/image/blog-post.jpg"
+summary: "这是通过 Markdown 维护的内容..."
+language: "ja"
+---
+这里是正文内容...
+
+
+增加一个人生阶段 (Journey)
+
+在 src/content/journey/ 下增加 .md，Astro 会自动读取并在 About 页面生成时间轴。
+
+5. 架构优势
+
+自动路由: 利用 Astro 的 getStaticPaths，增加一个 MD 文件就自动生成一个页面。
+
+本地图片优化: Astro 的 <Image /> 组件可以直接处理 Markdown 里的相对路径图片，自动压缩并转为 WebP。
+
+i18n 友好: 可以通过文件夹结构（如 content/blog/ja/ 和 content/blog/en/）轻松实现多语言。
+
+无需 Loading: 所有 Markdown 在构建时直接转为 HTML，极致的 SEO 表现。
+
+下一步建议
+
+定义 Schema: 我们先在 src/content/config.ts 中把这些模型定义出来。
+
+拆分组件: 将设计稿中的 Bento 卡片提取为独立组件，这些组件通过 props 接收来自 Markdown 的数据。
