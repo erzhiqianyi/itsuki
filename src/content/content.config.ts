@@ -1,7 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
-// 博客文章集合
+// 1. 博客文章集合
 const blog = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/blog" }),
     schema: z.object({
@@ -16,7 +16,7 @@ const blog = defineCollection({
     }),
 });
 
-// 摄影作品集合
+// 2. 摄影作品集合
 const photos = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/photos" }),
     schema: z.object({
@@ -39,7 +39,7 @@ const photos = defineCollection({
     }),
 });
 
-// 视频作品集合
+// 3. 视频作品集合
 const videos = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx,json,yaml}', base: "src/content/videos" }),
     schema: z.object({
@@ -58,11 +58,11 @@ const videos = defineCollection({
     }),
 });
 
-// Now 页面 - 核心状态集合
+// 4. Now 页面 - 核心状态集合
 const now = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/now" }),
     schema: z.object({
-        type: z.enum(['mission', 'status']), // 区分使命宣言和当前状态卡片
+        type: z.enum(['mission', 'status']),
         lang: z.enum(['ja', 'en']).default('ja'),
         title: z.string(),
         description: z.string().optional(),
@@ -83,28 +83,27 @@ const now = defineCollection({
     }),
 });
 
-// Now 页面 - 归档集合 (书影音记录)
+// 5. Now 页面 - 归档集合 (书影音记录)
 const archive = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/archive" }),
     schema: z.object({
         type: z.enum(['books', 'games', 'movies']),
         title: z.string(),
-        meta: z.string(), // 作者、导演等
-        date: z.string(), // 完成日期
-        status: z.string(), // 已读、二周目等
-        imgId: z.string().optional(), // Unsplash ID
+        meta: z.string(),
+        date: z.string(),
+        status: z.string(),
+        imgId: z.string().optional(),
         hasReview: z.boolean().default(false),
         reviewLink: z.string().optional(),
     }),
 });
 
-// About 页面 - 个人信息与履历集合
+// 6. About 页面 - 个人资料与履历集合
 const about = defineCollection({
     loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/about" }),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
-
-        // Profile 模块字段
+        // Profile 模块
         name: z.string().optional(),
         avatar: z.string().optional(),
         tags: z.array(z.string()).optional(),
@@ -122,20 +121,16 @@ const about = defineCollection({
                 border: z.string()
             })).optional()
         })).optional(),
-
-        // Bio 模块字段
+        // Bio 模块
         title: z.string().optional(),
         quote: z.string().optional(),
-
-        // 列表类模块字段 (Experience / Journey)
+        // Experience / Journey 模块列表数据
         items: z.array(z.object({
-            // 工作经历相关
             role: z.string().optional(),
             company: z.string().optional(),
             period: z.string().optional(),
             description: z.string().optional(),
             tech: z.array(z.string()).optional(),
-            // 旅程时间轴相关
             date: z.string().optional(),
             location: z.string().optional(),
             desc: z.string().optional(),
@@ -145,4 +140,43 @@ const about = defineCollection({
     })
 });
 
-export const collections = { blog, photos, videos, now, archive, about };
+// 7. Japanese 页面 - 日语学习动态集合
+const japanese = defineCollection({
+    loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/japanese" }),
+    schema: z.object({
+        lang: z.enum(['ja', 'en']).default('ja'),
+        type: z.enum(['jlpt', 'stats', 'word', 'resources', 'meta']),
+        // JLPT 进度 (type: 'jlpt')
+        jlpt_items: z.array(z.object({
+            level: z.string(),
+            date: z.string(),
+            status: z.string(),
+            progress: z.number(),
+            color: z.string(),
+            bg: z.string()
+        })).optional(),
+        // 学习统计 (type: 'stats')
+        stat_items: z.array(z.object({
+            icon: z.string(),
+            label: z.record(z.string()),
+            value: z.string(),
+            color: z.string()
+        })).optional(),
+        // 每日单词 (type: 'word')
+        kanji: z.string().optional(),
+        reading: z.string().optional(),
+        meaning: z.record(z.string()).optional(),
+        updatedAt: z.string().optional(),
+        // 学习资源 (type: 'resources')
+        resource_items: z.array(z.object({
+            name: z.string(),
+            href: z.string(),
+            icon: z.string(),
+            desc: z.record(z.string())
+        })).optional(),
+        // 页面元数据 (type: 'meta')
+        target_date: z.string().optional(),
+    })
+});
+
+export const collections = { blog, photos, videos, now, archive, about, japanese };

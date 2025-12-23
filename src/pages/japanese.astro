@@ -1,0 +1,313 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_CONFIG } from '../data/site-config';
+
+/**
+ * Japanese 页面 - 日语学习动态
+ * 采用 Bento 布局展示 JLPT 进度、学习统计和每日单词
+ */
+
+const currentPath = Astro.url.pathname;
+const isEnglish = currentPath.startsWith('/en');
+const lang = isEnglish ? 'en' : 'ja';
+
+// 获取 Japanese 集合的所有条目并按语言过滤
+const jpEntries = await getCollection('japanese', ({ data }) => data.lang === lang);
+
+// 解析不同类型的数据
+const jlptData = jpEntries.find(e => e.data.type === 'jlpt')?.data.jlpt_items || [];
+const statsData = jpEntries.find(e => e.data.type === 'stats')?.data.stat_items || [];
+const wordData = jpEntries.find(e => e.data.type === 'word')?.data || {};
+const resourcesData = jpEntries.find(e => e.data.type === 'resources')?.data.resource_items || [];
+const metaData = jpEntries.find(e => e.data.type === 'meta')?.data || { target_date: '2026-04-01' };
+
+const ui = {
+    headings: {
+        status: { ja: "学習状況", en: "Learning Status" },
+        word: { ja: "今日の言葉", en: "Word of the Day" },
+        resources: { ja: "学習リソース", en: "Resources" },
+        ai: { ja: "AIアシスタント", en: "AI Assistant" }
+    },
+    labels: {
+        countdown: { ja: "目標まで", en: "Days to Goal" },
+        meaning: { ja: "意味", en: "Meaning" },
+        arrival: { ja: "日本到着予定", en: "Target Date" }
+    }
+};
+---
+
+<BaseLayout title={`Japanese - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+    <main class="max-w-6xl mx-auto pt-10 pb-20 px-6 space-y-12 text-left">
+
+        <!-- Top Section: Status and Daily Word -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Learning Progress (2/3 width) -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                <!-- JLPT Levels -->
+                <div class="bento-card bg-[#313244]/20 rounded-[2.5rem] p-10 relative overflow-hidden border border-white/5 shadow-2xl">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-pink/5 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+                    <div class="relative z-10">
+                        <h2 class="text-xs font-bold uppercase tracking-[0.3em] text-pink/60 mb-10 flex items-center gap-2">
+                            <i data-lucide="award" class="w-4 h-4"></i>
+                            {ui.headings.status[lang]}
+                        </h2>
+                        <div class="space-y-12">
+                            {jlptData.map(j => (
+                                    <div class="space-y-4 group">
+                                        <div class="flex justify-between items-end">
+                                            <div>
+                                                <span class="text-5xl font-black text-white mr-4 group-hover:text-pink transition-colors">{j.level}</span>
+                                                <span class="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-500 font-bold">{j.date}</span>
+                                            </div>
+                                            <span class={`text-[10px] font-bold font-mono ${j.color} px-2.5 py-1 ${j.bg} rounded-lg border border-white/5 uppercase`}>{j.status}</span>
+                                        </div>
+                                        <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                            <div class={`h-full rounded-full transition-all duration-1000 ${j.color.replace('text', 'bg')}`} style={`width: ${j.progress}%`}></div>
+                                        </div>
+                                    </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Countdown Bar -->
+                <div class="bento-card bg-[#313244]/20 rounded-3xl p-6 flex items-center justify-between overflow-hidden relative group border border-white/5">
+                    <div class="absolute inset-0 bg-gradient-to-r from-pink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div class="w-12 h-12 rounded-2xl bg-pink/10 flex items-center justify-center text-pink">
+                            <i data-lucide="plane-takeoff" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest font-bold">{ui.labels.countdown[lang]}</div>
+                            <div class="text-xl font-bold text-white">{metaData.target_date} <span class="text-pink ml-2 italic font-medium">{ui.labels.arrival[lang]}</span></div>
+                        </div>
+                    </div>
+                    <div class="text-3xl font-black text-white/5 font-mono group-hover:text-pink/20 transition-colors px-2" id="days-remaining" data-target={metaData.target_date}>
+                        --- DAYS
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Stats and Word -->
+            <div class="flex flex-col gap-6">
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 gap-4">
+                    {statsData.map(s => (
+                            <div class="bento-card bg-[#313244]/20 rounded-2xl p-6 flex items-center gap-5 border border-white/5 hover:bg-[#313244]/40 transition-colors">
+                                <div class={`w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center ${s.color} shadow-inner`}>
+                                    <i data-lucide={s.icon} class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-0.5 font-bold">{s.label[lang]}</div>
+                                    <div class="text-2xl font-black text-white tracking-tight">{s.value}</div>
+                                </div>
+                            </div>
+                    ))}
+                </div>
+
+                <!-- Word of the Day Card -->
+                <div class="bento-card bg-pink/5 rounded-[2.5rem] p-8 border border-pink/10 flex-1 flex flex-col justify-center text-center relative group overflow-hidden">
+                    {wordData.updatedAt && (
+                            <div class="absolute top-4 right-4 text-[8px] font-mono text-white/10 uppercase font-bold italic tracking-tighter">UPDATED: {wordData.updatedAt}</div>
+                    )}
+                    <h3 class="text-[10px] font-bold text-pink/50 uppercase tracking-widest mb-8 flex items-center justify-center gap-2">
+                        <i data-lucide="sparkles" class="w-3 h-3"></i>
+                        {ui.headings.word[lang]}
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="relative inline-block">
+                            <div class="text-6xl font-black text-white kanji-shadow mb-2 leading-none" id="word-kanji">{wordData.kanji}</div>
+                            <button id="speak-btn" data-text={wordData.kanji} class="absolute -right-10 top-1/2 -translate-y-1/2 p-2 text-white/20 hover:text-pink transition-all">
+                                <i data-lucide="volume-2" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                        <div class="text-sm font-mono text-pink/80 bg-pink/10 py-1.5 px-4 rounded-full w-fit mx-auto font-bold tracking-widest">{wordData.reading}</div>
+                        <div class="pt-6 border-t border-white/5 text-left">
+                            <div class="text-[10px] font-mono text-gray-500 uppercase mb-2 tracking-widest font-bold">{ui.labels.meaning[lang]}</div>
+                            <div class="text-sm text-[var(--subtext)] leading-relaxed italic font-medium">{wordData.meaning?.[lang]}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4">
+                <h2 class="text-xl font-bold text-white flex items-center gap-3 shrink-0 italic">
+                    <i data-lucide="library" class="w-5 h-5 text-pink"></i>
+                    {ui.headings.resources[lang]}
+                </h2>
+                <div class="h-px flex-1 bg-white/5"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {resourcesData.map(r => (
+                        <a href={r.href} target="_blank" class="bento-card bg-[#313244]/20 rounded-2xl p-6 flex flex-col group border border-white/5 hover:border-pink/20 transition-all">
+                            <div class="flex justify-between items-start mb-6">
+                                <div class="p-4 bg-pink/5 rounded-2xl text-pink group-hover:bg-pink/10 transition-all group-hover:scale-110">
+                                    <i data-lucide={r.icon} class="w-6 h-6"></i>
+                                </div>
+                                <div class="text-white/5 group-hover:text-pink transition-colors">
+                                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+                                </div>
+                            </div>
+                            <h4 class="text-sm font-bold text-white mb-2 group-hover:text-pink transition-colors">{r.name}</h4>
+                            <p class="text-xs text-[var(--subtext)] leading-relaxed opacity-70 font-medium">{r.desc[lang]}</p>
+                        </a>
+                ))}
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Floating AI Assistant -->
+    <div id="ai-chat-window" style="display: none;" class="fixed bottom-24 right-6 w-80 max-h-[450px] bg-[#313244]/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden z-[100]">
+        <div class="p-5 border-b border-white/5 flex justify-between items-center bg-pink/10">
+            <h4 class="text-xs font-black text-pink flex items-center gap-2 tracking-[0.2em] uppercase italic">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> {ui.headings.ai[lang]}
+            </h4>
+            <button id="close-chat" class="p-1.5 hover:bg-white/10 rounded-full transition text-white/50">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div id="ai-messages" class="flex-1 p-5 overflow-y-auto space-y-4 text-xs leading-relaxed custom-scrollbar">
+            <div class="ai-bubble p-4 bg-pink/5 border border-pink/10 rounded-2xl rounded-tl-none text-[var(--subtext)]">
+                {lang === 'ja' ? '日本語の学習はどうですか？何かお手伝いしましょうか？' : "How's your Japanese learning going? Need any help?"}
+            </div>
+        </div>
+        <div class="p-5 border-t border-white/5 flex gap-2">
+            <input type="text" id="ai-input" class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-pink/50 transition-colors" placeholder="...">
+            <button id="send-btn" class="p-2.5 bg-pink text-[#1e1e2e] rounded-xl hover:opacity-90 transition shadow-lg">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <button id="toggle-ai" class="fixed bottom-6 right-6 w-14 h-14 bg-pink text-[#1e1e2e] rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-[110]">
+        <i data-lucide="languages" class="w-6 h-6"></i>
+    </button>
+</BaseLayout>
+
+<style is:global>
+    .kanji-shadow { text-shadow: 0 0 20px rgba(245, 194, 231, 0.4); }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
+</style>
+
+<script>
+    import {
+        createIcons, Award, PlaneTakeoff, BookOpen, Edit3, Clock,
+        Sparkles, Volume2, Library, ArrowUpRight, X, Send, Languages
+    } from 'lucide';
+
+    // 挂载图标
+    function initIcons() {
+        createIcons({
+            icons: {
+                Award, PlaneTakeoff, BookOpen, Edit3, Clock,
+                Sparkles, Volume2, Library, ArrowUpRight, X, Send, Languages
+            }
+        });
+    }
+
+    // 倒计时逻辑
+    function initCountdown() {
+        const el = document.getElementById('days-remaining');
+        if (!el) return;
+        const targetStr = el.getAttribute('data-target');
+        if (!targetStr) return;
+
+        const target = new Date(targetStr);
+        const now = new Date();
+        const diff = target.getTime() - now.getTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        el.innerText = `${days > 0 ? days : 0} DAYS`;
+    }
+
+    // 语音朗读
+    function initTTS() {
+        const btn = document.getElementById('speak-btn');
+        if (!btn) return;
+        btn.onclick = () => {
+            const text = btn.getAttribute('data-text');
+            if (!text) return;
+            const msg = new SpeechSynthesisUtterance();
+            msg.text = text;
+            msg.lang = 'ja-JP';
+            window.speechSynthesis.speak(msg);
+        };
+    }
+
+    // AI 助手逻辑
+    const apiKey = "";
+
+    async function callGemini(prompt: string, currentLang: string) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const sys = `你叫花园之灵 ✨，树 (Itsuki) 的 AI 助手。现在在日语学习页。你非常清楚他的目标：2026年4月留学。语气：知性、像老师一样鼓励他。语言环境：${currentLang}。`;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: { parts: [{ text: sys }] }
+                })
+            });
+            const data = await res.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error loading response.";
+        } catch (err) {
+            return "Connection error.";
+        }
+    }
+
+    function appendMessage(role: 'ai' | 'user', text: string) {
+        const container = document.getElementById('ai-messages');
+        if (!container) return;
+        const div = document.createElement('div');
+        div.className = role === 'ai'
+            ? 'ai-bubble p-4 bg-pink/5 border border-pink/10 rounded-2xl rounded-tl-none text-[var(--subtext)] text-left'
+            : 'user-bubble p-4 ml-auto w-fit bg-white/5 border border-white/10 rounded-2xl rounded-tr-none text-pink text-right';
+        div.innerText = text;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+        return div;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initIcons();
+        initCountdown();
+        initTTS();
+
+        const toggleBtn = document.getElementById('toggle-ai');
+        const chatWin = document.getElementById('ai-chat-window');
+        const closeBtn = document.getElementById('close-chat');
+        const sendBtn = document.getElementById('send-btn');
+        const input = document.getElementById('ai-input') as HTMLInputElement;
+
+        toggleBtn?.addEventListener('click', () => {
+            if (chatWin) chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+        });
+        closeBtn?.addEventListener('click', () => {
+            if (chatWin) chatWin.style.display = 'none';
+        });
+
+        async function handleSend() {
+            const text = input.value.trim();
+            if (!text) return;
+            appendMessage('user', text);
+            input.value = '';
+            const typing = appendMessage('ai', '...');
+            const currentLang = document.documentElement.lang || 'ja';
+            const response = await callGemini(text, currentLang);
+            if (typing) typing.innerText = response;
+        }
+
+        sendBtn?.addEventListener('click', handleSend);
+        input?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    });
+</script>

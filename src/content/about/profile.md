@@ -1,6 +1,6 @@
 ---
 name: "樹(itsuki)"
-avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&h=400&fit=crop"
+avatar: "/assets/about/bio.jpeg"
 tags:
     - "Full-stack"
     - "Minimalist"
