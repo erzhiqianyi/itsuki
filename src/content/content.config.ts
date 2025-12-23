@@ -98,4 +98,51 @@ const archive = defineCollection({
     }),
 });
 
-export const collections = { blog, photos, videos, now, archive };
+// About 页面 - 个人信息与履历集合
+const about = defineCollection({
+    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/about" }),
+    schema: z.object({
+        lang: z.enum(['ja', 'en']).default('ja'),
+
+        // Profile 模块字段
+        name: z.string().optional(),
+        avatar: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+        attributes: z.array(z.object({
+            icon: z.string(),
+            label: z.string(),
+            value: z.string().optional(),
+            color: z.string(),
+            isLanguageList: z.boolean().optional(),
+            items: z.array(z.object({
+                lang: z.string(),
+                level: z.string(),
+                color: z.string(),
+                bg: z.string(),
+                border: z.string()
+            })).optional()
+        })).optional(),
+
+        // Bio 模块字段
+        title: z.string().optional(),
+        quote: z.string().optional(),
+
+        // 列表类模块字段 (Experience / Journey)
+        items: z.array(z.object({
+            // 工作经历相关
+            role: z.string().optional(),
+            company: z.string().optional(),
+            period: z.string().optional(),
+            description: z.string().optional(),
+            tech: z.array(z.string()).optional(),
+            // 旅程时间轴相关
+            date: z.string().optional(),
+            location: z.string().optional(),
+            desc: z.string().optional(),
+            color: z.string().optional(),
+            cover: z.string().optional(),
+        })).optional()
+    })
+});
+
+export const collections = { blog, photos, videos, now, archive, about };

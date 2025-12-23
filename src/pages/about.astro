@@ -1,0 +1,346 @@
+---
+import {getEntry, render} from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {SITE_CONFIG} from '../data/site-config';
+
+/**
+ * About 页面 - 内容集合驱动版
+ * 基于新的 config.ts 架构，使用 loader 模式调取数据
+ */
+
+const currentPath = Astro.url.pathname;
+const isEnglish = currentPath.startsWith('/en');
+const lang = isEnglish ? 'en' : 'ja';
+
+// 获取各个模块的 Entry (假设文件位于 src/content/about/ 下)
+// 例如: profile.md, bio.md, experience.md, journey.md
+const profileEntry = await getEntry('about', 'profile');
+const bioEntry = await getEntry('about', 'bio');
+const experienceEntry = await getEntry('about', 'experience');
+const journeyEntry = await getEntry('about', 'journey');
+
+// 渲染 Markdown 正文内容 (针对 bio 模块)
+const bioContent = bioEntry ? await render(bioEntry) : null;
+const BioComponent = bioContent?.Content;
+
+// 数据提取
+const profile = profileEntry?.data || {};
+const bioData = bioEntry?.data || {};
+const experienceItems = experienceEntry?.data?.items || [];
+const journeyItems = journeyEntry?.data?.items || [];
+
+const ui = {
+    headings: {
+        experience: {ja: "EXPERIENCE", en: "EXPERIENCE"},
+        journey: {ja: "JOURNEY", en: "JOURNEY"},
+        ai: {ja: "AIアシスタント", en: "AI Assistant"}
+    }
+};
+---
+
+<BaseLayout title={`About - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+    <main class="max-w-6xl mx-auto pt-10 pb-20 px-6 flex flex-col lg:flex-row gap-12 text-left">
+
+        <!-- 左侧: 个人资料卡片 (Sidebar Profile) -->
+        <aside class="lg:w-1/3">
+            <div class="bento-card bg-[#313244]/20 rounded-[2.5rem] p-8 sticky top-24 border border-white/5">
+                {profile.avatar && (
+                        <div class="w-full aspect-square rounded-3xl overflow-hidden mb-8 shadow-2xl bg-[#181825]">
+                            <img src={profile.avatar} alt="Avatar"
+                                 class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+                        </div>
+                )}
+
+                <h2 class="text-3xl font-bold text-white mb-2">{profile.name}</h2>
+
+                <div class="flex flex-wrap gap-2 mb-8">
+                    {profile.tags?.map(tag => (
+                            <span class="px-3 py-1 bg-accent/5 text-accent rounded-full text-[10px] font-mono border border-accent/10"># {tag}</span>
+                    ))}
+                </div>
+
+                <div class="space-y-8 pt-8 border-t border-white/5">
+                    {profile.attributes?.map(attr => (
+                            <div class="flex items-start gap-4 group">
+                                <div class={`w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center ${attr.color} group-hover:bg-white/10 transition shrink-0 mt-1`}>
+                                    <i data-lucide={attr.icon} class="w-4 h-4"></i>
+                                </div>
+                                <div class="flex-1 text-left">
+                                    <div class="text-[9px] font-mono uppercase text-gray-500 tracking-wider mb-1">{attr.label}</div>
+
+                                    {attr.isLanguageList ? (
+                                            <div class="flex flex-col gap-2 mt-2">
+                                                {attr.items?.map(li => (
+                                                        <div class="flex items-center gap-2">
+                                                            <span class={`w-6 text-[10px] font-bold font-mono ${li.color}`}>{li.lang}</span>
+                                                            <span class={`text-[11px] px-2 py-0.5 rounded-md border ${li.bg} ${li.color} ${li.border}`}>{li.level}</span>
+                                                        </div>
+                                                ))}
+                                            </div>
+                                    ) : (
+                                            <div class="text-sm text-[var(--subtext)] group-hover:text-white transition">
+                                                {attr.value}
+                                            </div>
+                                    )}
+                                </div>
+                            </div>
+                    ))}
+                </div>
+            </div>
+        </aside>
+
+        <!-- 右侧: 内容区 (Bio, Experience, Journey) -->
+        <div class="lg:w-2/3 space-y-24">
+
+            <!-- 简介 (Bio) -->
+            <section class="space-y-8">
+                {bioData.title && (
+                        <h1 class="text-5xl font-extrabold text-white tracking-tight leading-tight italic">
+                            {bioData.title}
+                        </h1>
+                )}
+
+                <div class="prose prose-invert max-w-none text-[var(--subtext)] leading-relaxed text-lg space-y-6 font-medium">
+                    {BioComponent ?
+                            <BioComponent/> : <p>Loading biography...</p>}
+                </div>
+
+                {bioData.quote && (
+                        <blockquote
+                                class="border-l-4 border-accent bg-accent/5 p-8 rounded-r-3xl italic text-accent font-serif text-xl">
+                            {bioData.quote}
+                        </blockquote>
+                )}
+            </section>
+
+            <!-- 工作经验 (Experience) -->
+            <section class="space-y-10">
+                <div class="flex items-center gap-4">
+                    <h3 class="font-mono text-xs uppercase tracking-[0.2em] text-accent font-bold italic">{ui.headings.experience[lang]}</h3>
+                    <div class="h-px flex-1 bg-white/5"></div>
+                </div>
+                <div class="space-y-6">
+                    {experienceItems.map(exp => (
+                            <div class="bento-card bg-white/[0.02] p-8 rounded-3xl border border-white/5 hover:bg-white/[0.04] transition-all group">
+                                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                                    <div>
+                                        <h4 class="text-xl font-bold text-white group-hover:text-accent transition-colors">{exp.role}</h4>
+                                        <div class="text-accent text-sm font-mono font-bold tracking-tight">{exp.company}</div>
+                                    </div>
+                                    <div class="text-xs font-mono text-gray-500 bg-white/5 px-4 py-1.5 rounded-full border border-white/5 h-fit">{exp.period}</div>
+                                </div>
+                                <p class="text-[var(--subtext)] mb-6 leading-relaxed font-medium">{exp.description}</p>
+                                <div class="flex flex-wrap gap-2">
+                                    {exp.tech?.map(t => (
+                                            <span class="text-[10px] font-mono text-gray-500 bg-black/20 px-2.5 py-1 rounded-lg border border-white/5 group-hover:border-accent/20 transition-colors uppercase tracking-widest">{t}</span>
+                                    ))}
+                                </div>
+                            </div>
+                    ))}
+                </div>
+            </section>
+
+            <!-- 旅程 (Journey) -->
+            <section class="space-y-10">
+                <div class="flex items-center gap-4">
+                    <h3 class="font-mono text-xs uppercase tracking-[0.2em] text-pink font-bold italic">{ui.headings.journey[lang]}</h3>
+                    <div class="h-px flex-1 bg-white/5"></div>
+                </div>
+                <div class="relative pl-10 border-l-2 border-white/5 space-y-16 ml-2">
+                    {journeyItems.map(item => (
+                            <div class="relative group timeline-item">
+                                <div class={`absolute -left-[51px] top-1.5 w-4 h-4 rounded-full ${item.color || 'bg-accent'} border-4 border-[#1e1e2e] shadow-[0_0_15px_currentColor] transition-transform group-hover:scale-125`}></div>
+                                <div class="flex items-center gap-3 mb-3">
+                                    <span class="font-mono text-[11px] text-white/40 font-bold">{item.date}</span>
+                                    <span class="text-[9px] font-mono uppercase px-2 py-0.5 rounded bg-white/5 text-gray-500 border border-white/5 font-bold tracking-widest">{item.location}</span>
+                                </div>
+                                <div class="space-y-5">
+                                    <h4 class="text-2xl font-black text-white group-hover:text-accent transition-colors italic">{item.title}</h4>
+                                    <p class="text-base text-[var(--subtext)] leading-relaxed font-medium">{item.desc}</p>
+                                    {item.cover && (
+                                            <div class="w-full aspect-[2/1] rounded-3xl overflow-hidden border border-white/5 shadow-2xl relative">
+                                                <img src={item.cover}
+                                                     class="w-full h-full object-cover opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+                                                     loading="lazy">
+                                                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                                            </div>
+                                    )}
+                                </div>
+                            </div>
+                    ))}
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- AI Assistant Floating UI -->
+    <div id="ai-chat-window" style="display: none;"
+         class="fixed bottom-24 right-6 w-80 max-h-[450px] bg-[#313244]/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden z-[100]">
+        <div class="p-5 border-b border-white/5 flex justify-between items-center bg-accent/10">
+            <h4 class="text-xs font-black text-accent flex items-center gap-2 tracking-[0.2em] uppercase">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> {ui.headings.ai[lang]}
+            </h4>
+            <button id="close-chat"
+                    class="p-1.5 hover:bg-white/10 rounded-full transition text-white/50 hover:text-white">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+        <div id="ai-messages" class="flex-1 p-5 overflow-y-auto space-y-4 text-xs leading-relaxed custom-scrollbar">
+            <div class="ai-bubble p-4 bg-accent/5 border border-accent/10 rounded-2xl rounded-tl-none text-[var(--subtext)]">
+                {lang === 'ja' ? '私の経歴やスキルについて何か質問はありますか？' : 'Do you have questions about my background or skills?'}
+            </div>
+        </div>
+        <div class="p-5 border-t border-white/5 flex gap-2">
+            <input type="text" id="ai-input"
+                   class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-accent/50 transition-colors"
+                   placeholder="...">
+            <button id="send-btn"
+                    class="p-2.5 bg-accent text-[#1e1e2e] rounded-xl hover:opacity-90 transition shadow-lg">
+                <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+
+    <button id="toggle-ai"
+            class="fixed bottom-6 right-6 w-14 h-14 bg-accent text-[#1e1e2e] rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all z-[110]">
+        <i data-lucide="sparkles" class="w-6 h-6"></i>
+    </button>
+</BaseLayout>
+
+<style is:global>
+    /* 侧边栏属性图标颜色辅助类 */
+    .text-red {
+        color: #f38ba8;
+    }
+
+    .text-blue {
+        color: #89b4fa;
+    }
+
+    .text-green {
+        color: #a6e3a1;
+    }
+
+    .text-pink {
+        color: #f5c2e7;
+    }
+
+    .bg-red\/5 {
+        background-color: rgba(243, 139, 168, 0.05);
+    }
+
+    .bg-green\/5 {
+        background-color: rgba(166, 227, 161, 0.05);
+    }
+
+    .bg-blue\/5 {
+        background-color: rgba(137, 180, 250, 0.05);
+    }
+
+    .border-red\/10 {
+        border-color: rgba(243, 139, 168, 0.1);
+    }
+
+    .border-green\/10 {
+        border-color: rgba(166, 227, 161, 0.1);
+    }
+
+    .border-blue\/10 {
+        border-color: rgba(137, 180, 250, 0.1);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+</style>
+
+<script>
+    import {createIcons, Sparkles, X, Send, MapPin, Mail, Globe, Code} from 'lucide';
+
+    // 重新挂载图标
+    function initIcons() {
+        createIcons({
+            icons: {Sparkles, X, Send, MapPin, Mail, Globe, Code}
+        });
+    }
+
+    const apiKey = ""; // 运行时环境将提供
+
+    async function callGemini(prompt: string, currentLang: string) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const sysInstruction = `你是花园之灵 ✨，树 (Itsuki) 的 AI 助手。你正在关于页 (About Page) 模式运行。请用知性、简洁的语气回答。语言环境：${currentLang}。`;
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    contents: [{parts: [{text: prompt}]}],
+                    systemInstruction: {parts: [{text: sysInstruction}]}
+                })
+            });
+            const data = await res.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error loading response.";
+        } catch (err) {
+            return "Connection error. Please try again later.";
+        }
+    }
+
+    function appendMessage(role: 'ai' | 'user', text: string) {
+        const container = document.getElementById('ai-messages');
+        if (!container) return;
+
+        const div = document.createElement('div');
+        div.className = role === 'ai'
+            ? 'ai-bubble p-4 bg-accent/5 border border-accent/10 rounded-2xl rounded-tl-none text-[var(--subtext)] text-left'
+            : 'user-bubble p-4 ml-auto w-fit bg-white/5 border border-white/10 rounded-2xl rounded-tr-none text-accent text-right';
+
+        div.innerText = text;
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+        return div;
+    }
+
+    // 交互逻辑
+    document.addEventListener('DOMContentLoaded', () => {
+        initIcons();
+
+        const toggleBtn = document.getElementById('toggle-ai');
+        const chatWin = document.getElementById('ai-chat-window');
+        const closeBtn = document.getElementById('close-chat');
+        const sendBtn = document.getElementById('send-btn');
+        const input = document.getElementById('ai-input') as HTMLInputElement;
+
+        toggleBtn?.addEventListener('click', () => {
+            if (chatWin) chatWin.style.display = chatWin.style.display === 'flex' ? 'none' : 'flex';
+        });
+
+        closeBtn?.addEventListener('click', () => {
+            if (chatWin) chatWin.style.display = 'none';
+        });
+
+        async function handleSend() {
+            const text = input.value.trim();
+            if (!text) return;
+
+            appendMessage('user', text);
+            input.value = '';
+
+            const typingBubble = appendMessage('ai', '...');
+            const lang = document.documentElement.lang || 'ja';
+            const response = await callGemini(text, lang);
+
+            if (typingBubble) typingBubble.innerText = response;
+        }
+
+        sendBtn?.addEventListener('click', handleSend);
+        input?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+    });
+</script>

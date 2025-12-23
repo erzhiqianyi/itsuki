@@ -1,0 +1,36 @@
+---
+name: "樹(itsuki)"
+avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?q=80&w=400&h=400&fit=crop"
+tags:
+    - "Full-stack"
+    - "Minimalist"
+    - "Design-driven"
+attributes:
+    - icon: "map-pin"
+      label: "Location"
+      value: "東京、日本"
+      color: "text-red"
+    - icon: "mail"
+      label: "Contact"
+      value: "hello@itsuki.dev"
+      color: "text-blue"
+    - icon: "globe"
+      label: "Languages"
+      isLanguageList: true
+      items:
+        - lang: "CN"
+          level: "母国語"
+          color: "text-red"
+          bg: "bg-red/5"
+          border: "border-red/10"
+        - lang: "JA"
+          level: "N1 (流暢)"
+          color: "text-green"
+          bg: "bg-green/5"
+          border: "border-green/10"
+        - lang: "EN"
+          level: "ビジネス"
+          color: "text-blue"
+          bg: "bg-blue/5"
+          border: "border-blue/10"
+---
