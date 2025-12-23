@@ -1,0 +1,289 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_CONFIG } from '../data/site-config';
+
+/**
+ * Now 页面 - 完整集成版
+ */
+
+const currentPath = Astro.url.pathname;
+const isEnglish = currentPath.startsWith('/en');
+const lang = isEnglish ? 'en' : 'ja';
+
+// 1. 获取核心状态数据 (now 集合)
+const nowEntries = await getCollection('now', ({ data }) => data.lang === lang);
+const mission = nowEntries.find(e => e.data.type === 'mission');
+
+// 2. 获取并排序当前状态 (Reading/Gaming)
+// 确保数据中包含 category: 'reading' 或 'gaming'
+const currentStatus = nowEntries.filter(e => e.data.type === 'status');
+
+// 3. 获取归档数据 (archive 集合)
+const archiveEntries = await getCollection('archive');
+const sortedArchive = archiveEntries.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
+
+// 4. UI 文本
+const ui = {
+    headings: {
+        mission: { ja: "The Big Mission", en: "The Big Mission" },
+        currently: { ja: "Currently", en: "Currently" },
+        archive: { ja: "アーカイブ", en: "Archive" }
+    },
+    archiveTabs: [
+        { id: "books", label: { ja: "読書", en: "Books" }, icon: "book" },
+        { id: "games", label: { ja: "ゲーム", en: "Games" }, icon: "gamepad-2" },
+        { id: "movies", label: { ja: "映画", en: "Movies" }, icon: "film" }
+    ],
+    labels: {
+        readReview: { ja: "感想を読む", en: "Read Review" },
+        progress: { ja: "進捗", en: "Progress" },
+        status: {
+            playing: { ja: "プレイ中", en: "Playing" },
+            reading: { ja: "読書中", en: "Reading" }
+        }
+    }
+};
+
+// 序列化归档数据供客户端脚本使用
+const clientArchive = sortedArchive.map(a => ({
+    ...a.data,
+    id: a.id
+}));
+---
+
+    <BaseLayout title={`Now - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+<div class="max-w-4xl mx-auto space-y-12 text-left px-4 md:px-0">
+
+    <!-- 1. 使命宣言 (Mission) -->
+{mission && (
+    <section class="bento-card bg-gradient-to-br from-green/5 to-transparent rounded-[2.5rem] p-10 text-center relative overflow-hidden border border-white/5">
+    <div class="absolute top-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
+    <span class="relative flex h-2 w-2">
+    <span class="pulse-dot absolute inline-flex h-full w-full rounded-full bg-green opacity-75"></span>
+        <span class="relative inline-flex rounded-full h-2 w-2 bg-green"></span>
+    </span>
+    <span class="text-[10px] font-mono font-bold uppercase tracking-[0.3em] text-green/60">{ui.headings.mission[lang]}</span>
+    </div>
+    <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 mt-4 tracking-tight">
+    {mission.data.title}
+    </h1>
+    <p class="text-[var(--subtext)] text-sm md:text-lg max-w-2xl mx-auto leading-relaxed mb-10 font-medium">
+    {mission.data.description}
+    </p>
+    <div class="grid grid-cols-3 gap-4 border-t border-white/5 pt-10">
+    {mission.data.metrics?.map(m => (
+            <div>
+                <div class="text-[9px] font-mono uppercase text-gray-500 mb-1 tracking-widest font-bold">{m.label[lang]}</div>
+                <div class={`text-xl md:text-2xl font-black ${m.color}`}>{m.value}</div>
+    </div>
+))}
+</div>
+</section>
+)}
+
+<!-- 2. 当前状态 (Currently) -->
+<!-- 使用 grid-cols-2 确保 Reading 和 Gaming 左右并排 -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    {currentStatus.map(status => (
+            <div class="bento-card bg-[#313244]/30 rounded-[2rem] p-8 flex items-center gap-6 relative overflow-hidden border border-white/5 group hover:bg-[#313244]/50 transition-all duration-500">
+                {/* 封面图 */}
+{status.data.cover && (
+    <div class="w-20 h-28 shrink-0 bg-[#181825] rounded-xl overflow-hidden border border-white/10 shadow-2xl group-hover:scale-105 transition-transform duration-500">
+    <img src={status.data.cover} class="w-full h-full object-cover opacity-90" alt={status.data.title} />
+</div>
+)}
+
+<div class="flex-1 min-w-0">
+    {/* 分类标签 */}
+    <div class={`flex items-center gap-2 mb-3 ${status.data.category === 'reading' ? 'text-accent' : 'text-red'}`}>
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    {status.data.category === 'reading' ? (
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+        ) : (
+            <>
+                <line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/>
+        <rect width="20" height="12" x="2" y="6" rx="2"/>
+        <circle cx="15.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="13.5" r=".5" fill="currentColor"/>
+        </>
+)}
+</svg>
+<span class="text-[10px] font-mono font-black uppercase tracking-widest">
+    {status.data.category === 'reading' ? 'Reading' : 'Gaming'}
+    </span>
+    </div>
+
+    <h3 class="text-lg font-bold text-white mb-0.5 truncate tracking-tight group-hover:text-white transition-colors">
+    {status.data.title}
+    </h3>
+    <p class="text-xs text-[var(--subtext)] mb-5 truncate font-medium opacity-80">
+    {status.data.category === 'reading' ? (status.data.author || 'Unknown Author') : (status.data.platform || 'Steam')}
+    </p>
+
+{/* 进度条 */}
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden mb-2">
+<div
+    class={`h-full rounded-full transition-all duration-1000 ${status.data.category === 'reading' ? 'bg-accent' : 'bg-red'}`}
+style={`width:${status.data.progress}%`}
+></div>
+</div>
+
+{/* 底部详情 */}
+<div class="flex items-center justify-between text-[9px] font-mono text-gray-500 uppercase font-bold tracking-tighter">
+    <span>{ui.labels.progress[lang]}: {status.data.progress}%</span>
+<span class="flex items-center gap-1.5">
+<span class={`w-1.5 h-1.5 rounded-full animate-pulse ${status.data.category === 'reading' ? 'bg-accent' : 'bg-red'}`}></span>
+{status.data.status_text?.[lang]}
+</span>
+</div>
+</div>
+</div>
+))}
+</div>
+
+<!-- 3. 归档区域 (Archive) -->
+<section class="bento-card bg-[#313244]/20 rounded-[2.5rem] overflow-hidden flex flex-col min-h-[620px] border border-white/5">
+<div class="p-8 border-b border-white/5 flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/[0.01]">
+<h2 class="text-2xl font-black text-white flex items-center gap-3 italic">
+<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-green"><path d="M20 10V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6"/><path d="M12 2v20"/><path d="M3 10h18"/><path d="M3 18h18"/><path d="m7 22 5-5 5 5"/></svg>
+{ui.headings.archive[lang]}
+</h2>
+<div class="flex bg-black/20 p-1 rounded-2xl border border-white/5" id="archive-tabs">
+    {ui.archiveTabs.map(tab => (
+            <button
+                class="tab-btn flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-mono font-bold transition-all border border-transparent text-gray-500 hover:text-white"
+        data-tab={tab.id}
+            >
+            {tab.label[lang]}
+            </button>
+))}
+</div>
+</div>
+
+<div class="flex-1 p-6" id="archive-list">
+    <!-- 客户端渲染内容 -->
+    </div>
+
+    <div class="p-8 border-t border-white/5 flex justify-center items-center gap-4 bg-white/[0.01]" id="archive-pagination">
+    <!-- 客户端渲染分页 -->
+    </div>
+    </section>
+
+    </div>
+    </BaseLayout>
+
+    <style>
+/* 动画效果 */
+.pulse-dot { animation: pulse 2s infinite; }
+@keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    50% { transform: scale(1.15); opacity: 0.3; }
+    100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+/* 选项卡激活样式 */
+.tab-btn.active {
+    background: rgba(166, 227, 161, 0.1);
+    color: #a6e3a1;
+    border-color: rgba(166, 227, 161, 0.2);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* 归档项目交互 */
+.archive-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.archive-item:hover {
+    background: rgba(255,255,255,0.03);
+    transform: translateX(8px);
+}
+</style>
+
+<script is:inline define:vars={{ clientArchive, lang, ui }}>
+/**
+ * 归档区域客户端逻辑：处理选项卡切换与分页
+ */
+const state = {
+    activeTab: "books",
+    currentPage: 1,
+    itemsPerPage: 5
+};
+
+function renderArchive() {
+    const listContainer = document.getElementById('archive-list');
+    const paginContainer = document.getElementById('archive-pagination');
+    if (!listContainer) return;
+
+    // 1. 过滤数据
+    const filtered = clientArchive.filter(i => i.type === state.activeTab);
+    const totalPages = Math.ceil(filtered.length / state.itemsPerPage);
+    const start = (state.currentPage - 1) * state.itemsPerPage;
+    const paginated = filtered.slice(start, start + state.itemsPerPage);
+
+    // 2. 渲染列表
+    if (filtered.length === 0) {
+        listContainer.innerHTML = `<div class="py-20 text-center text-white/20 font-mono italic tracking-widest uppercase">No Records Found.</div>`;
+        paginContainer.innerHTML = '';
+    } else {
+        listContainer.innerHTML = paginated.map(item => `
+                <div class="archive-item flex items-center gap-5 p-5 rounded-3xl border-b border-white/5 last:border-0 group">
+                    <div class="w-16 h-16 rounded-2xl overflow-hidden bg-[#181825] border border-white/10 shrink-0 shadow-xl group-hover:border-green/30 transition-colors">
+                        <img src="https://images.unsplash.com/photo-${item.imgId || '1516979187457-637abb4f9353'}?q=80&w=200&h=200&fit=crop" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" loading="lazy">
+                    </div>
+                    <div class="flex-1 min-w-0 text-left">
+                        <h4 class="text-base font-bold text-white group-hover:text-green transition-colors truncate tracking-tight">${item.title}</h4>
+                        <div class="text-[10px] text-gray-500 font-mono flex items-center gap-3 mt-2 uppercase font-black tracking-tighter">
+                            <span>${item.meta}</span>
+                            <span class="w-1 h-1 rounded-full bg-white/10"></span>
+                            <span>${item.date}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 text-right shrink-0">
+                        <span class="hidden sm:inline text-[9px] font-mono bg-green/5 text-green/60 px-3 py-1 rounded-lg border border-green/10 uppercase tracking-widest font-black">${item.status}</span>
+                        ${item.hasReview ? `
+                            <a href="${item.reviewLink || '#'}" class="flex items-center gap-2 text-[10px] font-black text-green bg-green/5 hover:bg-green/10 px-4 py-2 rounded-xl transition-all border border-green/5">
+                                <span class="hidden md:inline">${ui.labels.readReview[lang]}</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
+                            </a>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+        // 3. 渲染分页
+        if (totalPages > 1) {
+            let pagHtml = `<button class="p-2.5 rounded-xl hover:bg-white/5 text-gray-500 transition ${state.currentPage === 1 ? 'opacity-10 pointer-events-none' : ''}" onclick="window.setArchivePage(${state.currentPage - 1})">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>`;
+
+            for (let i = 1; i <= totalPages; i++) {
+                pagHtml += `<button onclick="window.setArchivePage(${i})" class="w-10 h-10 rounded-xl font-mono text-[10px] transition-all border ${i === state.currentPage ? 'bg-green text-[#1e1e2e] border-green font-black shadow-lg shadow-green/20 scale-110' : 'border-white/5 text-gray-500 hover:bg-white/5'}">${i}</button>`;
+            }
+
+            pagHtml += `<button class="p-2.5 rounded-xl hover:bg-white/5 text-gray-500 transition ${state.currentPage === totalPages ? 'opacity-10 pointer-events-none' : ''}" onclick="window.setArchivePage(${state.currentPage + 1})">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>`;
+            paginContainer.innerHTML = pagHtml;
+        } else {
+            paginContainer.innerHTML = '';
+        }
+    }
+}
+
+window.setArchivePage = (p) => {
+    state.currentPage = p;
+    renderArchive();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderArchive();
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        if (btn.dataset.tab === state.activeTab) btn.classList.add('active');
+        btn.onclick = () => {
+            state.activeTab = btn.dataset.tab;
+            state.currentPage = 1;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderArchive();
+        };
+    });
+});
+</script>
