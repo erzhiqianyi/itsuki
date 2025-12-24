@@ -1,6 +1,7 @@
 ---
-// 修复：尝试使用解构导出的不同写法来绕过环境中的解析错误
+// 修复：确保从 site-config 准确获取主题色和配置
 import { SITE_CONFIG, t } from '../data/site-config';
+import { ViewTransitions } from 'astro:transitions'; // 增加视图过渡以实现 1:1 的平滑感
 
 interface Props {
     title?: string;
@@ -13,150 +14,186 @@ const {
     title = SITE_CONFIG.brand.logo,
 } = Astro.props;
 
-// 动态获取描述
 const configDescription = SITE_CONFIG.brand.description[lang] || "";
 const description = Astro.props.description || configDescription;
 const { colors } = SITE_CONFIG.theme;
-
-// 处理路径，用于语言切换
 const currentPath = Astro.url.pathname;
 ---
 
-    <!doctype html>
+<!doctype html>
 <html lang={lang} class="scroll-smooth">
 <head>
     <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<link rel="icon" type="image/svg+xml" href={SITE_CONFIG.brand.favicon} />
-<meta name="generator" content={Astro.generator} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href={SITE_CONFIG.brand.favicon} />
+    <meta name="generator" content={Astro.generator} />
 
-<title>{title}</title>
-<meta name="description" content={description} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
 
-<!-- 导入设计稿要求的字体 -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-    </head>
-    <body class="min-h-screen flex flex-col font-sans selection:bg-[#89b4fa]/30 bg-[#1e1e2e] text-[#cdd6f4]">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
-<!-- 顶部导航 -->
-<header class="fixed top-0 left-0 w-full z-50 bg-[#1e1e2e]/80 backdrop-blur-md border-b border-white/5">
-<div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-<a href={lang === 'en' ? '/en' : '/'} class="font-mono text-xl font-bold text-[var(--accent)] flex items-center gap-3 group transition-opacity">
-<div class="w-2.5 h-2.5 rounded-full bg-[#89b4fa] shadow-[0_0_15px_#89b4fa] group-hover:scale-125 transition-transform"></div>
-    <span class="tracking-tight text-[#89b4fa]">{SITE_CONFIG.brand.logo}</span>
-    </a>
+    <ViewTransitions />
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-[#89b4fa]/30 bg-[#1e1e2e] text-[#cdd6f4] antialiased">
 
-    <div class="hidden md:flex items-center gap-8">
-<nav class="flex gap-8 text-sm font-semibold text-[var(--subtext)]">
-    {SITE_CONFIG.navigation.map((item) => (
-            <a
-                href={lang === 'en' ? `/en${item.href}`.replace(/\/$/, '') : item.href}
-class={`transition-colors duration-300 ${item.color || 'hover:text-[var(--accent)]'}`}
->
-{item.label[lang]}
-</a>
-))}
-</nav>
+<header class="fixed top-0 left-0 w-full z-[100] bg-[#1e1e2e]/70 backdrop-blur-xl border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <a href={lang === 'en' ? '/en' : '/'} class="font-mono text-xl font-bold flex items-center gap-3 group">
+            <div class="w-2.5 h-2.5 rounded-full bg-[#89b4fa] shadow-[0_0_15px_rgba(137,180,250,0.6)] group-hover:scale-125 transition-transform duration-500"></div>
+            <span class="tracking-tight text-[#f5e0dc] group-hover:text-[#89b4fa] transition-colors">{SITE_CONFIG.brand.logo}</span>
+        </a>
 
-<!-- 语言切换组件 -->
-<div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10">
-<a
-    href={lang === 'en' ? (currentPath.replace(/^\/en/, '') || '/') : currentPath}
-class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[var(--accent)] text-[#1e1e2e]' : 'text-[var(--subtext)] hover:text-white'}`}
->
-JA
-</a>
-<a
-href={lang === 'ja' ? (`/en${currentPath === '/' ? '' : currentPath}`) : currentPath}
-class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[var(--accent)] text-[#1e1e2e]' : 'text-[var(--subtext)] hover:text-white'}`}
->
-EN
-</a>
-</div>
-</div>
+        <div class="hidden md:flex items-center gap-8">
+            <nav class="flex gap-8 text-[13px] font-medium text-[#bac2de]">
+                {SITE_CONFIG.navigation.map((item) => (
+                        <a
+                                href={lang === 'en' ? `/en${item.href}`.replace(/\/$/, '') : item.href}
+                                class={`transition-all duration-300 hover:text-white relative group py-2`}
+                        >
+                            {item.label[lang]}
+                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#89b4fa] transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                ))}
+            </nav>
 
-<button class="md:hidden p-2 text-[var(--subtext)] hover:text-white transition-colors">
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-<line x1="3" y1="12" x2="21" y2="12"></line>
-    <line x1="3" y1="6" x2="21" y2="6"></line>
-    <line x1="3" y1="18" x2="21" y2="18"></line>
-    </svg>
-    </button>
+            <div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10 ml-2">
+                <a href={lang === 'en' ? (currentPath.replace(/^\/en/, '') || '/') : currentPath}
+                   class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>
+                    JA
+                </a>
+                <a href={lang === 'ja' ? (`/en${currentPath === '/' ? '' : currentPath}`) : currentPath}
+                   class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>
+                    EN
+                </a>
+            </div>
+        </div>
+
+        <button id="menu-toggle" class="md:hidden p-2 text-[#a6adc8] hover:text-white transition-colors" aria-label="Toggle Menu">
+            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
     </div>
-    </header>
+</header>
 
-    <main class="flex-grow w-full max-w-6xl mx-auto px-6 pt-24 pb-20">
+<div id="mobile-menu" class="fixed inset-0 z-[90] bg-[#1e1e2e] hidden flex-col items-center justify-center pt-16">
+    <nav class="flex flex-col items-center gap-8 text-xl font-bold">
+        {SITE_CONFIG.navigation.map((item) => (
+                <a href={lang === 'en' ? `/en${item.href}` : item.href} class="text-[#cdd6f4] hover:text-[#89b4fa] transition-colors">
+                    {item.label[lang]}
+                </a>
+        ))}
+        <div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10 mt-8">
+            <a href="/" class="px-6 py-2 text-sm font-bold rounded-full text-white">JA</a>
+            <a href="/en" class="px-6 py-2 text-sm font-bold rounded-full text-[#a6adc8]">EN</a>
+        </div>
+    </nav>
+</div>
+
+<main class="flex-grow w-full max-w-6xl mx-auto px-6 pt-24 pb-20">
     <slot />
-    </main>
+</main>
 
-    <footer class="mt-12 text-center text-xs text-gray-600 font-mono pb-12 flex flex-col items-center gap-4">
-<div class="flex items-center gap-3 text-[10px] uppercase tracking-widest text-gray-500">
-<a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[var(--accent)] transition underline decoration-white/10 underline-offset-4">{t('prev', lang)}</a>
-<span class="text-white/10">/</span>
-    <a href={SITE_CONFIG.brand.webring.home} target="_blank" class="hover:text-white transition font-bold">{SITE_CONFIG.brand.webring.label}</a>
-    <span class="text-white/10">/</span>
-    <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[var(--accent)] transition underline decoration-white/10 underline-offset-4">{t('next', lang)}</a>
-</div>
-<div class="text-[var(--subtext)] opacity-60">
-    {SITE_CONFIG.brand.footer} • {t('builtWith', lang)}
-</div>
+<footer class="mt-12 text-center text-xs font-mono pb-12 flex flex-col items-center gap-6">
+    <div class="flex items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-[#585b70]">
+        <a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[#89b4fa] transition-all border-b border-transparent hover:border-[#89b4fa] pb-1">{t('prev', lang)}</a>
+        <span class="opacity-20">/</span>
+        <a href={SITE_CONFIG.brand.webring.home} target="_blank" class="hover:text-white transition font-bold text-[#7f849c]">{SITE_CONFIG.brand.webring.label}</a>
+        <span class="opacity-20">/</span>
+        <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[#89b4fa] transition-all border-b border-transparent hover:border-[#89b4fa] pb-1">{t('next', lang)}</a>
+    </div>
+    <div class="text-[#6c7086] opacity-80">
+        {SITE_CONFIG.brand.footer} • <span class="text-[#f5e0dc]">{t('builtWith', lang)}</span>
+    </div>
 </footer>
 
 <style is:global define:vars={{
     'accent': colors.accent,
-        'bg': colors.bg,
-        'card': colors.card,
-        'text': colors.text,
-        'subtext': colors.subtext,
-        'pink': colors.pink,
-        'green': colors.green,
-        'peach': colors.peach,
-        'red': colors.red
+    'bg': colors.bg,
+    'card': colors.card,
+    'text': colors.text,
+    'subtext': colors.subtext,
+    'pink': colors.pink,
+    'green': colors.green,
+    'peach': colors.peach,
+    'red': colors.red
 }}>
-:root {
-    --bg: #1e1e2e;
-    --card: #313244;
-}
+    :root {
+        --bg: #1e1e2e;
+        --card: #181825; /* 调整为更深一点的底色以对齐 Demo */
+        --accent-rgb: 137, 180, 250;
+    }
 
-html, body {
-    background-color: var(--bg);
-    color: var(--text);
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: 'Noto Sans JP', sans-serif;
-}
+    html, body {
+        background-color: var(--bg);
+        color: var(--text);
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        /* 修复：优先使用 Inter，确保 1:1 的排版视觉 */
+        font-family: 'Inter', 'Noto Sans JP', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
 
-/* Bento Card 核心样式 */
-.bento-card {
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background-color: var(--card);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    color: inherit;
-}
+    /* Bento Card 1:1 像素级复刻 */
+    .bento-card {
+        position: relative;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        background: linear-gradient(145deg, rgba(30, 30, 46, 0.6), rgba(24, 24, 37, 0.8));
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border-radius: 2rem; /* 复刻设计稿的大圆角 */
+    }
 
-.bento-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(137, 180, 250, 0.3);
-    box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.4);
-}
+    .bento-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(var(--accent-rgb), 0.3);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+    }
 
-/* 滚动条优化 */
-.scroller::-webkit-scrollbar { width: 4px; }
-.scroller::-webkit-scrollbar-thumb { background: #45475a; border-radius: 10px; }
+    /* 文字装饰 */
+    h1, h2, h3 {
+        letter-spacing: -0.02em;
+    }
 
-h1, h2, h3, h4, h5, h6 {
-    color: #ffffff;
-    line-height: 1.3;
-}
-
-/* 动画效果 */
-@keyframes spin { to { transform: rotate(360deg); } }
-.animate-spin-slow { animation: spin 3s linear infinite; }
+    .scroller::-webkit-scrollbar { width: 5px; }
+    .scroller::-webkit-scrollbar-thumb { background: #313244; border-radius: 10px; }
 </style>
+
+<script>
+    // 处理移动端菜单切换逻辑
+    function setupMenu() {
+        const toggle = document.getElementById('menu-toggle');
+        const menu = document.getElementById('mobile-menu');
+        const icon = document.getElementById('menu-icon');
+
+        if (toggle && menu) {
+            toggle.addEventListener('click', () => {
+                const isHidden = menu.classList.contains('hidden');
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    menu.classList.add('flex');
+                    document.body.style.overflow = 'hidden';
+                    icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"></path>'; // 切换为 X
+                } else {
+                    menu.classList.add('hidden');
+                    menu.classList.remove('flex');
+                    document.body.style.overflow = '';
+                    icon.innerHTML = '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+                }
+            });
+        }
+    }
+
+    // 兼容 ViewTransitions 的脚本初始化
+    setupMenu();
+    document.addEventListener('astro:after-swap', setupMenu);
+</script>
 </body>
 </html>

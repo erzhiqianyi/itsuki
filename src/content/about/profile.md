@@ -1,6 +1,6 @@
 ---
 name: "樹(itsuki)"
-avatar: "/assets/about/bio.jpeg"
+avatar: "/assets/about/bio.svg"
 tags:
     - "Full-stack"
     - "Minimalist"

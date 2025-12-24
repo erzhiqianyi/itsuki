@@ -4,12 +4,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_CONFIG } from '../data/site-config';
 
 /**
- * 首页 - 动态枢纽版 (V3.3)
- * 1. 个人资料与 SNS 链接
+ * 首页 - 动态枢纽版 (V4.2)
+ * 1. 英雄区顺序调整：Profile(2) + Now(1) + SNS(1) 并排布局
  * 2. 统计数据动态计算
- * 3. 抓取 Now 的最新状态
- * 4. 抓取最新 5 篇文章 (含摘要显示) 和 5 个视频，跳转路径优化
- * 5. 自动切换的精选大图轮播 (随机选 3 张)
+ * 3. 抓取最新 5 篇文章 (含摘要) 和 5 个视频
+ * 4. 自动切换的精选大图轮播
  */
 
 const currentPath = Astro.url.pathname;
@@ -23,7 +22,7 @@ const blogEntries = await getCollection('blog', ({ data }) => data.lang === lang
 const videoEntries = await getCollection('videos', ({ data }) => data.lang === lang);
 const photoEntries = await getCollection('photos', ({ data }) => data.lang === lang);
 
-// 2. 逻辑处理：排序与筛选
+// 2. 排序与筛选
 const latestPosts = blogEntries
     .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date))
     .slice(0, 5);
@@ -32,7 +31,6 @@ const latestVideos = videoEntries
     .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date))
     .slice(0, 5);
 
-// 随机选 3 张作为精选轮播大图
 const featuredPhotos = [...photoEntries]
     .sort(() => Math.random() - 0.5)
     .slice(0, 3);
@@ -55,6 +53,7 @@ const ui = {
     },
     sections: {
         now: { ja: "ナウ", en: "Now" },
+        sns: { ja: "フォロー", en: "Follow" },
         recentPosts: { ja: "最近の記事", en: "Recent Posts" },
         recentVideos: { ja: "最新の動画", en: "Latest Videos" },
         gallery: { ja: "精選ギャラリー", en: "Featured Gallery" }
@@ -64,57 +63,39 @@ const ui = {
 ---
 
 <BaseLayout title={`${profile?.data.name || 'Home'} - ${SITE_CONFIG.brand.logo}`} lang={lang}>
-    <div class="max-w-6xl mx-auto space-y-12 px-6 py-10">
+    <div class="max-w-6xl mx-auto space-y-8 px-6 py-10">
 
-        <!-- 1. Hero Section: Profile & SNS & Stats -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="md:col-span-2 bento-card bg-[#313244]/20 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-10 border border-white/5 relative overflow-hidden group">
+        <!-- 1. Hero Section: Profile(2) + Now(1) + SNS(1) -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-6 items-stretch">
+
+            <!-- Card 1: Profile (Left/Main - Spans 2) -->
+            <div class="md:col-span-2 bento-card bg-[#313244]/20 rounded-[2.5rem] p-10 flex flex-col md:flex-row items-center gap-8 border border-white/5 relative overflow-hidden group order-1">
                 <div class="absolute -right-10 -top-10 w-40 h-40 bg-accent/10 blur-[80px] rounded-full group-hover:bg-accent/20 transition-all"></div>
 
                 <div class="relative shrink-0">
                     {profile?.data.avatar && (
-                            <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 p-1 shadow-2xl relative z-10">
-                                <img src={profile.data.avatar} class="w-full h-full object-cover rounded-full" alt="Avatar" />
+                            <div class="w-32 h-32 rounded-full overflow-hidden border-2 border-white/10 p-1 shadow-2xl relative z-10 bg-[#181825]">
+                                <img
+                                        src={profile.data.avatar}
+                                        class="w-full h-full object-cover rounded-full"
+                                        alt="Avatar"
+                                        decoding="async"
+                                />
                             </div>
                     )}
-                    <!-- SNS Links -->
-                    <div class="flex justify-center gap-3 mt-4 relative z-10">
-                        {snsLinks.map(sns => (
-                                <a href={sns.url} target="_blank" class="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-all">
-                                    <span class="sr-only">{sns.platform}</span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        {sns.icon === 'github' && (
-                                                <>
-                                                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
-                                                    <path d="M9 18c-4.51 2-5-2-7-2"/>
-                                                </>
-                                        )}
-                                        {sns.icon === 'twitter' && <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>}
-                                        {sns.icon === 'instagram' && (
-                                                <>
-                                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
-                                                </>
-                                        )}
-                                    </svg>
-                                </a>
-                        ))}
-                    </div>
                 </div>
 
-                <div class="flex-1 text-center md:text-left">
-                    <h1 class="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight leading-tight italic">
+                <div class="flex-1 text-center md:text-left relative z-10">
+                    <h1 class="text-4xl font-black text-white mb-4 tracking-tight leading-tight italic">
                         {profile?.data.name || 'Itsuki'}
                     </h1>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-6">
+                    <div class="flex flex-wrap justify-center md:justify-start gap-2 mb-8">
                         {profile?.data.tags?.map(tag => (
                                 <span class="px-3 py-1 bg-white/5 rounded-full text-[10px] font-mono text-gray-400 border border-white/5 uppercase tracking-widest font-bold">
                                 # {tag}
                             </span>
                         ))}
                     </div>
-                    <!-- 动态统计 -->
                     <div class="flex items-center justify-center md:justify-start gap-8 border-t border-white/5 pt-6">
                         <div class="text-center">
                             <div class="text-2xl font-black text-white">{blogEntries.length}</div>
@@ -132,8 +113,8 @@ const ui = {
                 </div>
             </div>
 
-            <!-- 2. Now Section -->
-            <a href={isEnglish ? "/en/now" : "/now"} class="bento-card bg-green/5 hover:bg-green/10 rounded-[2.5rem] p-8 flex flex-col justify-between border border-green/10 transition-all group overflow-hidden relative text-left">
+            <!-- Card 2: Now Status (Center) -->
+            <a href={isEnglish ? "/en/now" : "/now"} class="bento-card bg-green/5 hover:bg-green/10 rounded-[2.5rem] p-8 border border-green/10 transition-all group overflow-hidden relative text-left order-2 flex flex-col justify-between">
                 <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green"><path d="M4 14.5L13 3l-1 9h8L11 21l1-9H4z"/></svg>
                 </div>
@@ -148,23 +129,56 @@ const ui = {
                     {currentNow ? (
                             <div class="space-y-2 text-left">
                                 <p class="text-[9px] text-gray-500 uppercase font-mono font-bold tracking-widest">{currentNow.data.category}</p>
-                                <h3 class="text-xl font-bold text-white group-hover:text-green transition-colors leading-tight">
+                                <h3 class="text-xl font-bold text-white group-hover:text-green transition-colors leading-tight italic">
                                     {currentNow.data.title}
                                 </h3>
                             </div>
                     ) : (
-                            <p class="text-sm text-gray-500">No recent updates.</p>
+                            <p class="text-sm text-gray-500">No updates.</p>
                     )}
                 </div>
                 <div class="flex items-center gap-2 text-[10px] font-mono font-bold text-green/60 mt-6 group-hover:translate-x-1 transition-transform">
                     {ui.viewMore[lang]} <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
                 </div>
             </a>
+
+            <!-- Card 3: SNS Links (Right) -->
+            <div class="bento-card bg-[#313244]/10 rounded-[2.5rem] p-8 border border-white/5 flex flex-col justify-between order-3">
+                <h2 class="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-gray-500 mb-6 italic text-left">
+                    {ui.sections.sns[lang]}
+                </h2>
+                <div class="flex flex-col gap-5">
+                    {snsLinks.map(sns => (
+                            <a href={sns.url} target="_blank" class="flex items-center gap-4 group transition-all">
+                                <div class="w-10 h-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 group-hover:bg-white/10 group-hover:text-white transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        {sns.icon === 'github' && (
+                                                <>
+                                                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/>
+                                                    <path d="M9 18c-4.51 2-5-2-7-2"/>
+                                                </>
+                                        )}
+                                        {sns.icon === 'twitter' && <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>}
+                                        {sns.icon === 'instagram' && (
+                                                <>
+                                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+                                                </>
+                                        )}
+                                    </svg>
+                                </div>
+                                <span class="text-xs font-bold text-white group-hover:text-accent transition-colors">{sns.platform}</span>
+                            </a>
+                    ))}
+                </div>
+            </div>
+
         </section>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-            <!-- 3. 最近文章 (Blog - 最新 5 篇，含 Summary) -->
+        <!-- 2. Blog & Videos Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Recent Posts -->
             <section class="bento-card bg-[#313244]/10 rounded-[2.5rem] p-8 border border-white/5 flex flex-col h-full text-left font-sans">
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-xs font-mono font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3 italic">
@@ -193,7 +207,7 @@ const ui = {
                 </div>
             </section>
 
-            <!-- 4. 最新视频 (Videos - 最新 5 个) -->
+            <!-- Latest Videos -->
             <section class="bento-card bg-[#313244]/10 rounded-[2.5rem] p-8 border border-white/5 flex flex-col h-full text-left">
                 <div class="flex items-center justify-between mb-8">
                     <h2 class="text-xs font-mono font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3 italic text-left">
@@ -206,7 +220,7 @@ const ui = {
                     {latestVideos.map(video => (
                             <a href={video.data.url || "#"} class="flex items-center gap-5 p-3 rounded-2xl hover:bg-white/5 transition-all group">
                                 <div class="w-20 h-12 bg-black rounded-xl overflow-hidden shrink-0 border border-white/5 relative">
-                                    <img src={video.data.image} class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" alt="" />
+                                    <img src={video.data.image} class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" alt="" decoding="async" />
                                     <div class="absolute inset-0 flex items-center justify-center">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="white" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-0 group-hover:opacity-100 transition-opacity"><path d="m9 8 6 4-6 4Z"/></svg>
                                     </div>
@@ -224,7 +238,7 @@ const ui = {
             </section>
         </div>
 
-        <!-- 5. 精选轮播大图 (Featured Gallery Carousel) -->
+        <!-- 3. Featured Gallery Carousel -->
         <section class="space-y-8">
             <div class="flex items-center justify-between">
                 <h2 class="text-xs font-mono font-black uppercase tracking-[0.4em] text-gray-500 flex items-center gap-3 italic text-left">
@@ -234,7 +248,6 @@ const ui = {
                 <a href={isEnglish ? "/en/photos" : "/photos"} class="text-[10px] font-mono font-black text-gray-600 hover:text-white transition-colors uppercase tracking-widest">{ui.viewMore[lang]} →</a>
             </div>
 
-            <!-- 轮播容器 -->
             <div class="relative w-full aspect-[21/9] md:aspect-[3/1] rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#181825] shadow-2xl group">
                 {featuredPhotos.map((photo, index) => (
                         <div
@@ -245,18 +258,17 @@ const ui = {
                                     src={photo.data.image}
                                     class="w-full h-full object-cover"
                                     alt={photo.data.title[lang]}
+                                    decoding="async"
                             />
-                            <!-- 信息遮罩层 -->
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-10 flex flex-col justify-end text-left">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent p-10 flex flex-col justify-end text-left">
                                 <div class="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-700">
-                                    <p class="text-[10px] font-mono text-pink font-black uppercase tracking-[0.3em] mb-2">{photo.data.location_tag} • {photo.data.date}</p>
-                                    <h3 class="text-2xl md:text-3xl font-black text-white italic tracking-tight">{photo.data.title[lang]}</h3>
+                                    <p class="text-[10px] font-mono text-pink font-black uppercase tracking-[0.3em] mb-2 drop-shadow-sm">{photo.data.location_tag} • {photo.data.date}</p>
+                                    <h3 class="text-2xl md:text-3xl font-black text-white italic tracking-tight drop-shadow-md">{photo.data.title[lang]}</h3>
                                 </div>
                             </div>
                         </div>
                 ))}
 
-                <!-- 轮播指示器 -->
                 <div class="absolute bottom-8 right-10 z-20 flex gap-2">
                     {featuredPhotos.map((_, index) => (
                             <div class={`slide-dot w-2 h-2 rounded-full border border-white/20 transition-all duration-500 ${index === 0 ? 'bg-pink w-6 border-pink' : 'bg-white/20'}`} data-index={index}></div>
@@ -287,10 +299,9 @@ const ui = {
 
         let currentIndex = 0;
         const totalSlides = slides.length;
-        const intervalTime = 5000; // 每 5 秒切换一次
+        const intervalTime = 5000;
 
         function goToSlide(nextIndex: number) {
-            // 隐藏当前页
             const currentSlide = slides[currentIndex] as HTMLElement;
             const currentDot = dots[currentIndex] as HTMLElement;
             currentSlide.classList.replace('opacity-100', 'opacity-0');
@@ -298,7 +309,6 @@ const ui = {
             currentDot.classList.remove('bg-pink', 'w-6', 'border-pink');
             currentDot.classList.add('bg-white/20');
 
-            // 显示下一页
             currentIndex = nextIndex;
             const nextSlide = slides[currentIndex] as HTMLElement;
             const nextDot = dots[currentIndex] as HTMLElement;
@@ -315,8 +325,7 @@ const ui = {
 
         let slideInterval = setInterval(autoPlay, intervalTime);
 
-        // 鼠标悬停时暂停
-        const container = document.querySelector('.group'); // 指轮播大容器
+        const container = document.querySelector('.group');
         if (container) {
             container.addEventListener('mouseenter', () => clearInterval(slideInterval));
             container.addEventListener('mouseleave', () => slideInterval = setInterval(autoPlay, intervalTime));
