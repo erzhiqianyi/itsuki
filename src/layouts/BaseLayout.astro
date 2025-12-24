@@ -1,21 +1,28 @@
 ---
-// 修复：确保从 site-config 准确获取主题色和配置
 import { SITE_CONFIG, t } from '../data/site-config';
-import { ViewTransitions } from 'astro:transitions'; // 增加视图过渡以实现 1:1 的平滑感
+import { ClientRouter } from 'astro:transitions'; // Astro 5.0 推荐写法
 
 interface Props {
     title?: string;
     description?: string;
+    image?: string;    // 分享预览图
+    article?: boolean; // 是否为文章页
     lang?: 'ja' | 'en';
 }
 
 const {
     lang = 'ja',
     title = SITE_CONFIG.brand.logo,
+    article = false,
 } = Astro.props;
 
+// SEO 逻辑
 const configDescription = SITE_CONFIG.brand.description[lang] || "";
 const description = Astro.props.description || configDescription;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://erzhiqian.cc');
+const ogImage = new URL(Astro.props.image || '/og-default.jpg', Astro.url);
+const siteTitle = title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`;
+
 const { colors } = SITE_CONFIG.theme;
 const currentPath = Astro.url.pathname;
 ---
@@ -28,14 +35,26 @@ const currentPath = Astro.url.pathname;
     <link rel="icon" type="image/svg+xml" href={SITE_CONFIG.brand.favicon} />
     <meta name="generator" content={Astro.generator} />
 
-    <title>{title}</title>
+    <title>{siteTitle}</title>
+    <meta name="title" content={siteTitle} />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:url" content={Astro.url} />
+    <meta property="og:title" content={siteTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content={siteTitle} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={ogImage} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
-    <ViewTransitions />
+    <ClientRouter />
 </head>
 <body class="min-h-screen flex flex-col font-sans selection:bg-[#89b4fa]/30 bg-[#1e1e2e] text-[#cdd6f4] antialiased">
 
@@ -49,34 +68,20 @@ const currentPath = Astro.url.pathname;
         <div class="hidden md:flex items-center gap-8">
             <nav class="flex gap-8 text-[13px] font-medium text-[#bac2de]">
                 {SITE_CONFIG.navigation.map((item) => (
-                        <a
-                                href={lang === 'en' ? `/en${item.href}`.replace(/\/$/, '') : item.href}
-                                class={`transition-all duration-300 hover:text-white relative group py-2`}
-                        >
+                        <a href={lang === 'en' ? `/en${item.href}`.replace(/\/$/, '') : item.href} class="transition-all duration-300 hover:text-white relative group py-2">
                             {item.label[lang]}
                             <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#89b4fa] transition-all duration-300 group-hover:w-full"></span>
                         </a>
                 ))}
             </nav>
-
             <div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10 ml-2">
-                <a href={lang === 'en' ? (currentPath.replace(/^\/en/, '') || '/') : currentPath}
-                   class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>
-                    JA
-                </a>
-                <a href={lang === 'ja' ? (`/en${currentPath === '/' ? '' : currentPath}`) : currentPath}
-                   class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>
-                    EN
-                </a>
+                <a href={lang === 'en' ? (currentPath.replace(/^\/en/, '') || '/') : currentPath} class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>JA</a>
+                <a href={lang === 'ja' ? (`/en${currentPath === '/' ? '' : currentPath}`) : currentPath} class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>EN</a>
             </div>
         </div>
 
-        <button id="menu-toggle" class="md:hidden p-2 text-[#a6adc8] hover:text-white transition-colors" aria-label="Toggle Menu">
-            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="3" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-            </svg>
+        <button id="menu-toggle" class="md:hidden p-2 text-[#a6adc8] hover:text-white transition-colors">
+            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
     </div>
 </header>
@@ -84,14 +89,8 @@ const currentPath = Astro.url.pathname;
 <div id="mobile-menu" class="fixed inset-0 z-[90] bg-[#1e1e2e] hidden flex-col items-center justify-center pt-16">
     <nav class="flex flex-col items-center gap-8 text-xl font-bold">
         {SITE_CONFIG.navigation.map((item) => (
-                <a href={lang === 'en' ? `/en${item.href}` : item.href} class="text-[#cdd6f4] hover:text-[#89b4fa] transition-colors">
-                    {item.label[lang]}
-                </a>
+                <a href={lang === 'en' ? `/en${item.href}` : item.href} class="text-[#cdd6f4] hover:text-[#89b4fa] transition-colors">{item.label[lang]}</a>
         ))}
-        <div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10 mt-8">
-            <a href="/" class="px-6 py-2 text-sm font-bold rounded-full text-white">JA</a>
-            <a href="/en" class="px-6 py-2 text-sm font-bold rounded-full text-[#a6adc8]">EN</a>
-        </div>
     </nav>
 </div>
 
@@ -101,15 +100,13 @@ const currentPath = Astro.url.pathname;
 
 <footer class="mt-12 text-center text-xs font-mono pb-12 flex flex-col items-center gap-6">
     <div class="flex items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-[#585b70]">
-        <a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[#89b4fa] transition-all border-b border-transparent hover:border-[#89b4fa] pb-1">{t('prev', lang)}</a>
+        <a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[#89b4fa] transition-all">{t('prev', lang)}</a>
         <span class="opacity-20">/</span>
-        <a href={SITE_CONFIG.brand.webring.home} target="_blank" class="hover:text-white transition font-bold text-[#7f849c]">{SITE_CONFIG.brand.webring.label}</a>
+        <a href={SITE_CONFIG.brand.webring.home} target="_blank" class="hover:text-white transition font-bold">{SITE_CONFIG.brand.webring.label}</a>
         <span class="opacity-20">/</span>
-        <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[#89b4fa] transition-all border-b border-transparent hover:border-[#89b4fa] pb-1">{t('next', lang)}</a>
+        <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[#89b4fa] transition-all">{t('next', lang)}</a>
     </div>
-    <div class="text-[#6c7086] opacity-80">
-        {SITE_CONFIG.brand.footer} • <span class="text-[#f5e0dc]">{t('builtWith', lang)}</span>
-    </div>
+    <div class="text-[#6c7086] opacity-80">{SITE_CONFIG.brand.footer} • <span class="text-[#f5e0dc]">{t('builtWith', lang)}</span></div>
 </footer>
 
 <style is:global define:vars={{
@@ -125,22 +122,17 @@ const currentPath = Astro.url.pathname;
 }}>
     :root {
         --bg: #1e1e2e;
-        --card: #181825; /* 调整为更深一点的底色以对齐 Demo */
+        --card: #181825;
         --accent-rgb: 137, 180, 250;
     }
-
     html, body {
         background-color: var(--bg);
         color: var(--text);
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-        /* 修复：优先使用 Inter，确保 1:1 的排版视觉 */
+        margin: 0; padding: 0;
         font-family: 'Inter', 'Noto Sans JP', sans-serif;
         -webkit-font-smoothing: antialiased;
     }
-
-    /* Bento Card 1:1 像素级复刻 */
+    /* 修复 Unknown Word：直接使用标准 CSS */
     .bento-card {
         position: relative;
         transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -148,50 +140,30 @@ const currentPath = Astro.url.pathname;
         background: linear-gradient(145deg, rgba(30, 30, 46, 0.6), rgba(24, 24, 37, 0.8));
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        border-radius: 2rem; /* 复刻设计稿的大圆角 */
+        border-radius: 2.5rem;
     }
-
     .bento-card:hover {
         transform: translateY(-8px);
-        border-color: rgba(var(--accent-rgb), 0.3);
+        border-color: rgba(137, 180, 250, 0.3);
         box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
     }
-
-    /* 文字装饰 */
-    h1, h2, h3 {
-        letter-spacing: -0.02em;
-    }
-
-    .scroller::-webkit-scrollbar { width: 5px; }
-    .scroller::-webkit-scrollbar-thumb { background: #313244; border-radius: 10px; }
 </style>
 
 <script>
-    // 处理移动端菜单切换逻辑
     function setupMenu() {
         const toggle = document.getElementById('menu-toggle');
         const menu = document.getElementById('mobile-menu');
         const icon = document.getElementById('menu-icon');
-
         if (toggle && menu) {
-            toggle.addEventListener('click', () => {
+            toggle.onclick = () => {
                 const isHidden = menu.classList.contains('hidden');
-                if (isHidden) {
-                    menu.classList.remove('hidden');
-                    menu.classList.add('flex');
-                    document.body.style.overflow = 'hidden';
-                    icon.innerHTML = '<path d="M18 6L6 18M6 6l12 12"></path>'; // 切换为 X
-                } else {
-                    menu.classList.add('hidden');
-                    menu.classList.remove('flex');
-                    document.body.style.overflow = '';
-                    icon.innerHTML = '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
-                }
-            });
+                menu.classList.toggle('hidden', !isHidden);
+                menu.classList.toggle('flex', isHidden);
+                document.body.style.overflow = isHidden ? 'hidden' : '';
+                icon.innerHTML = isHidden ? '<path d="M18 6L6 18M6 6l12 12"></path>' : '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+            };
         }
     }
-
-    // 兼容 ViewTransitions 的脚本初始化
     setupMenu();
     document.addEventListener('astro:after-swap', setupMenu);
 </script>

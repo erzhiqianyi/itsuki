@@ -1,0 +1,187 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { SITE_CONFIG } from '../../../data/site-config';
+
+export async function getStaticPaths({ paginate }) {
+    const lang = 'ja';
+    const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
+
+    // 1. 获取所有唯一的分类（转为小写以确保匹配）
+    const categories = [...new Set(allPosts.map(post => post.data.category.toLowerCase()))];
+
+    // 2. 为每个分类生成分页
+    return categories.flatMap((category) => {
+        const filteredPosts = allPosts
+            .filter(post => post.data.category.toLowerCase() === category)
+            .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
+
+        return paginate(filteredPosts, {
+            params: { category },
+            pageSize: 3, // 保持一致，每页3篇方便测试
+        });
+    });
+}
+
+const { page } = Astro.props;
+const { category } = Astro.params;
+const lang = 'ja';
+
+// --- 侧边栏静态数据 (需要全量数据来计算) ---
+const allPostsForSidebar = await getCollection('blog', ({ data }) => data.lang === lang);
+const categoryCounts = allPostsForSidebar.reduce((acc, post) => {
+    const cat = post.data.category;
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+}, {});
+
+const dynamicCategories = Object.entries(categoryCounts).map(([label, count]) => ({
+    id: label.toLowerCase(),
+    label,
+    count
+}));
+
+const featuredPosts = allPostsForSidebar.filter(post => post.data.featured).slice(0, 3);
+
+// --- 分页连续页码计算 ---
+const totalPages = page.lastPage;
+const currentPage = page.currentPage;
+const maxVisiblePages = 3;
+let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+if (endPage - startPage + 1 < maxVisiblePages) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+}
+const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
+
+const blogUI = {
+    search: { ja: "検索", en: "Search" },
+    categories: { ja: "カテゴリー", en: "Categories" },
+    featured: { ja: "おすすめ", en: "Featured" },
+    allPosts: { ja: "すべての記事", en: "All Posts" },
+    readMore: { ja: "詳しく見る", en: "Read More" }
+};
+---
+
+<BaseLayout title={`${category.toUpperCase()} - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <aside class="space-y-6 order-2 lg:order-1 text-left">
+            <div class="bento-card rounded-3xl p-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    {blogUI.search[lang]}
+                </h3>
+                <input type="text" id="search-input" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--accent)]/50 transition-all" placeholder="Search posts..." />
+            </div>
+
+            <div class="bento-card rounded-3xl p-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--green)] mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/></svg>
+                    {blogUI.categories[lang]}
+                </h3>
+                <div class="space-y-1">
+                    {dynamicCategories.map(cat => (
+                            <a
+                                    href={`/category/${cat.id}`}
+                                    class={`w-full flex justify-between items-center px-4 py-2 rounded-xl transition-all hover:bg-white/5 group ${cat.id === category ? 'bg-white/10 text-white' : 'text-[var(--subtext)]'}`}
+                            >
+                                <span class="text-sm font-semibold group-hover:text-white transition-colors">{cat.label}</span>
+                                <span class="text-[10px] font-mono opacity-40 group-hover:opacity-100">{cat.count}</span>
+                            </a>
+                    ))}
+                </div>
+            </div>
+
+            {featuredPosts.length > 0 && (
+                    <div class="bento-card rounded-3xl p-6">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--peach)] mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+                            {blogUI.featured[lang]}
+                        </h3>
+                        <div class="space-y-4">
+                            {featuredPosts.map(post => (
+                                    <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="flex gap-4 group">
+                                        <div class="w-14 h-14 rounded-2xl bg-[#181825] overflow-hidden shrink-0 border border-white/5">
+                                            <img src={post.data.coverImage} class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition duration-700" alt="" />
+                                        </div>
+                                        <div class="min-w-0 flex flex-col justify-center">
+                                            <h4 class="text-[12px] font-bold text-white group-hover:text-[var(--accent)] transition truncate mb-1">{post.data.title}</h4>
+                                            <span class="text-[9px] font-mono text-gray-500">{post.data.date}</span>
+                                        </div>
+                                    </a>
+                            ))}
+                        </div>
+                    </div>
+            )}
+        </aside>
+
+        <div class="lg:col-span-3 space-y-6 order-1 lg:order-2">
+            <div class="flex justify-between items-center px-2">
+                <h2 class="text-xl font-bold text-white flex items-center gap-3">
+          <span class="text-[var(--accent)] bg-[var(--accent)]/10 px-3 py-1 rounded-lg border border-[var(--accent)]/20 uppercase tracking-widest text-xs font-mono">
+            {category}
+          </span>
+                    {blogUI.allPosts[lang]}
+                </h2>
+            </div>
+
+            <div class="space-y-6 min-h-[500px]">
+                {page.data.map((post) => (
+                        <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="bento-card rounded-[2.5rem] overflow-hidden flex flex-col sm:flex-row group w-full items-stretch min-h-[280px]">
+                            <div class="sm:w-80 w-full h-64 sm:h-auto shrink-0 relative border-r border-white/5 overflow-hidden bg-[#181825]">
+                                <img src={post.data.coverImage} class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-[1.5s]" alt={post.data.title} />
+                            </div>
+                            <div class="p-8 md:p-10 flex flex-col justify-between flex-1 text-left">
+                                <div>
+                                    <div class="flex items-center gap-4 mb-4 text-[10px] font-mono font-bold uppercase tracking-wider">
+                                        <span class="text-[var(--accent)]">{post.data.category}</span>
+                                        <span class="text-gray-500">{post.data.date}</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-[var(--accent)] transition duration-300 leading-tight">
+                                        {post.data.title}
+                                    </h3>
+                                    <p class="text-[14px] text-[var(--subtext)] line-clamp-3">
+                                        {post.data.summary}
+                                    </p>
+                                </div>
+                                <div class="mt-8 pt-6 border-t border-white/5 flex justify-end items-center">
+                <span class="text-[var(--accent)] font-black flex items-center gap-2 text-[10px] uppercase tracking-widest group-hover:translate-x-2 transition-transform">
+                  {blogUI.readMore[lang]}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </span>
+                                </div>
+                            </div>
+                        </a>
+                ))}
+            </div>
+
+            <div class="flex justify-center items-center gap-2 pt-12">
+                {page.url.prev ? (
+                        <a href={page.url.prev} class="p-3 text-[var(--subtext)] hover:text-white transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                        </a>
+                ) : (
+                        <div class="p-3 text-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></div>
+                )}
+
+                {visiblePages.map((num) => (
+                        <a
+                                href={num === 1 ? `/category/${category}` : `/category/${category}/${num}`}
+                                class={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all duration-300 text-sm font-bold ${num === currentPage ? 'bg-[var(--accent)] text-[#1e1e2e] border-[var(--accent)] shadow-lg scale-110 font-black' : 'border-white/5 text-[var(--subtext)] hover:bg-white/5'}`}
+                        >
+                            {num}
+                        </a>
+                ))}
+
+                {page.url.next ? (
+                        <a href={page.url.next} class="p-3 text-[var(--subtext)] hover:text-white transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                        </a>
+                ) : (
+                        <div class="p-3 text-white/10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+                )}
+            </div>
+        </div>
+    </div>
+</BaseLayout>
