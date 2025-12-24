@@ -4,10 +4,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_CONFIG } from '../data/site-config';
 
 /**
- * 首页 - 像素级 Bento 还原版 (V17.0)
- * 1. 配置驱动：水印文字从 brand.watermark 动态读取，拒绝硬编码
- * 2. 高对比度：Summary(85%)、Philosophy(90%)、Dates(55%) 确保阅读无障碍
- * 3. 结构：左侧 (3+7=10) vs 右侧 (1+3+4+2=10) 实现错位平衡
+ * 首页 - 像素级 Bento 还原版 (V25.0)
+ * 1. 画廊高度优化：Gallery 减至 row-span-4，比例更像传统相框
+ * 2. 布局平衡：左侧总高 (2+7=9) 对齐右侧总高 (1+2+4+2=9)
+ * 3. 统计色彩：文字颜色同步频道色，提升显眼度
+ * 4. 修复：YouTube 图标及画廊标题对象映射
  */
 
 const currentPath = Astro.url.pathname;
@@ -32,44 +33,49 @@ const allDates = [
     ...photoEntries.map(e => Date.parse(e.data.date)),
     ...videoEntries.map(e => Date.parse(e.data.date))
 ].filter(Boolean);
-const latestDate = allDates.length > 0 ? new Date(Math.max(...allDates)).toISOString().split('T')[0] : "2025-01-01";
+const latestDate = allDates.length > 0 ? new Date(Math.max(...allDates)).toISOString().split('T')[0] : "2025-12-25";
 
 // 3. 配置映射
 const { brand, profile, ui, navigation, socials } = SITE_CONFIG;
 const getLink = (path: string) => isEnglish ? `/en${path}` : path;
 const getBlogHref = (id: string) => getLink(`/blog/${id.replace(/\.(md|mdx)$/, '')}`);
 
+// 统计组
 const statGroups = [
     {
         id: 'blog',
         link: getLink('/blog'),
-        color: 'hover:bg-[#fab387]/10 border-[#fab387]/20 text-[#fab387]',
+        themeColor: 'text-[#fab387]',
+        bgColor: 'hover:bg-[#fab387]/10 border-[#fab387]/20',
         icon: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/>',
         label: ui.headings.blog[lang],
-        primaryValue: blogEntries.length,
-        secondaryValue: `${formattedWords} ${ui.labels.words?.[lang] || 'Words'}`
+        value: blogEntries.length,
+        extra: `${formattedWords}`
     },
     {
         id: 'photos',
         link: getLink('/photos'),
-        color: 'hover:bg-[#89b4fa]/10 border-[#89b4fa]/20 text-[#89b4fa]',
+        themeColor: 'text-[#89b4fa]',
+        bgColor: 'hover:bg-[#89b4fa]/10 border-[#89b4fa]/20',
         icon: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
         label: ui.headings.photos[lang],
-        primaryValue: photoEntries.length,
-        secondaryValue: null
+        value: photoEntries.length,
+        extra: null
     },
     {
         id: 'videos',
         link: getLink('/videos'),
-        color: 'hover:bg-[#f38ba8]/10 border-[#f38ba8]/20 text-[#f38ba8]',
+        themeColor: 'text-[#f38ba8]',
+        bgColor: 'hover:bg-[#f38ba8]/10 border-[#f38ba8]/20',
         icon: '<path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/>',
         label: ui.headings.youtube[lang],
-        primaryValue: videoEntries.length,
-        secondaryValue: null
+        value: videoEntries.length,
+        extra: null
     }
 ];
 
-const latestPosts = blogEntries.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date)).slice(0, 8);
+// 筛选内容 (Blog 展示 9 篇以适配 7层高度)
+const latestPosts = blogEntries.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date)).slice(0, 9);
 const latestVideos = videoEntries.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date)).slice(0, 2);
 const featuredPhotos = photoEntries.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date)).slice(0, 5);
 const currentNow = nowEntries.find(e => e.data.type === 'status');
@@ -77,7 +83,7 @@ const nowLabel = navigation.find(n => n.id === 'nav-now')?.label[lang] || "Now";
 
 const ICON_MAP: Record<string, string> = {
     github: '<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.28 1.15-.28 2.35 0 3.5-.73 1.02-1.08 2.25-1 3.5 0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/>',
-    youtube: '<path d="M22 12s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>',
+    youtube: '<path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/>',
     instagram: '<rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>'
 };
 ---
@@ -86,124 +92,115 @@ const ICON_MAP: Record<string, string> = {
     <main class="max-w-6xl mx-auto px-6 pt-4 pb-20 text-left">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-5 md:auto-rows-[120px]">
 
-            <section class="md:col-span-8 md:row-span-3 bento-card bg-[#313244]/15 rounded-[2.5rem] p-8 md:p-10 flex flex-col border border-white/5 relative overflow-hidden group">
+            <section class="md:col-span-8 md:row-span-2 bento-card bg-[#313244]/15 rounded-[2.5rem] p-8 md:p-10 flex flex-col border border-white/5 relative overflow-hidden group">
                 <div class="absolute inset-0 z-0 flex items-center justify-center text-[11rem] font-black italic text-white/[0.02] select-none pointer-events-none uppercase tracking-tighter leading-none -rotate-12">
                     {brand.watermark}
                 </div>
 
-                <div class="relative z-10 flex-1 flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center gap-5 mb-4">
-                            <div class="w-14 h-14 md:w-16 md:h-16 rounded-2xl overflow-hidden border border-white/10 bg-[#1e1e2e] shrink-0 group-hover:scale-105 transition-transform duration-500">
-                                <img src={profile.avatar} alt="Avatar" class="w-full h-full object-cover" />
-                            </div>
-                            <div class="space-y-0.5 text-left">
-                                <div class="flex items-center gap-2">
-                                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span></span>
-                                    <span class="text-[8px] font-bold text-white/40 uppercase tracking-[0.3em] font-mono">{ui.labels.statusActive?.[lang] || "Status: Active"}</span>
+                <div class="relative z-10 flex flex-row gap-8 h-full">
+                    <a href={getLink('/about')} class="flex-1 flex flex-col justify-between h-full min-w-0 text-left hover:bg-white/[0.02] -m-4 p-4 rounded-[2rem] transition-all group/intro">
+                        <div>
+                            <div class="flex items-center gap-5 mb-4 text-left">
+                                <div class="w-16 h-16 rounded-2xl overflow-hidden border border-white/10 bg-[#1e1e2e] shrink-0 shadow-2xl group-hover/intro:scale-105 transition-transform duration-500">
+                                    <img src={profile.avatar} alt="Avatar" class="w-full h-full object-cover" />
                                 </div>
-                                <h1 class="text-3xl md:text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{profile.intro[lang]}</h1>
+                                <div class="space-y-0.5 text-left">
+                                    <div class="flex items-center gap-2">
+                                        <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span></span>
+                                        <span class="text-[9px] font-bold text-white/40 uppercase tracking-[0.3em] font-mono">{ui.labels.statusActive?.[lang]}</span>
+                                    </div>
+                                    <h1 class="text-4xl font-black text-white italic tracking-tighter leading-none group-hover/intro:text-[var(--peach)] transition-colors">{profile.intro[lang]}</h1>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 text-left">
+                                {profile.roles.map(role => (
+                                        <span class={`px-2.5 py-0.5 bg-white/5 rounded-full text-[9px] font-mono border border-white/10 uppercase tracking-widest font-black ${role.color}`}># {role.label[lang]}</span>
+                                ))}
                             </div>
                         </div>
 
-                        <div class="flex flex-wrap gap-2 mb-4 text-left">
-                            {profile.roles.map(role => (
-                                    <span class={`px-2.5 py-0.5 bg-white/5 rounded-full text-[9px] font-mono border border-white/10 uppercase tracking-widest font-black ${role.color}`}># {role.label[lang]}</span>
-                            ))}
+                        <div class="mt-4 text-left">
+                            <p class="max-w-xl text-white/90 text-sm md:text-base leading-relaxed font-medium italic">{profile.philosophy[lang]}</p>
+                            <div class="flex items-center gap-3 mt-3">
+                                <div class="h-px w-8 bg-white/10"></div>
+                                <span class="text-[9px] font-mono font-bold text-white/30 uppercase tracking-widest">{ui.labels.updated[lang]}: {latestDate}</span>
+                            </div>
                         </div>
-                    </div>
+                    </a>
 
-                    <div class="flex-1 flex flex-col justify-center py-2 text-left">
-                        <p class="max-w-xl text-white/90 text-sm md:text-base leading-relaxed font-medium italic mb-3">
-                            {profile.philosophy[lang]}
-                        </p>
-                        <div class="flex items-center gap-3 border-l-2 border-[var(--peach)]/50 pl-4 py-0.5 text-[9px] font-mono font-bold text-white/50 uppercase tracking-widest leading-none">
-                            <span>{ui.labels.updated[lang]}: {latestDate}</span>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 border-t border-white/5 pt-4">
+                    <div class="hidden md:flex w-56 flex-col divide-y divide-white/5 justify-center">
                         {statGroups.map((group) => (
-                                <a href={group.link} class={`flex items-center gap-3 p-3.5 rounded-[1.5rem] border transition-all duration-300 group/stat ${group.color}`}>
-                                    <div class="w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center shrink-0 group-hover/stat:scale-110 transition-transform">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" set:html={group.icon} />
-                                    </div>
-                                    <div class="flex flex-col text-left leading-none">
-                                        <div class="flex items-baseline gap-1.5 mb-0.5">
-                                            <span class="text-xl font-black italic text-white leading-none">{group.primaryValue}</span>
-                                            {group.secondaryValue && <span class="text-[8px] font-mono font-bold text-white/50 uppercase">{group.secondaryValue.split(' ')[0]}</span>}
+                                <a href={group.link} class={`flex items-center justify-between px-4 py-3 first:rounded-t-2xl last:rounded-b-2xl bg-white/5 transition-all group/stat ${group.bgColor}`}>
+                                    <div class="flex items-center gap-3">
+                                        <div class={`w-7 h-7 flex items-center justify-center ${group.themeColor} opacity-70 group-hover/stat:opacity-100 transition-all`}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" set:html={group.icon} />
                                         </div>
-                                        <span class="text-[8px] font-mono font-bold uppercase tracking-widest text-white/40 leading-none">{group.label}</span>
+                                        <span class={`text-[10px] font-mono font-bold uppercase tracking-wider ${group.themeColor} opacity-60 group-hover/stat:opacity-90 transition-all leading-none`}>
+                                        {group.label}
+                                    </span>
+                                    </div>
+                                    <div class="text-right leading-none">
+                                        <span class="text-lg font-black italic text-white block leading-none">{group.value}</span>
+                                        {group.extra && <span class={`text-[8px] font-mono ${group.themeColor} opacity-50 mt-1 block`}>{group.extra}</span>}
                                     </div>
                                 </a>
                         ))}
                     </div>
                 </div>
-
-                <a href={getLink('/about')} class="absolute top-8 right-8 z-20 w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-[var(--peach)] hover:bg-white/10 hover:border-[var(--peach)]/30 transition-all duration-300 group/about shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover/about:rotate-45 transition-transform"><path d="M7 7l10 10M17 7H7v10"/></svg>
-                </a>
             </section>
 
             <a href={getLink('/now')} class="md:col-span-4 md:row-span-1 bento-card bg-green-400/5 hover:bg-green-400/10 rounded-[2.5rem] p-8 border border-green-400/10 transition-all group flex flex-col justify-center text-left">
-                <h2 class="text-xl font-black text-white italic tracking-tighter uppercase mb-1 flex items-center gap-2 leading-none text-left">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-green-400"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                <h2 class="text-lg font-black text-white italic tracking-tighter uppercase mb-1 flex items-center gap-2 leading-none text-left">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-green-400"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                     {nowLabel}
                 </h2>
-                <h3 class="text-lg font-bold text-white/70 italic leading-none truncate">{currentNow?.data.title || "Exploring"}</h3>
+                <h3 class="text-base font-bold text-white/70 italic leading-none truncate text-left">{currentNow?.data.title || "Exploring"}</h3>
             </a>
 
-            <section class="md:col-span-4 md:row-span-3 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 p-8 flex flex-col group relative text-left">
-                <div class="flex justify-between items-center mb-6 relative z-10 text-left">
-                    <h2 class="text-xl font-black text-white italic tracking-tighter uppercase flex items-center gap-2 leading-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-red-400"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
+            <section class="md:col-span-4 md:row-span-2 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 p-6 flex flex-col group relative text-left">
+                <div class="flex justify-between items-center mb-4 relative z-10 text-left">
+                    <h2 class="text-lg font-black text-white italic tracking-tighter uppercase flex items-center gap-2 leading-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-red-400"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>
                         {ui.headings.youtube[lang]}
                     </h2>
-                    <a href={getLink('/videos')} class="bg-red-400 p-2 rounded-full text-[#1e1e2e] group-hover:rotate-45 transition-transform duration-500 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-                    </a>
+                    <a href={getLink('/videos')} class="bg-red-400 p-1.5 rounded-full text-[#1e1e2e] group-hover:rotate-45 transition-transform duration-500 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
                 </div>
-                <div class="space-y-3 flex-1 overflow-hidden">
+                <div class="divide-y divide-white/5 flex-1 overflow-hidden text-left">
                     {latestVideos.map(video => (
-                            <a href={video.data.url} target="_blank" class="bg-white/5 p-3 rounded-2xl flex items-center gap-4 hover:bg-white/10 transition-all border border-white/5 group/v text-left">
-                                <div class="w-16 h-12 bg-black rounded-lg overflow-hidden shrink-0 relative border border-white/5">
-                                    <img src={video.data.image} class="w-full h-full object-cover opacity-90 group-hover/v:opacity-100 transition-opacity" alt="" />
+                            <a href={video.data.url} target="_blank" class="py-2.5 flex items-center gap-3 hover:bg-white/[0.03] transition-all px-2 -mx-2 rounded-xl group/v">
+                                <div class="w-14 h-10 bg-black rounded-lg overflow-hidden shrink-0 relative">
+                                    <img src={video.data.image} class="w-full h-full object-cover opacity-80 group-hover/v:opacity-100 transition-opacity" alt="" />
                                 </div>
-                                <div class="min-w-0 text-left">
-                                    <h4 class="text-[11px] font-bold text-white truncate group-hover/v:text-red transition-colors leading-tight font-bold">{video.data.title}</h4>
-                                    <span class="text-[9px] font-mono text-white/55 mt-1 block uppercase leading-none font-bold">{video.data.duration}</span>
-                                </div>
+                                <h4 class="text-[11px] font-bold text-white truncate leading-tight group-hover/v:text-red-400 transition-colors text-left">{video.data.title}</h4>
                             </a>
                     ))}
                 </div>
             </section>
 
-            <section class="md:col-span-8 md:row-span-7 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 p-8 flex flex-col group overflow-hidden text-left relative">
-                <div class="flex justify-between items-center mb-6 text-left relative z-10">
-                    <h2 class="text-xl font-black text-white italic tracking-tighter uppercase flex items-center gap-2 leading-none text-left">
+            <section class="md:col-span-8 md:row-span-7 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 p-8 flex flex-col group overflow-hidden text-left relative text-left">
+                <div class="flex justify-between items-center mb-6 relative z-10 text-left">
+                    <h2 class="text-xl font-black text-white italic tracking-tighter uppercase flex items-center gap-2 leading-none">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-[var(--peach)]"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/><path d="M8 7h6"/><path d="M8 11h8"/></svg>
                         {ui.headings.blog[lang]}
                     </h2>
-                    <a href={getLink('/blog')} class="bg-[var(--peach)] p-2 rounded-full text-[#1e1e2e] group-hover:rotate-45 transition-transform duration-500 shadow-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg>
-                    </a>
+                    <a href={getLink('/blog')} class="bg-[var(--peach)] p-2 rounded-full text-[#1e1e2e] group-hover:rotate-45 transition-transform duration-500 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14m-7-7 7 7-7 7"/></svg></a>
                 </div>
-                <div class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar text-left">
+                <div class="space-y-1 divide-y divide-white/5 flex-1 overflow-y-auto pr-2 custom-scrollbar text-left">
                     {latestPosts.map(post => (
-                            <a href={getBlogHref(post.id)} class="flex gap-5 p-4 rounded-[2rem] hover:bg-white/[0.03] transition-all border border-transparent hover:border-white/5 group/item items-start">
-                                <div class="w-24 h-16 md:w-28 md:h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/5 shrink-0 relative">
+                            <a href={getBlogHref(post.id)} class="flex gap-5 py-5 first:pt-0 last:pb-0 hover:bg-white/[0.02] transition-all px-4 -mx-4 group/item items-start text-left">
+                                <div class="w-24 h-16 md:w-28 md:h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/5 shrink-0 relative shadow-lg">
                                     {post.data.cover ? (
-                                            <img src={post.data.cover} alt={post.data.title} class="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity" />
+                                            <img src={post.data.cover} alt={post.data.title} class="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500" />
                                     ) : (
                                             <div class="w-full h-full flex items-center justify-center text-white/30 italic font-mono text-[10px] uppercase leading-none">{ui.labels.noCover[lang]}</div>
                                     )}
                                 </div>
                                 <div class="flex-1 min-w-0 text-left">
-                                    <div class="flex items-center justify-between mb-2 leading-none">
+                                    <div class="flex items-center justify-between mb-2 leading-none text-left">
                                         <h4 class="text-base font-bold text-white group-hover/item:text-[var(--peach)] transition-colors truncate pr-4 leading-tight">{post.data.title}</h4>
                                         <span class="text-[9px] font-mono text-white/55 font-bold uppercase shrink-0 leading-none">{post.data.date}</span>
                                     </div>
-                                    {post.data.summary && <p class="text-sm text-white/85 line-clamp-2 leading-relaxed mt-2 text-left">{post.data.summary}</p>}
+                                    {post.data.summary && <p class="text-sm text-white/85 line-clamp-2 leading-relaxed text-left">{post.data.summary}</p>}
                                 </div>
                             </a>
                     ))}
@@ -211,7 +208,7 @@ const ICON_MAP: Record<string, string> = {
             </section>
 
             <div class="md:col-span-4 md:row-span-4 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 flex flex-col group relative overflow-hidden text-left">
-                <div class="p-8 flex justify-between items-center relative z-20 bg-gradient-to-b from-[#1e1e2e]/80 to-transparent">
+                <div class="p-8 flex justify-between items-center relative z-20 bg-gradient-to-b from-[#1e1e2e]/90 to-transparent text-left">
                     <h2 class="text-xl font-black text-white italic tracking-tighter uppercase leading-none flex items-center gap-2 text-left">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-[#89b4fa]"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
                         {ui.headings.photos[lang]}
@@ -223,25 +220,27 @@ const ICON_MAP: Record<string, string> = {
                 <div class="absolute inset-0 z-10 carousel-container">
                     {featuredPhotos.map((photo, index) => (
                             <div class={`absolute inset-0 transition-opacity duration-1000 ease-in-out carousel-slide ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
-                                <img src={photo.data.image} class="w-full h-full object-cover transition-all duration-[1.5s] group-hover:scale-110" alt={photo.data.title} />
-                                <div class="absolute bottom-6 left-8 right-8 text-white/85 font-mono text-[10px] tracking-widest uppercase truncate">{photo.data.title}</div>
+                                <img src={photo.data.image} class="w-full h-full object-cover transition-all duration-[1.5s] group-hover:scale-110" alt="" />
+                                <div class="absolute bottom-6 left-8 right-8 text-white/85 font-mono text-[10px] tracking-widest uppercase truncate bg-[#1e1e2e]/50 backdrop-blur-md px-3 py-2 rounded-xl text-left">
+                                    {photo.data.title[lang] || photo.data.title}
+                                </div>
                             </div>
                     ))}
                 </div>
             </div>
 
-            <section class="md:col-span-4 md:row-span-2 bento-card bg-[#313244]/15 rounded-[2.5rem] p-8 border border-white/5 flex flex-col group text-left">
+            <section class="md:col-span-4 md:row-span-2 bento-card bg-[#313244]/15 rounded-[2.5rem] border border-white/5 p-8 flex flex-col group text-left overflow-hidden">
                 <h2 class="text-xl font-black text-white italic tracking-tighter uppercase mb-6 flex items-center gap-2 leading-none text-left">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-[var(--peach)]"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
                     {ui.headings.sns[lang]}
                 </h2>
-                <div class="grid grid-cols-2 gap-2 flex-1 items-start text-left">
-                    {socials.map(sns => (
-                            <a href={sns.href} target="_blank" class="flex items-center gap-2 p-2.5 rounded-2xl bg-white/5 border border-white/5 hover:border-[var(--peach)]/30 hover:bg-white/10 transition-all group/sns overflow-hidden text-left">
-                                <div class={`w-7 h-7 rounded-lg bg-[#1e1e2e] flex items-center justify-center shrink-0 transition-colors ${sns.activeColor || 'text-white/60 group-hover/sns:text-[var(--peach)]'}`}>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" set:html={ICON_MAP[sns.icon] || ""} />
+                <div class="grid grid-cols-2 gap-3 flex-1 text-left">
+                    {socials.map((sns) => (
+                            <a href={sns.href} target="_blank" class="flex items-center gap-3 p-3 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[var(--peach)]/30 transition-all group/sns text-left">
+                                <div class={`w-8 h-8 rounded-xl bg-[#1e1e2e] flex items-center justify-center shrink-0 shadow-sm ${sns.activeColor || 'text-white/40'}`}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" set:html={ICON_MAP[sns.icon] || ""} />
                                 </div>
-                                <span class="text-[10px] font-bold text-white/85 group-hover/sns:text-white transition-colors truncate leading-none text-left">{sns.label}</span>
+                                <span class="text-[11px] font-bold text-white/80 group-hover/sns:text-white transition-colors truncate leading-none text-left">{sns.label}</span>
                             </a>
                     ))}
                 </div>
