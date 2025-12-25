@@ -6,12 +6,12 @@ title:
 location:
     ja: "日本、鎌倉"
     en: "Kamakura, Japan"
-image: "/assets/photos/2024/10/01-fujisan.jpeg"
+image: "/assets/photos/2024/10/01-fujisan.webp"
 date: "2024-10-01"
 location_tag: "kamakura"
 year_tag: "2024"
-collection_tag: "fujisan"
-featured: false
+collection_tag: "nihon"
+featured: true
 gear: "Sony"
 exif:
     camera: "Sony"
@@ -19,5 +19,3 @@ exif:
     shutter: "1/40s"
     iso: "1600"
 ---
-
-雨过天晴的镰仓，远处的富士山在夕阳下清晰可见。

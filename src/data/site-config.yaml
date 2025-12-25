@@ -9,7 +9,7 @@ brand:
   email: "itsuki@erzhiqian.cc"
   footer: "© 2025 itsuki"
   googleAnalyticsId: "G-DK00YQ60DN" # 你的 GA4 ID
-  siteUrl: "https://template.itsuki.erzhiqian.cc"
+  siteUrl: "https://itsuki.erzhiqian.cc"
   # 站点描述 (用于 SEO 和页脚)
   description:
     ja: "技術、生活、写真を探求するデジタルガーデン。这里记录着成长的足迹。"
@@ -132,7 +132,7 @@ stats:
 
 # 7. 个人简介 (Profile - Hero Section)
 profile:
-  avatar: "https://itsuki-9yx.pages.dev/assets/about/bio.svg"
+  avatar: "https://template.itsuki.erzhiqian.cc/assets/about/bio.svg"
   intro:
     ja: "こんにちは、樹です"
     en: "Hi, I'm Itsuki"
