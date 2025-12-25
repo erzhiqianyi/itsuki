@@ -1,10 +1,10 @@
 ---
 type: "games"
-title: "ELDEN RING"
-meta: "FromSoftware"
-date: "2024-12-01"
-status: "二周目クリア"
-imgId: "1542751371522-62024b7596ae"
+title: "ホロウナイト・シルクソング"
+meta: "Cherry"
+date: "2025-11-01"
+status: "第二幕"
+cover: "/assets/now/game/2025/12/01_shirukusong.webp"
 hasReview: false
 ---
 终于在 DLC 发布前完成了二周目全收集。

@@ -1,14 +1,20 @@
 ---
 items:
-    - role: "シニアWebエンジニア"
-      company: "Future Tech Inc."
-      period: "2021 - Present"
-      description: "次世代のEコマースプラットフォームのフロントエンドアーキテクチャを担当。パフォーマンスの最適化とコンポーネントライブラリの構築を主導しました。"
-      tech: ["React", "Astro", "Tailwind", "TypeScript"]
+  - role: "シニアソフトウェアエンジニア / データエンジニア"
+    company: "HSBC (香港上海銀行)"
+    period: "2021.09 - 2026.01.16 (予定)"
+    description: "グローバル規制対応ビッグデータプラットフォームの構築を主導。Basel III SA-CVA（信用調整後の標準的手法）の計算ロジックを実装し、全世界の市場リスク管理を支える基盤を確立。SparkとClickHouseを活用した高性能データパイプラインにより、複雑な金融モデルの計算効率を大幅に向上させました。全編英語の業務環境下で、海外のクオンツやPMと連携し、プロダクションレベルのデリバリーを一貫して担当。"
+    tech: ["Java", "Python", "Pandas", "Scala", "Spark", "ClickHouse"]
 
-    - role: "UIデザイナー"
-      company: "Design Studio K"
-      period: "2019 - 2021"
-      description: "ミニマルなモバイルアプリのインターフェース設計とプロトタイピング。禅の美学をデジタルインターフェースに取り入れる試みを行いました。"
-      tech: ["Figma", "SwiftUI", "Adobe XD"]
+  - role: "シニアJavaデベロッパー / コアメンバー"
+    company: "广州合谐医疗科技有限公司"
+    period: "2017.07 - 2021.09"
+    description: "ドメイン駆動設計（DDD）を用いたシステム再構築を牽引。慢性疾患管理システムのドメインモデルを抽象化し、糖尿病から高血圧など多病態への迅速な横展開を実現しました。また、遺伝子レポート生成エンジンや汎用アンケートサービスを構築し、業務のセルフサービス化・ノーコード化を推進。開発チームのリソース解放とリリースサイクルの短縮に大きく貢献しました。"
+    tech: ["Java", "Spring Boot", "Spring Data JPA", "Domain Driven Design", "Redis", "MySQL", "Spock"]
+
+  - role: "Javaデベロッパー"
+    company: "ITスタートアップ (創業期)"
+    period: "2016.10 - 2017.05"
+    description: "唯一の開発担当として、建設機械修理プラットフォームの0から1への立ち上げを完遂。要件定義からデプロイまで全工程を担当し、WeChat公式アカウントを通じた修理発注、故障診断、エンジニア派遣の自動化フローを構築。ビジネス初期のコアシステムとして安定稼働を実現しました。"
+    tech: ["Java", "MySQL", "Git"]
 ---
