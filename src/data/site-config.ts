@@ -13,6 +13,8 @@ interface SiteConfig {
         favicon: string;
         email: string;
         footer: string;
+        googleAnalyticsId: string;
+        siteUrl: string;
         description: { ja: string; en: string };
         webring: {
             label: string;

@@ -1,12 +1,13 @@
 ---
+// src/layouts/BaseLayout.astro
 import { SITE_CONFIG, t } from '../data/site-config';
-import { ClientRouter } from 'astro:transitions'; // Astro 5.0 推荐写法
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
     title?: string;
     description?: string;
-    image?: string;    // 分享预览图
-    article?: boolean; // 是否为文章页
+    image?: string;
+    article?: boolean; // 是否为文章页，用于生成不同的 JSON-LD
     lang?: 'ja' | 'en';
 }
 
@@ -16,12 +17,36 @@ const {
     article = false,
 } = Astro.props;
 
-// SEO 逻辑
+// --- SEO 逻辑 ---
 const configDescription = SITE_CONFIG.brand.description[lang] || "";
 const description = Astro.props.description || configDescription;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site || 'https://erzhiqian.cc');
+
+// 优先使用 YAML 中配置的 siteUrl，确保 Canonical URL 正确
+const siteUrl = SITE_CONFIG.brand.siteUrl || 'https://erzhiqian.cc';
+const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const ogImage = new URL(Astro.props.image || '/og-default.jpg', Astro.url);
 const siteTitle = title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`;
+
+// --- Google Analytics ID ---
+const GA_ID = SITE_CONFIG.brand.googleAnalyticsId; // 从配置中心获取
+
+// --- 结构化数据 (JSON-LD) ---
+const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": article ? "BlogPosting" : "WebSite",
+    "name": siteTitle,
+    "description": description,
+    "url": canonicalURL.href,
+    ...(article && {
+        "headline": title,
+        "image": [ogImage.href],
+        "author": {
+            "@type": "Person",
+            "name": "Itsuki",
+            "url": siteUrl
+        }
+    })
+};
 
 const { colors } = SITE_CONFIG.theme;
 const currentPath = Astro.url.pathname;
@@ -45,10 +70,35 @@ const currentPath = Astro.url.pathname;
     <meta property="og:title" content={siteTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImage} />
+
     <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={Astro.url} />
     <meta property="twitter:title" content={siteTitle} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    {GA_ID && (
+            <>
+                <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
+                <script is:inline define:vars={{ GA_ID }}>
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag() { dataLayer.push(arguments); }
+                    gtag('js', new Date());
+                    gtag('config', GA_ID);
+
+                    // 兼容 ClientRouter：在每次页面内容切换后触发 PageView 上报
+                    document.addEventListener('astro:page-load', () => {
+                        gtag('event', 'page_view', {
+                            page_title: document.title,
+                            page_location: window.location.href,
+                            page_path: window.location.pathname
+                        });
+                    });
+                </script>
+            </>
+    )}
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -130,9 +180,7 @@ const currentPath = Astro.url.pathname;
         color: var(--text);
         margin: 0; padding: 0;
         font-family: 'Inter', 'Noto Sans JP', sans-serif;
-        -webkit-font-smoothing: antialiased;
     }
-    /* 修复 Unknown Word：直接使用标准 CSS */
     .bento-card {
         position: relative;
         transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -160,11 +208,16 @@ const currentPath = Astro.url.pathname;
                 menu.classList.toggle('hidden', !isHidden);
                 menu.classList.toggle('flex', isHidden);
                 document.body.style.overflow = isHidden ? 'hidden' : '';
-                icon.innerHTML = isHidden ? '<path d="M18 6L6 18M6 6l12 12"></path>' : '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
+                icon.innerHTML = isHidden ?
+                    '<path d="M18 6L6 18M6 6l12 12"></path>' :
+                    '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
             };
         }
     }
+
+    // 初始化与重置逻辑
     setupMenu();
+    // 关键：在 View Transitions 切换后重新运行 JS 逻辑
     document.addEventListener('astro:after-swap', setupMenu);
 </script>
 </body>

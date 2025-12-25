@@ -8,6 +8,8 @@ brand:
   watermark: "Itsuki"
   email: "itsuki@erzhiqian.cc"
   footer: "© 2025 itsuki"
+  googleAnalyticsId: "G-xxxxxx" # 你的 GA4 ID
+  siteUrl: "https://itsuki.erzhiqian.cc"
   # 站点描述 (用于 SEO 和页脚)
   description:
     ja: "技術、生活、写真を探求するデジタルガーデン。这里记录着成长的足迹。"
