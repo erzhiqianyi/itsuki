@@ -1,16 +1,16 @@
 ---
 type: mission
 lang: ja
-title: "Build the Future, Record the Growth"
-description: "技術の力で日常をより豊かに。フルスタック開発と写真表現を通じて、世界の美しさを切り取り、デジタルガーデンに記録し続けます。"
+title: "2026年4月、東京へ"
+description: "日本語学校への入学と、日本での新しいキャリア形成に向けた準備期間です。"
 metrics:
-- label: { ja: "GitHub Contribs", en: "GitHub Contribs" }
-  value: "1.2k"
+- label: { ja: "貯金目標", en: "Savings" }
+  value: "100%"
   color: "text-green"
-- label: { ja: "Captured Photos", en: "Captured Photos" }
-  value: "5.8k"
+- label: { ja: "日本語", en: "Language" }
+  value: "N2 Level"
   color: "text-peach"
-- label: { ja: "Learned Skills", en: "Learned Skills" }
-  value: "24"
-  color: "text-accent"
+- label: { ja: "仕事", en: "Status" }
+  value: "在職"
+  color: "text-peach"
 ---
