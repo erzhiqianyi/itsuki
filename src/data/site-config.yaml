@@ -1,4 +1,5 @@
 # Itsuki Digital Garden - 全局核心配置文件
+# 这个文件是站点的“大脑”，存放所有非内容类的静态设置。
 
 # 1. 品牌信息 (Brand Info)
 brand:
@@ -7,10 +8,11 @@ brand:
   watermark: "Itsuki"
   email: "itsuki@erzhiqian.cc"
   footer: "© 2025 itsuki"
-  googleAnalyticsId: "G-DK00YQ60DN"
-  siteUrl: "https://template.itsuki.erzhiqian.cc"
+  googleAnalyticsId: "G-DK00YQ60DN" # 你的 GA4 ID
+  siteUrl: "https://itsuki.erzhiqian.cc"
+  # 站点描述 (用于 SEO 和页脚)
   description:
-    ja: "技術、生活、写真を探求するデジタルガーデン。好奇心旺盛に変化と挑戦を楽しんでいます"
+    ja: "技術、生活、写真を探求するデジタルガーデン。这里记录着成长的足迹。"
     en: "A digital garden exploring tech, life, and photography. Recording the footprints of growth here."
   webring:
     label: "An IndieWeb Webring"
@@ -24,47 +26,30 @@ navigation:
     href: "/"
     label: { ja: "ホーム", en: "Home" }
     color: "hover:text-accent"
-    icon: 'home' # 基础图标，代表归宿
   - id: "nav-blog"
     href: "/blog"
     label: { ja: "ブログ", en: "Blog" }
     color: "hover:text-accent"
-    icon: 'pen-tool' # 相比 book-open，pen-tool 更强调“创作者”的身份
-  - id: "nav-archive"
-    href: "/archive"
-    label: { ja: "アーカイブ", en: "Archive" }
-    color: "hover:text-accent"
-    icon: 'archive' # 抽屉/存档文件夹的语义
-  - id: "nav-ai"
-    href: "/ai-tools"
-    label: { ja: "AIツール", en: "AI Tools" }
-    color: "hover:text-blue-400"
-    icon: 'sparkles' # AI 的通用视觉符号（闪烁、魔法、智能）
   - id: "nav-photo"
     href: "/photos"
     label: { ja: "写真", en: "Photos" }
     color: "hover:text-peach"
-    icon: 'aperture' # 摄影师专属符号，比普通 camera 更专业、美观
   - id: "nav-yt"
     href: "/videos"
     label: { ja: "動画", en: "Videos" }
     color: "hover:text-red"
-    icon: 'video' # 摄像机图标，完美契合你的 YouTube 创作
   - id: "nav-now"
     href: "/now"
     label: { ja: "現在", en: "Now" }
     color: "hover:text-green"
-    icon: 'clock' # “Now” 页面通常记录近况，时钟代表当下
   - id: "nav-about"
     href: "/about"
     label: { ja: "私について", en: "About" }
     color: "hover:text-accent"
-    icon: 'user' # 个人信息的标准符号
   - id: "nav-jp"
     href: "/japanese"
     label: { ja: "日本語学習", en: "Japanese" }
     color: "hover:text-pink"
-    icon: 'languages' # 双语切换或学习的直观表达
 
 # 3. 社交链接 (Socials)
 socials:
@@ -102,11 +87,7 @@ theme:
     peach: "#fab387"
     red: "#f38ba8"
 
-# 5. 博客逻辑配置 (Blog Logic)
-blog:
-  pageSize: 9 # 27寸显示器网格布局建议设置为 6 或 9
-
-# 6. 全局 UI 文本 (UI Translation Dictionary)
+# 5. 全局 UI 文本 (UI Translation Dictionary)
 ui:
   headings:
     blog: { ja: "最新記事", en: "Recent Writing" }
@@ -120,7 +101,6 @@ ui:
     ai: { ja: "花园之灵 ✨", en: "Garden Spirit ✨" }
     resources: { ja: "学習リソース", en: "Resources" }
     wordOfDay: { ja: "今日の単語", en: "Word of the Day" }
-    aiTools: { ja: "AIツール・コレクション", en: "AI Tool Collection" }
   labels:
     viewAll: { ja: "すべて見る ->", en: "View All ->" }
     gallery: { ja: "ギャラリー ->", en: "Gallery ->" }
@@ -135,20 +115,11 @@ ui:
     updated: { ja: "最終更新", en: "Last Updated" }
     noCover: { ja: "カバーなし", en: "NO COVER" }
     collaborate: { ja: "コラボレーションしましょう", en: "Let's Collaborate" }
-    # 新增：分页与归档标签
-    firstPage: { ja: "最初", en: "First" }
-    lastPage: { ja: "最後", en: "Last" }
-    pageOf: { ja: " / ", en: " of " }
-    viewFullArchive: { ja: "全記事一覧 (アーカイブ) ->", en: "View Full Archive ->" }
-    postCount: { ja: "件の記事", en: " posts" }
-    viewDemo: { ja: "デモを見る", en: "View Demo" }
-    openWeb: { ja: "サイトを開く", en: "Open Web" }
-    backToGallery: { ja: "ギャラリーに戻る", en: "Back to Gallery" }
-    aiToolsIntro: { ja: "Gemini Canvas で作成したクリエイティブなツール群", en: "Creative tools crafted with Gemini Canvas" }
-    all: { ja: "すべて", en: "All" }
-    changelogIntro: { ja: "サイトの進化の軌跡、マイルストーンを記録しています。",  en: "Recording the milestones and evolution of this site." }
+  webring:
+    prev: { ja: "前へ", en: "Prev" }
+    next: { ja: "次へ", en: "Next" }
 
-# 7. 统计项定义
+# 6. 统计项定义 (移除硬编码，改为配置顺序驱动)
 stats:
   - id: "posts"
     label: { ja: "記事数", en: "Posts" }
@@ -157,13 +128,11 @@ stats:
   - id: "videos"
     label: { ja: "動画", en: "Videos" }
   - id: "words"
-    label: { ja: "総字数", en: "Words" }
-  - id: "ai-tools"
-    label: { ja: "AI道具", en: "AI Tools" }
+    label: { ja: "总字数", en: "Words" }
 
-# 8. 个人简介 (Profile)
+# 7. 个人简介 (Profile - Hero Section)
 profile:
-  avatar: "https://itsuki-9yx.pages.dev/assets/about/bio.svg"
+  avatar: "https://template.itsuki.erzhiqian.cc/assets/about/bio.svg"
   intro:
     ja: "こんにちは、樹です"
     en: "Hi, I'm Itsuki"

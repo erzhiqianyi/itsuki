@@ -3,7 +3,7 @@ lang: ja
 title: "Youtubeを始めました"
 desc: "この動画は、日本語学習者である私がYouTubeを始めた理由、そして最初の一本を公開するまでの物語です。
 日本語初心者として「まず行動すること」の大切さを感じながら、一歩ずつ挑戦しています。"
-image: "/assets/videos/2025/11/01_start.png"
+image: "/assets/videos/2025/11/01_start.webp"
 tags:
   - "日本語"
   - "勉強"
