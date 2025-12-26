@@ -7,7 +7,7 @@ export async function getStaticPaths({ paginate }) {
     const lang = 'ja';
     const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
     const sortedPosts = allPosts.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
-    return paginate(sortedPosts, { pageSize: 3 }); // 每页3篇进行测试
+    return paginate(sortedPosts, { pageSize: 10 });
 }
 
 const { page } = Astro.props;
