@@ -8,7 +8,7 @@ import icon from 'astro-icon'; // 导入插件
 // [https://astro.build/config](https://astro.build/config)
 export default defineConfig({
     // 1. 站点部署后的基础 URL
-    site: 'https://template.itsuki.erzhiqian.cc',
+    site: 'https://itsuki.erzhiqian.cc',
 
     // 2. 项目部署的子路径（如果是根目录则留空）
     // base: '/blog',
