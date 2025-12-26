@@ -189,8 +189,8 @@ const ICON_MAP: Record<string, string> = {
                     {latestPosts.map(post => (
                             <a href={getBlogHref(post.id)} class="flex gap-5 py-5 first:pt-0 last:pb-0 hover:bg-white/[0.02] transition-all px-4 -mx-4 group/item items-start text-left">
                                 <div class="w-24 h-16 md:w-28 md:h-20 rounded-2xl overflow-hidden bg-white/5 border border-white/5 shrink-0 relative shadow-lg">
-                                    {post.data.cover ? (
-                                            <img src={post.data.cover} alt={post.data.title} class="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500" />
+                                    {post.data.coverImage ? (
+                                            <img src={post.data.coverImage} alt={post.data.title} class="w-full h-full object-cover opacity-90 group-hover/item:opacity-100 transition-opacity duration-500" />
                                     ) : (
                                             <div class="w-full h-full flex items-center justify-center text-white/30 italic font-mono text-[10px] uppercase leading-none">{ui.labels.noCover[lang]}</div>
                                     )}
