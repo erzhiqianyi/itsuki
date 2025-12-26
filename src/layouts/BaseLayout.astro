@@ -18,7 +18,8 @@ const {
 } = Astro.props;
 
 // --- SEO 逻辑 ---
-const configDescription = SITE_CONFIG.brand.description[lang] || "";
+// 优先级：外部传入的 description > 配置文件中的默认描述
+const configDescription = SITE_CONFIG.brand.description[lang] || SITE_CONFIG.brand.description['ja'];
 const description = Astro.props.description || configDescription;
 
 // 优先使用 YAML 中配置的 siteUrl，确保 Canonical URL 正确
@@ -28,7 +29,7 @@ const ogImage = new URL(Astro.props.image || '/og-default.jpg', Astro.url);
 const siteTitle = title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`;
 
 // --- Google Analytics ID ---
-const GA_ID = SITE_CONFIG.brand.googleAnalyticsId; // 从配置中心获取
+const GA_ID = SITE_CONFIG.brand.googleAnalyticsId;
 
 // --- 结构化数据 (JSON-LD) ---
 const jsonLd = {
@@ -88,7 +89,6 @@ const currentPath = Astro.url.pathname;
                     gtag('js', new Date());
                     gtag('config', GA_ID);
 
-                    // 兼容 ClientRouter：在每次页面内容切换后触发 PageView 上报
                     document.addEventListener('astro:page-load', () => {
                         gtag('event', 'page_view', {
                             page_title: document.title,
@@ -160,15 +160,15 @@ const currentPath = Astro.url.pathname;
 </footer>
 
 <style is:global define:vars={{
-    'accent': colors.accent,
-    'bg': colors.bg,
-    'card': colors.card,
-    'text': colors.text,
-    'subtext': colors.subtext,
-    'pink': colors.pink,
-    'green': colors.green,
-    'peach': colors.peach,
-    'red': colors.red
+    'accent': SITE_CONFIG.theme.colors.accent,
+    'bg': SITE_CONFIG.theme.colors.bg,
+    'card': SITE_CONFIG.theme.colors.card,
+    'text': SITE_CONFIG.theme.colors.text,
+    'subtext': SITE_CONFIG.theme.colors.subtext,
+    'pink': SITE_CONFIG.theme.colors.pink,
+    'green': SITE_CONFIG.theme.colors.green,
+    'peach': SITE_CONFIG.theme.colors.peach,
+    'red': SITE_CONFIG.theme.colors.red
 }}>
     :root {
         --bg: #1e1e2e;
@@ -214,10 +214,7 @@ const currentPath = Astro.url.pathname;
             };
         }
     }
-
-    // 初始化与重置逻辑
     setupMenu();
-    // 关键：在 View Transitions 切换后重新运行 JS 逻辑
     document.addEventListener('astro:after-swap', setupMenu);
 </script>
 </body>
