@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# 显式告知爬虫站点地图的位置
+Sitemap: https://itsuki.erzhiqian.cc/sitemap-index.xml

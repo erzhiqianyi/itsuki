@@ -6,7 +6,7 @@ import sitemap from '@astrojs/sitemap'; // 确保已安装此插件
 // [https://astro.build/config](https://astro.build/config)
 export default defineConfig({
     // 1. 站点部署后的基础 URL
-    site: 'https://template.itsuki.erzhiqian.cc',
+    site: 'https://itsuki.erzhiqian.cc',
 
     // 2. 项目部署的子路径（如果是根目录则留空）
     // base: '/blog',
