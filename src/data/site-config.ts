@@ -11,6 +11,7 @@ interface SiteConfig {
     brand: {
         logo: string;
         favicon: string;
+        watermark: string;
         email: string;
         footer: string;
         googleAnalyticsId: string;
@@ -22,6 +23,10 @@ interface SiteConfig {
             prev: string;
             next: string;
         }
+    };
+    // 博客全局配置
+    blog: {
+        pageSize: number;
     };
     navigation: Array<{
         id: string;
@@ -55,29 +60,42 @@ interface SiteConfig {
         headings: Record<string, { ja: string; en: string }>;
         labels: Record<string, { ja: string; en: string }>;
     };
+    stats: Array<{
+        id: string;
+        label: { ja: string; en: string };
+    }>;
+    profile: {
+        avatar: string;
+        intro: { ja: string; en: string };
+        roles: Array<{ id: string; label: { ja: string; en: string }; color: string; }>;
+        philosophy: { ja: string; en: string };
+    }
 }
 
 // 构建配置文件路径
-// process.cwd() 在 Astro 构建或开发时指向项目根目录
 const configPath = path.resolve(process.cwd(), 'src/data/site-config.yaml');
 
 let config: SiteConfig;
 
 try {
-    // 同步读取文件内容
     const fileContents = fs.readFileSync(configPath, 'utf8');
-    // 使用 js-yaml 解析内容
     config = yaml.load(fileContents) as SiteConfig;
 } catch (e) {
     console.error('无法加载 site-config.yaml，请检查文件路径和格式:', e);
-    // 提供一个基础的回退配置，防止由于配置错误导致整个站点构建失败
+    // 完备的回退配置
     config = {
-        brand: { logo: "Itsuki", footer: "© 2025" },
-        ui: { headings: {}, labels: {} }
+        brand: {
+            logo: "Itsuki",
+            footer: "© 2025",
+            description: { ja: "", en: "" }
+        } as any,
+        blog: { pageSize: 6 },
+        ui: { headings: {}, labels: {} },
+        navigation: [],
+        socials: []
     } as any;
 }
 
-// 导出解析后的配置对象
 export const SITE_CONFIG = config;
 
 /**
@@ -88,7 +106,9 @@ export const SITE_CONFIG = config;
 export function t(key: string, lang: 'ja' | 'en' = 'ja') {
     if (!SITE_CONFIG.ui) return key;
 
-    const entry = SITE_CONFIG.ui.headings?.[key] || SITE_CONFIG.ui.labels?.[key];
+    // 优先从 labels 查找，再从 headings 查找
+    const entry = SITE_CONFIG.ui.labels?.[key] || SITE_CONFIG.ui.headings?.[key];
+
     // @ts-ignore
     return entry ? entry[lang] : key;
 }
