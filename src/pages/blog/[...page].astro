@@ -1,19 +1,21 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SITE_CONFIG } from '../../data/site-config';
+import { SITE_CONFIG, t } from '../../data/site-config';
 
 export async function getStaticPaths({ paginate }) {
     const lang = 'ja';
     const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
     const sortedPosts = allPosts.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
-    return paginate(sortedPosts, { pageSize: 3 }); // 每页3篇进行测试
+
+    // 从配置文件读取分页大小，提升灵活性
+    return paginate(sortedPosts, { pageSize: SITE_CONFIG.blog.pageSize });
 }
 
 const { page } = Astro.props;
 const lang = 'ja';
 
-// 侧边栏数据获取
+// 侧边栏数据获取与逻辑处理
 const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
 const categoryCounts = allPosts.reduce((acc, post) => {
     const cat = post.data.category;
@@ -24,9 +26,10 @@ const categoryCounts = allPosts.reduce((acc, post) => {
 const dynamicCategories = Object.entries(categoryCounts).map(([label, count]) => ({
     id: label.toLowerCase(), label, count
 }));
+
 const featuredPosts = allPosts.filter(p => p.data.featured).slice(0, 3);
 
-// 分页连续页码计算 (显示3页)
+// 分页连续页码计算与状态管理
 const totalPages = page.lastPage;
 const currentPage = page.currentPage;
 let startPage = Math.max(1, currentPage - 1);
@@ -37,9 +40,7 @@ const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => s
 const blogUI = {
     search: { ja: "検索", en: "Search" },
     categories: { ja: "カテゴリー", en: "Categories" },
-    featured: { ja: "おすすめ", en: "Featured" },
-    allPosts: { ja: "すべての記事", en: "All Posts" },
-    readMore: { ja: "詳しく見る", en: "Read More" }
+    featured: { ja: "おすすめ", en: "Featured" }
 };
 ---
 
@@ -69,61 +70,91 @@ const blogUI = {
                 </div>
             </div>
 
-            {featuredPosts.length > 0 && (
-                    <div class="bento-card rounded-3xl p-6">
-                        <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--peach)] mb-4 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
-                            {blogUI.featured[lang]}
-                        </h3>
-                        <div class="space-y-4">
-                            {featuredPosts.map(p => (
-                                    <a href={`/blog/${p.id.replace(/\.(md|mdx)$/, '')}`} class="flex gap-4 group">
-                                        <div class="w-14 h-14 rounded-2xl bg-[#181825] overflow-hidden shrink-0 border border-white/5">
-                                            <img src={p.data.coverImage} class="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition duration-700" alt="" />
-                                        </div>
-                                        <div class="min-w-0 flex flex-col justify-center">
-                                            <h4 class="text-[12px] font-bold text-white group-hover:text-[var(--accent)] transition truncate mb-1">{p.data.title}</h4>
-                                            <span class="text-[9px] font-mono text-gray-500">{p.data.date}</span>
-                                        </div>
-                                    </a>
-                            ))}
-                        </div>
-                    </div>
-            )}
+            <div class="bento-card rounded-3xl p-6 bg-gradient-to-br from-[var(--accent)]/10 to-transparent border-[var(--accent)]/20">
+                <a href="/archive" class="flex flex-col gap-2 group">
+                    <span class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+                        {t('archive', lang)}
+                    </span>
+                    <span class="text-sm font-semibold text-white group-hover:translate-x-1 transition-transform">
+                        {t('viewFullArchive', lang)}
+                    </span>
+                </a>
+            </div>
         </aside>
 
         <div class="lg:col-span-3 space-y-6 order-1 lg:order-2">
-            <div id="posts-container" class="space-y-6">
+            <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                 {page.data.map((post) => (
-                        <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="bento-card flex flex-col sm:flex-row group w-full min-h-[280px]">
-                            <div class="sm:w-80 w-full h-64 sm:h-auto shrink-0 relative overflow-hidden bg-[#181825]">
+                        <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="bento-card flex flex-col group w-full overflow-hidden">
+                            <div class="w-full h-44 relative overflow-hidden bg-[#181825]">
                                 <img src={post.data.coverImage} class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-[1.5s]" alt={post.data.title} />
                             </div>
-                            <div class="p-8 md:p-10 flex flex-col justify-between flex-1 text-left bg-gradient-to-br from-white/[0.02] to-transparent">
+                            <div class="p-5 flex flex-col justify-between flex-1 text-left bg-gradient-to-br from-white/[0.02] to-transparent">
                                 <div>
-                                    <div class="flex items-center gap-4 mb-4 text-[10px] font-mono font-bold uppercase tracking-wider">
+                                    <div class="flex items-center gap-3 mb-3 text-[9px] font-mono font-bold uppercase tracking-wider">
                                         <span class="text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-0.5 rounded border border-[var(--accent)]/20">{post.data.category}</span>
                                         <span class="text-gray-500">{post.data.date}</span>
                                     </div>
-                                    <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-[var(--accent)] transition duration-300 leading-tight">{post.data.title}</h3>
-                                    {post.data.summary && <p class="text-[14px] text-[var(--subtext)] leading-relaxed line-clamp-3">{post.data.summary}</p>}
+                                    <h3 class="text-lg font-bold text-white mb-3 group-hover:text-[var(--accent)] transition duration-300 leading-snug line-clamp-2">
+                                        {post.data.title}
+                                    </h3>
+                                    {post.data.summary && <p class="text-[12px] text-[var(--subtext)] leading-relaxed line-clamp-2 opacity-80">{post.data.summary}</p>}
                                 </div>
-                                <div class="mt-8 pt-6 border-t border-white/5 flex justify-end">
-                                    <span class="text-[var(--accent)] font-black flex items-center gap-2 text-[10px] uppercase tracking-widest">{blogUI.readMore[lang]} <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></span>
+                                <div class="mt-5 pt-4 border-t border-white/5 flex justify-end">
+                                <span class="text-[var(--accent)] font-black flex items-center gap-2 text-[9px] uppercase tracking-widest">
+                                    {t('readMore', lang)}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                </span>
                                 </div>
                             </div>
                         </a>
                 ))}
             </div>
 
-            <div class="flex justify-center items-center gap-2 pt-12">
-                {page.url.prev ? <a href={page.url.prev} class="p-3 text-[var(--subtext)] hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a> : <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></div>}
+            <div class="flex flex-col items-center gap-6 pt-12">
+                <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-[var(--subtext)] opacity-60">
+                    {currentPage} {t('pageOf', lang)} {totalPages}
+                </div>
 
-                {visiblePages.map(num => (
-                        <a href={num === 1 ? "/blog" : `/blog/${num}`} class={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all duration-300 text-sm font-bold ${num === currentPage ? 'bg-[var(--accent)] text-[#1e1e2e] border-[var(--accent)] scale-110 shadow-lg' : 'border-white/5 text-[var(--subtext)] hover:bg-white/5'}`}>{num}</a>
-                ))}
+                <div class="flex justify-center items-center gap-2">
+                    {currentPage > 1 ? (
+                            <a href="/blog" class="p-3 text-[var(--subtext)] hover:text-white transition-colors" title={t('firstPage', lang)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>
+                            </a>
+                    ) : (
+                            <div class="p-3 opacity-10 cursor-not-allowed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg></div>
+                    )}
 
-                {page.url.next ? <a href={page.url.next} class="p-3 text-[var(--subtext)] hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a> : <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>}
+                    {page.url.prev ?
+                            <a href={page.url.prev} class="p-3 text-[var(--subtext)] hover:text-white transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                            </a> :
+                            <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></div>
+                    }
+
+                    {visiblePages.map(num => (
+                            <a href={num === 1 ? "/blog" : `/blog/${num}`}
+                               class={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all duration-300 text-sm font-bold ${num === currentPage ? 'bg-[var(--accent)] text-[#1e1e2e] border-[var(--accent)] scale-110 shadow-lg' : 'border-white/5 text-[var(--subtext)] hover:bg-white/5'}`}>
+                                {num}
+                            </a>
+                    ))}
+
+                    {page.url.next ?
+                            <a href={page.url.next} class="p-3 text-[var(--subtext)] hover:text-white transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                            </a> :
+                            <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
+                    }
+
+                    {currentPage < totalPages ? (
+                            <a href={`/blog/${totalPages}`} class="p-3 text-[var(--subtext)] hover:text-white transition-colors" title={t('lastPage', lang)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg>
+                            </a>
+                    ) : (
+                            <div class="p-3 opacity-10 cursor-not-allowed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg></div>
+                    )}
+                </div>
             </div>
         </div>
     </div>

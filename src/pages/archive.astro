@@ -1,0 +1,90 @@
+---
+import {getCollection} from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import {SITE_CONFIG, t} from '../data/site-config';
+
+const lang = 'ja';
+const allPosts = await getCollection('blog', ({data}) => data.lang === lang);
+
+// 1. 按时间倒序排列
+const sortedPosts = allPosts.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
+
+// 2. 按年份和月份分组逻辑
+const groupedPosts = sortedPosts.reduce((acc, post) => {
+    const date = new Date(post.data.date);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1; // 1-12
+
+    if (!acc[year]) acc[year] = {};
+    if (!acc[year][month]) acc[year][month] = [];
+
+    acc[year][month].push(post);
+    return acc;
+}, {} as Record<number, Record<number, any[]>>);
+
+// 3. 获取排序后的年份列表（倒序）
+const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
+---
+
+<BaseLayout title={`${t('archive', lang)} - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <header class="mb-12 text-left">
+            <h1 class="text-4xl font-black text-white mb-4 flex items-center gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5">
+                    <path d="M20 10V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+                    <path d="M12 15V5"/>
+                    <path d="m9 8 3-3 3 3"/>
+                </svg>
+                {t('archive', lang)}
+            </h1>
+            <p class="text-[var(--subtext)] font-mono text-sm">
+                Total: {allPosts.length} {t('postCount', lang)}
+            </p>
+        </header>
+
+        <div class="space-y-16">
+            {years.map(year => (
+                    <section class="relative">
+                        <div class="sticky top-0 z-10 py-4 bg-[var(--bg)]/80 backdrop-blur-sm">
+                            <h2 class="text-6xl font-black opacity-10 absolute -top-4 -left-4 pointer-events-none">{year}</h2>
+                            <h2 class="text-3xl font-bold text-[var(--accent)] relative">{year}</h2>
+                        </div>
+
+                        <div class="mt-8 space-y-12 pl-4 border-l-2 border-white/5">
+                            {Object.keys(groupedPosts[year]).map(Number).sort((a, b) => b - a).map(month => (
+                                    <div class="relative">
+                                        <h3 class="text-lg font-bold text-[var(--green)] mb-6 flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-[var(--green)]"></span>
+                                            {month}月
+                                        </h3>
+
+                                        <ul class="space-y-4 ml-4">
+                                            {groupedPosts[year][month].map(post => (
+                                                    <li>
+                                                        <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`}
+                                                           class="group flex items-baseline justify-between gap-4">
+                                                <span class="text-white/80 group-hover:text-[var(--accent)] transition-colors text-base font-medium underline-offset-4 decoration-white/10 group-hover:underline">
+                                                    {post.data.title}
+                                                </span>
+                                                            <span class="shrink-0 font-mono text-xs text-gray-500">
+                                                    {post.data.date.split('-').slice(1).join('-')} </span>
+                                                        </a>
+                                                    </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                            ))}
+                        </div>
+                    </section>
+            ))}
+        </div>
+    </div>
+</BaseLayout>
+
+<style>
+    /* 针对归档页的微调 */
+    :root {
+        --bg: #1e1e2e; /* 对应 Catppuccin Mocha */
+    }
+</style>

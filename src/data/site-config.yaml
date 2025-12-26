@@ -1,5 +1,4 @@
 # Itsuki Digital Garden - 全局核心配置文件
-# 这个文件是站点的“大脑”，存放所有非内容类的静态设置。
 
 # 1. 品牌信息 (Brand Info)
 brand:
@@ -8,9 +7,8 @@ brand:
   watermark: "Itsuki"
   email: "itsuki@erzhiqian.cc"
   footer: "© 2025 itsuki"
-  googleAnalyticsId: "G-DK00YQ60DN" # 你的 GA4 ID
+  googleAnalyticsId: "G-DK00YQ60DN"
   siteUrl: "https://template.itsuki.erzhiqian.cc"
-  # 站点描述 (用于 SEO 和页脚)
   description:
     ja: "技術、生活、写真を探求するデジタルガーデン。这里记录着成长的足迹。"
     en: "A digital garden exploring tech, life, and photography. Recording the footprints of growth here."
@@ -29,6 +27,11 @@ navigation:
   - id: "nav-blog"
     href: "/blog"
     label: { ja: "ブログ", en: "Blog" }
+    color: "hover:text-accent"
+  # 新增：归档页入口
+  - id: "nav-archive"
+    href: "/archive"
+    label: { ja: "アーカイブ", en: "Archive" }
     color: "hover:text-accent"
   - id: "nav-photo"
     href: "/photos"
@@ -87,7 +90,11 @@ theme:
     peach: "#fab387"
     red: "#f38ba8"
 
-# 5. 全局 UI 文本 (UI Translation Dictionary)
+# 5. 博客逻辑配置 (Blog Logic)
+blog:
+  pageSize: 9 # 27寸显示器网格布局建议设置为 6 或 9
+
+# 6. 全局 UI 文本 (UI Translation Dictionary)
 ui:
   headings:
     blog: { ja: "最新記事", en: "Recent Writing" }
@@ -115,11 +122,14 @@ ui:
     updated: { ja: "最終更新", en: "Last Updated" }
     noCover: { ja: "カバーなし", en: "NO COVER" }
     collaborate: { ja: "コラボレーションしましょう", en: "Let's Collaborate" }
-  webring:
-    prev: { ja: "前へ", en: "Prev" }
-    next: { ja: "次へ", en: "Next" }
+    # 新增：分页与归档标签
+    firstPage: { ja: "最初", en: "First" }
+    lastPage: { ja: "最後", en: "Last" }
+    pageOf: { ja: " / ", en: " of " }
+    viewFullArchive: { ja: "全記事一覧 (アーカイブ) ->", en: "View Full Archive ->" }
+    postCount: { ja: "件の記事", en: " posts" }
 
-# 6. 统计项定义 (移除硬编码，改为配置顺序驱动)
+# 7. 统计项定义
 stats:
   - id: "posts"
     label: { ja: "記事数", en: "Posts" }
@@ -130,7 +140,7 @@ stats:
   - id: "words"
     label: { ja: "总字数", en: "Words" }
 
-# 7. 个人简介 (Profile - Hero Section)
+# 8. 个人简介 (Profile)
 profile:
   avatar: "https://itsuki-9yx.pages.dev/assets/about/bio.svg"
   intro:
