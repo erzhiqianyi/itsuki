@@ -24,35 +24,47 @@ navigation:
     href: "/"
     label: { ja: "ホーム", en: "Home" }
     color: "hover:text-accent"
+    icon: 'home' # 基础图标，代表归宿
   - id: "nav-blog"
     href: "/blog"
     label: { ja: "ブログ", en: "Blog" }
     color: "hover:text-accent"
-  # 新增：归档页入口
+    icon: 'pen-tool' # 相比 book-open，pen-tool 更强调“创作者”的身份
   - id: "nav-archive"
     href: "/archive"
     label: { ja: "アーカイブ", en: "Archive" }
     color: "hover:text-accent"
+    icon: 'archive' # 抽屉/存档文件夹的语义
+  - id: "nav-ai"
+    href: "/ai-tools"
+    label: { ja: "AIツール", en: "AI Tools" }
+    color: "hover:text-blue-400"
+    icon: 'sparkles' # AI 的通用视觉符号（闪烁、魔法、智能）
   - id: "nav-photo"
     href: "/photos"
     label: { ja: "写真", en: "Photos" }
     color: "hover:text-peach"
+    icon: 'aperture' # 摄影师专属符号，比普通 camera 更专业、美观
   - id: "nav-yt"
     href: "/videos"
     label: { ja: "動画", en: "Videos" }
     color: "hover:text-red"
+    icon: 'video' # 摄像机图标，完美契合你的 YouTube 创作
   - id: "nav-now"
     href: "/now"
     label: { ja: "現在", en: "Now" }
     color: "hover:text-green"
+    icon: 'clock' # “Now” 页面通常记录近况，时钟代表当下
   - id: "nav-about"
     href: "/about"
     label: { ja: "私について", en: "About" }
     color: "hover:text-accent"
+    icon: 'user' # 个人信息的标准符号
   - id: "nav-jp"
     href: "/japanese"
     label: { ja: "日本語学習", en: "Japanese" }
     color: "hover:text-pink"
+    icon: 'languages' # 双语切换或学习的直观表达
 
 # 3. 社交链接 (Socials)
 socials:
@@ -108,6 +120,7 @@ ui:
     ai: { ja: "花园之灵 ✨", en: "Garden Spirit ✨" }
     resources: { ja: "学習リソース", en: "Resources" }
     wordOfDay: { ja: "今日の単語", en: "Word of the Day" }
+    aiTools: { ja: "AIツール・コレクション", en: "AI Tool Collection" }
   labels:
     viewAll: { ja: "すべて見る ->", en: "View All ->" }
     gallery: { ja: "ギャラリー ->", en: "Gallery ->" }
@@ -128,6 +141,12 @@ ui:
     pageOf: { ja: " / ", en: " of " }
     viewFullArchive: { ja: "全記事一覧 (アーカイブ) ->", en: "View Full Archive ->" }
     postCount: { ja: "件の記事", en: " posts" }
+    viewDemo: { ja: "デモを見る", en: "View Demo" }
+    openWeb: { ja: "サイトを開く", en: "Open Web" }
+    backToGallery: { ja: "ギャラリーに戻る", en: "Back to Gallery" }
+    aiToolsIntro: { ja: "Gemini Canvas で作成したクリエイティブなツール群", en: "Creative tools crafted with Gemini Canvas" }
+    all: { ja: "すべて", en: "All" }
+    changelogIntro: { ja: "サイトの進化の軌跡、マイルストーンを記録しています。",  en: "Recording the milestones and evolution of this site." }
 
 # 7. 统计项定义
 stats:
@@ -138,7 +157,9 @@ stats:
   - id: "videos"
     label: { ja: "動画", en: "Videos" }
   - id: "words"
-    label: { ja: "总字数", en: "Words" }
+    label: { ja: "総字数", en: "Words" }
+  - id: "ai-tools"
+    label: { ja: "AI道具", en: "AI Tools" }
 
 # 8. 个人简介 (Profile)
 profile:

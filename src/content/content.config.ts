@@ -1,9 +1,9 @@
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
+import {defineCollection, z} from 'astro:content';
+import {glob} from 'astro/loaders';
 
 // 1. 博客文章集合
 const blog = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/blog" }),
+    loader: glob({pattern: '**/[^_]*.{md,mdx}', base: "src/content/blog"}),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
         title: z.string(),
@@ -18,7 +18,7 @@ const blog = defineCollection({
 
 // 2. 摄影作品集合
 const photos = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/photos" }),
+    loader: glob({pattern: '**/[^_]*.{md,mdx}', base: "src/content/photos"}),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
         title: z.record(z.string()),
@@ -41,7 +41,7 @@ const photos = defineCollection({
 
 // 3. 视频作品集合
 const videos = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,mdx,json,yaml}', base: "src/content/videos" }),
+    loader: glob({pattern: '**/[^_]*.{md,mdx,json,yaml}', base: "src/content/videos"}),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
         title: z.string(),
@@ -60,7 +60,7 @@ const videos = defineCollection({
 
 // 4. Now 页面 - 核心状态集合
 const now = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/now" }),
+    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/now"}),
     schema: z.object({
         type: z.enum(['mission', 'status']),
         lang: z.enum(['ja', 'en']).default('ja'),
@@ -85,7 +85,7 @@ const now = defineCollection({
 
 // 5. Now 页面 - 归档集合 (书影音记录)
 const archive = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/archive" }),
+    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/archive"}),
     schema: z.object({
         type: z.enum(['books', 'games', 'movies']),
         title: z.string(),
@@ -100,7 +100,7 @@ const archive = defineCollection({
 
 // 6. About 页面 - 个人资料与履历集合
 const about = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: "src/content/about" }),
+    loader: glob({pattern: '**/[^_]*.{md,mdx}', base: "src/content/about"}),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
         // Profile 模块
@@ -142,7 +142,7 @@ const about = defineCollection({
 
 // 7. Japanese 页面 - 日语学习动态集合
 const japanese = defineCollection({
-    loader: glob({ pattern: '**/[^_]*.{md,yaml}', base: "src/content/japanese" }),
+    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/japanese"}),
     schema: z.object({
         lang: z.enum(['ja', 'en']).default('ja'),
         type: z.enum(['jlpt', 'stats', 'word', 'resources', 'meta']),
@@ -179,4 +179,35 @@ const japanese = defineCollection({
     })
 });
 
-export const collections = { blog, photos, videos, now, archive, about, japanese };
+
+const aiTools = defineCollection({
+    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/ai-tools"}),
+    schema: z.object({
+        lang: z.enum(['ja', 'en']).default('ja'),
+        title: z.string(),
+        description: z.string(),
+        // 1. 新增：跳转到 Gemini Canvas 或具体网页的链接
+        url: z.string().url(),
+        // 2. 预定义图标名 (Lucide)
+        icon: z.string().default('Wrench'),
+        category: z.array(z.string()).default([]),
+        // 3. 关联的 React 演示组件名
+        componentId: z.string().optional(),
+        date: z.string(),
+        featured: z.boolean().default(false),
+    }),
+});
+
+
+const changelog = defineCollection({
+    type: 'content',
+    schema: z.object({
+        title: z.string(),
+        date: z.string(), // 格式如 2025-12-27
+        version: z.string(),
+        lang: z.enum(['ja', 'en']), // 显式区分语言
+        type: z.enum(['feat', 'fix', 'refactor', 'style', 'perf']), // 日志类型
+    }),
+});
+
+export const collections = {blog, photos, videos, now, archive, about, japanese, 'ai-tools': aiTools, changelog};

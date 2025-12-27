@@ -1,13 +1,14 @@
 ---
 // src/layouts/BaseLayout.astro
-import { SITE_CONFIG, t } from '../data/site-config';
+import { SITE_CONFIG } from '../data/site-config';
 import { ClientRouter } from 'astro:transitions';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
     title?: string;
     description?: string;
     image?: string;
-    article?: boolean; // 是否为文章页，用于生成不同的 JSON-LD
+    article?: boolean;
     lang?: 'ja' | 'en';
 }
 
@@ -17,40 +18,71 @@ const {
     article = false,
 } = Astro.props;
 
+// --- 翻译辅助函数 ---
+const t = (key: string) => {
+    const labels = SITE_CONFIG.ui.labels as any;
+    const headings = SITE_CONFIG.ui.headings as any;
+    return labels[key]?.[lang] || headings[key]?.[lang] || key;
+};
+
 // --- SEO 逻辑 ---
-// 优先级：外部传入的 description > 配置文件中的默认描述
 const configDescription = SITE_CONFIG.brand.description[lang] || SITE_CONFIG.brand.description['ja'];
 const description = Astro.props.description || configDescription;
-
-// 优先使用 YAML 中配置的 siteUrl，确保 Canonical URL 正确
 const siteUrl = SITE_CONFIG.brand.siteUrl || 'https://erzhiqian.cc';
 const canonicalURL = new URL(Astro.url.pathname, siteUrl);
 const ogImage = new URL(Astro.props.image || '/og-default.jpg', Astro.url);
 const siteTitle = title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`;
 
-// --- Google Analytics ID ---
-const GA_ID = SITE_CONFIG.brand.googleAnalyticsId;
+// --- 路径逻辑与更新时间 ---
+const currentPath = Astro.url.pathname;
+const lastUpdatedDate = new Date().toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit'
+});
 
-// --- 结构化数据 (JSON-LD) ---
-const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": article ? "BlogPosting" : "WebSite",
-    "name": siteTitle,
-    "description": description,
-    "url": canonicalURL.href,
-    ...(article && {
-        "headline": title,
-        "image": [ogImage.href],
-        "author": {
-            "@type": "Person",
-            "name": "Itsuki",
-            "url": siteUrl
-        }
-    })
+// --- 智能路由生成器 (Smart Redirector) ---
+const getLocalizedHref = (href: string) => {
+    const cleanHref = href.startsWith('/') ? href : `/${href}`;
+
+    // 1. 特殊处理 Changelog：它在 [lang] 目录下
+    if (cleanHref.includes('changelog')) {
+        return `/${lang}/changelog`;
+    }
+
+    // 2. 英语环境下：所有链接强制加 /en
+    if (lang === 'en') {
+        if (cleanHref === '/') return '/en';
+        return cleanHref.startsWith('/en') ? cleanHref : `/en${cleanHref}`;
+    }
+
+    // 3. 日语(默认)环境下：保持原样（Root 模式），不加 /ja 前缀
+    return cleanHref.replace(/\/$/, '') || '/';
 };
 
-const { colors } = SITE_CONFIG.theme;
-const currentPath = Astro.url.pathname;
+// 判断激活状态
+const isPathActive = (href: string) => {
+    const localizedHref = getLocalizedHref(href).replace(/\/$/, '');
+    const normalizedPath = currentPath.replace(/\/$/, '');
+    if (localizedHref === '' || localizedHref === '/en' || localizedHref === '/ja') {
+        return normalizedPath === localizedHref;
+    }
+    return normalizedPath.startsWith(localizedHref);
+};
+
+// 语言切换器链接生成
+const getSwitchLangHref = (targetLang: 'ja' | 'en') => {
+    if (targetLang === lang) return currentPath;
+
+    if (targetLang === 'en') {
+        // 从 ja 切换到 en：加前缀
+        return `/en${currentPath}`.replace(/\/+$/, '').replace('/en/en', '/en') || '/en';
+    } else {
+        // 从 en 切换到 ja：去前缀
+        const path = currentPath.replace(/^\/en/, '') || '/';
+        // 特殊处理 changelog，如果要强制日语也去 ja/changelog 的话：
+        if (path.includes('changelog')) return '/ja/changelog';
+        return path;
+    }
+};
 ---
 
 <!doctype html>
@@ -62,87 +94,52 @@ const currentPath = Astro.url.pathname;
     <meta name="generator" content={Astro.generator} />
 
     <title>{siteTitle}</title>
-    <meta name="title" content={siteTitle} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
 
-    <meta property="og:type" content={article ? 'article' : 'website'} />
-    <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={siteTitle} />
-    <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
-
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={siteTitle} />
-    <meta property="twitter:description" content={description} />
-    <meta property="twitter:image" content={ogImage} />
-
-    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
-
-    {GA_ID && (
-            <>
-                <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}></script>
-                <script is:inline define:vars={{ GA_ID }}>
-                    window.dataLayer = window.dataLayer || [];
-                    function gtag() { dataLayer.push(arguments); }
-                    gtag('js', new Date());
-                    gtag('config', GA_ID);
-
-                    document.addEventListener('astro:page-load', () => {
-                        gtag('event', 'page_view', {
-                            page_title: document.title,
-                            page_location: window.location.href,
-                            page_path: window.location.pathname
-                        });
-                    });
-                </script>
-            </>
-    )}
+    <script type="application/ld+json" set:html={JSON.stringify({"@context": "https://schema.org","@type": article ? "BlogPosting" : "WebSite","name": siteTitle,"url": canonicalURL.href})} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 
     <ClientRouter />
 </head>
-<body class="min-h-screen flex flex-col font-sans selection:bg-[#89b4fa]/30 bg-[#1e1e2e] text-[#cdd6f4] antialiased">
+<body class="min-h-screen flex flex-col font-sans bg-[#1e1e2e] text-[#cdd6f4] antialiased">
 
-<header class="fixed top-0 left-0 w-full z-[100] bg-[#1e1e2e]/70 backdrop-blur-xl border-b border-white/5">
-    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href={lang === 'en' ? '/en' : '/'} class="font-mono text-xl font-bold flex items-center gap-3 group">
-            <div class="w-2.5 h-2.5 rounded-full bg-[#89b4fa] shadow-[0_0_15px_rgba(137,180,250,0.6)] group-hover:scale-125 transition-transform duration-500"></div>
+<header id="main-header" class="fixed top-0 left-0 w-full z-[100] transition-all duration-500 border-b border-transparent py-1">
+    <div class="max-w-7xl mx-auto px-4 lg:px-6 h-14 flex items-center justify-between gap-4">
+        <a href={lang === 'en' ? '/en' : '/'} class="font-mono text-lg font-bold flex items-center gap-2 group flex-shrink-0">
+            <div class="w-2 h-2 rounded-full bg-[#89b4fa] shadow-[0_0_15px_rgba(137,180,250,0.6)] group-hover:scale-125 transition-transform duration-500"></div>
             <span class="tracking-tight text-[#f5e0dc] group-hover:text-[#89b4fa] transition-colors">{SITE_CONFIG.brand.logo}</span>
         </a>
 
-        <div class="hidden md:flex items-center gap-8">
-            <nav class="flex gap-8 text-[13px] font-medium text-[#bac2de]">
-                {SITE_CONFIG.navigation.map((item) => (
-                        <a href={lang === 'en' ? `/en${item.href}`.replace(/\/$/, '') : item.href} class="transition-all duration-300 hover:text-white relative group py-2">
-                            {item.label[lang]}
-                            <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#89b4fa] transition-all duration-300 group-hover:w-full"></span>
-                        </a>
-                ))}
+        <div class="hidden xl:flex items-center gap-1 flex-grow justify-end">
+            <nav class="flex items-center gap-0.5 text-[12px] font-medium">
+                {SITE_CONFIG.navigation.map((item) => {
+                    const localizedHref = getLocalizedHref(item.href);
+                    const isActive = isPathActive(item.href);
+                    return (
+                            <a href={localizedHref} class={`transition-all duration-300 relative group py-1.5 px-2.5 flex items-center gap-1.5 whitespace-nowrap rounded-full ${isActive ? 'text-[#89b4fa] bg-white/5' : `text-[#bac2de] ${item.color} hover:bg-white/5`}`}>
+                                {item.icon && <Icon name={`lucide:${item.icon}`} class="w-3.5 h-3.5" />}
+                                <span>{item.label[lang]}</span>
+                                <span class={`absolute bottom-0 left-3 right-3 h-0.5 bg-[#89b4fa] transition-all duration-300 ${isActive ? 'opacity-100 shadow-[0_0_8px_rgba(137,180,250,0.4)]' : 'w-0 opacity-0 group-hover:w-[calc(100%-1.5rem)] group-hover:opacity-100'}`}></span>
+                            </a>
+                    )
+                })}
             </nav>
+
             <div class="flex items-center bg-white/5 rounded-full p-1 border border-white/10 ml-2">
-                <a href={lang === 'en' ? (currentPath.replace(/^\/en/, '') || '/') : currentPath} class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>JA</a>
-                <a href={lang === 'ja' ? (`/en${currentPath === '/' ? '' : currentPath}`) : currentPath} class={`px-3 py-1 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>EN</a>
+                <a href={getSwitchLangHref('ja')} class={`px-2.5 py-0.5 text-[10px] font-bold rounded-full transition-all ${lang === 'ja' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>JA</a>
+                <a href={getSwitchLangHref('en')} class={`px-2.5 py-0.5 text-[10px] font-bold rounded-full transition-all ${lang === 'en' ? 'bg-[#89b4fa] text-[#1e1e2e]' : 'text-[#a6adc8] hover:text-white'}`}>EN</a>
             </div>
         </div>
 
-        <button id="menu-toggle" class="md:hidden p-2 text-[#a6adc8] hover:text-white transition-colors">
-            <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <button id="menu-toggle" class="xl:hidden p-2 text-[#a6adc8] hover:text-white transition-colors">
+            <Icon name="lucide:menu" class="w-6 h-6" />
         </button>
     </div>
 </header>
-
-<div id="mobile-menu" class="fixed inset-0 z-[90] bg-[#1e1e2e] hidden flex-col items-center justify-center pt-16">
-    <nav class="flex flex-col items-center gap-8 text-xl font-bold">
-        {SITE_CONFIG.navigation.map((item) => (
-                <a href={lang === 'en' ? `/en${item.href}` : item.href} class="text-[#cdd6f4] hover:text-[#89b4fa] transition-colors">{item.label[lang]}</a>
-        ))}
-    </nav>
-</div>
 
 <main class="flex-grow w-full max-w-6xl mx-auto px-6 pt-24 pb-20">
     <slot />
@@ -150,72 +147,51 @@ const currentPath = Astro.url.pathname;
 
 <footer class="mt-12 text-center text-xs font-mono pb-12 flex flex-col items-center gap-6">
     <div class="flex items-center gap-4 text-[10px] uppercase tracking-[0.2em] text-[#585b70]">
-        <a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[#89b4fa] transition-all">{t('prev', lang)}</a>
+        <a href={SITE_CONFIG.brand.webring.prev} class="hover:text-[#89b4fa] transition-all">{t('prev')}</a>
         <span class="opacity-20">/</span>
         <a href={SITE_CONFIG.brand.webring.home} target="_blank" class="hover:text-white transition font-bold">{SITE_CONFIG.brand.webring.label}</a>
         <span class="opacity-20">/</span>
-        <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[#89b4fa] transition-all">{t('next', lang)}</a>
+        <a href={SITE_CONFIG.brand.webring.next} class="hover:text-[#89b4fa] transition-all">{t('next')}</a>
     </div>
-    <div class="text-[#6c7086] opacity-80">{SITE_CONFIG.brand.footer} • <span class="text-[#f5e0dc]">{t('builtWith', lang)}</span></div>
-</footer>
 
-<style is:global define:vars={{
-    'accent': SITE_CONFIG.theme.colors.accent,
-    'bg': SITE_CONFIG.theme.colors.bg,
-    'card': SITE_CONFIG.theme.colors.card,
-    'text': SITE_CONFIG.theme.colors.text,
-    'subtext': SITE_CONFIG.theme.colors.subtext,
-    'pink': SITE_CONFIG.theme.colors.pink,
-    'green': SITE_CONFIG.theme.colors.green,
-    'peach': SITE_CONFIG.theme.colors.peach,
-    'red': SITE_CONFIG.theme.colors.red
-}}>
-    :root {
-        --bg: #1e1e2e;
-        --card: #181825;
-        --accent-rgb: 137, 180, 250;
-    }
-    html, body {
-        background-color: var(--bg);
-        color: var(--text);
-        margin: 0; padding: 0;
-        font-family: 'Inter', 'Noto Sans JP', sans-serif;
-    }
-    .bento-card {
-        position: relative;
-        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        border: 1px solid rgba(255, 255, 255, 0.03);
-        background: linear-gradient(145deg, rgba(30, 30, 46, 0.6), rgba(24, 24, 37, 0.8));
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        border-radius: 2.5rem;
-    }
-    .bento-card:hover {
-        transform: translateY(-8px);
-        border-color: rgba(137, 180, 250, 0.3);
-        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-    }
-</style>
+    <div class="text-[#6c7086] opacity-80 flex flex-col sm:flex-row items-center gap-2">
+        <div>{SITE_CONFIG.brand.footer} • <span class="text-[#f5e0dc]">{t('builtWith')}</span></div>
+        <span class="hidden sm:inline opacity-30">|</span>
+        <a href={getLocalizedHref('/changelog')} class="group flex items-center gap-1.5 hover:text-[#89b4fa] transition-colors">
+            <Icon name="lucide:history" class="w-3 h-3 opacity-50 group-hover:opacity-100" />
+            <span>{t('updated')}: <span class="text-[#f5e0dc] group-hover:text-[#89b4fa] underline underline-offset-4 decoration-[#585b70]">{lastUpdatedDate}</span></span>
+        </a>
+    </div>
+</footer>
 
 <script>
     function setupMenu() {
         const toggle = document.getElementById('menu-toggle');
         const menu = document.getElementById('mobile-menu');
-        const icon = document.getElementById('menu-icon');
         if (toggle && menu) {
             toggle.onclick = () => {
                 const isHidden = menu.classList.contains('hidden');
                 menu.classList.toggle('hidden', !isHidden);
                 menu.classList.toggle('flex', isHidden);
                 document.body.style.overflow = isHidden ? 'hidden' : '';
-                icon.innerHTML = isHidden ?
-                    '<path d="M18 6L6 18M6 6l12 12"></path>' :
-                    '<line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line>';
             };
         }
     }
-    setupMenu();
-    document.addEventListener('astro:after-swap', setupMenu);
+    function handleScroll() {
+        const header = document.getElementById('main-header');
+        if (header) {
+            if (window.scrollY > 20) {
+                header.classList.add('bg-[#1e1e2e]/80', 'backdrop-blur-xl', 'border-white/10', 'shadow-lg', 'py-2');
+                header.classList.remove('border-transparent', 'py-1');
+            } else {
+                header.classList.remove('bg-[#1e1e2e]/80', 'backdrop-blur-xl', 'border-white/10', 'shadow-lg', 'py-2');
+                header.classList.add('border-transparent', 'py-1');
+            }
+        }
+    }
+    function init() { setupMenu(); handleScroll(); window.addEventListener('scroll', handleScroll); }
+    init();
+    document.addEventListener('astro:after-swap', init);
 </script>
 </body>
 </html>
