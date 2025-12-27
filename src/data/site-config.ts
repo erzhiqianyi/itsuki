@@ -33,6 +33,7 @@ interface SiteConfig {
         href: string;
         label: { ja: string; en: string };
         color: string;
+        icon: string;
     }>;
     socials: Array<{
         id: string;
