@@ -1,25 +1,22 @@
 ---
-// src/pages/blog/[...page].astro
+// src/pages/blog/featured.astro
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SITE_CONFIG, t } from '../../data/site-config';
 
-export async function getStaticPaths({ paginate }) {
-    const lang = 'ja';
-    const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
-    const sortedPosts = allPosts.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
-
-    return paginate(sortedPosts, { pageSize: SITE_CONFIG.blog.pageSize });
-}
-
-const { page } = Astro.props;
 const lang = 'ja';
+const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
 
-// --- 数据获取与逻辑处理 ---
-const allPostsForSidebar = await getCollection('blog', ({ data }) => data.lang === lang);
+// 1. 提取所有推荐文章并按时间降序排序
+const allFeaturedPosts = allPosts
+    .filter(post => post.data.featured)
+    .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
 
-// 1. 分类统计
-const categoryCounts = allPostsForSidebar.reduce((acc, post) => {
+// 2. 侧边栏推荐：仅取最新的前3篇
+const sidebarFeaturedPosts = allFeaturedPosts.slice(0, 3);
+
+// 3. 侧边栏分类统计
+const categoryCounts = allPosts.reduce((acc, post) => {
     const cat = post.data.category;
     acc[cat] = (acc[cat] || 0) + 1;
     return acc;
@@ -29,25 +26,12 @@ const dynamicCategories = Object.entries(categoryCounts).map(([label, count]) =>
     id: label.toLowerCase(), label, count
 }));
 
-// 2. 推荐文章：按时间降序排序，取前3篇
-const featuredPosts = allPostsForSidebar
-    .filter(p => p.data.featured)
-    .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date))
-    .slice(0, 3);
-
-// --- 分页逻辑 ---
-const totalPages = page.lastPage;
-const currentPage = page.currentPage;
-let startPage = Math.max(1, currentPage - 1);
-let endPage = Math.min(totalPages, startPage + 2);
-if (endPage - startPage < 2) startPage = Math.max(1, endPage - 2);
-const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-
 const blogUI = {
+    title: { ja: "おすすめ記事", en: "Featured Posts" },
+    subtitle: { ja: "厳選されたコンテンツをお楽しみください", en: "Hand-picked high quality contents" },
     search: { ja: "検索", en: "Search" },
     categories: { ja: "カテゴリー", en: "Categories" },
-    featured: { ja: "おすすめ", en: "Featured" },
-    viewAllFeatured: { ja: "すべてのおすすめを見る", en: "View All Featured" },
+    featured: { ja: "最新のおすすめ", en: "Latest Featured" },
     stats: {
         words: { ja: "文字", en: "words" },
         mins: { ja: "分", en: "min" }
@@ -62,10 +46,10 @@ function getStats(body: string) {
 }
 ---
 
-<BaseLayout title={`Blog - ${SITE_CONFIG.brand.logo}`} lang={lang}>
+<BaseLayout title={`${blogUI.title[lang]} - ${SITE_CONFIG.brand.logo}`} lang={lang}>
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <!-- 侧边栏 -->
         <aside class="space-y-6 order-2 lg:order-1 text-left">
-            <!-- 搜索 -->
             <div class="bento-card rounded-3xl p-6">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-4 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
@@ -74,7 +58,6 @@ function getStats(body: string) {
                 <input type="text" id="search-input" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--accent)]/50 transition-all" placeholder="Search posts..." />
             </div>
 
-            <!-- 分类 -->
             <div class="bento-card rounded-3xl p-6">
                 <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--green)] mb-4 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/></svg>
@@ -90,7 +73,6 @@ function getStats(body: string) {
                 </div>
             </div>
 
-            <!-- 归档 -->
             <div class="bento-card rounded-3xl p-6 bg-gradient-to-br from-[var(--accent)]/10 to-transparent border-[var(--accent)]/20">
                 <a href="/archive" class="flex flex-col gap-2 group">
                     <span class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] flex items-center gap-2">
@@ -103,15 +85,14 @@ function getStats(body: string) {
                 </a>
             </div>
 
-            <!-- 推荐文章：最新3篇 -->
-            {featuredPosts.length > 0 && (
+            {sidebarFeaturedPosts.length > 0 && (
                     <div class="bento-card rounded-3xl p-6 border-white/5">
                         <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--peach)] mb-4 flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
                             {blogUI.featured[lang]}
                         </h3>
-                        <div class="space-y-4 mb-6">
-                            {featuredPosts.map(post => (
+                        <div class="space-y-4">
+                            {sidebarFeaturedPosts.map(post => (
                                     <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="flex flex-col gap-1 group">
                                 <span class="text-[9px] font-mono text-[var(--subtext)] opacity-50 uppercase tracking-tighter flex items-center gap-1.5">
                                     <span class="w-1 h-1 rounded-full bg-[var(--peach)]"></span>
@@ -123,28 +104,35 @@ function getStats(body: string) {
                                     </a>
                             ))}
                         </div>
-                        <!-- 全部推荐入口 -->
-                        <a href="/blog/featured" class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] transition-all group">
-                            <span class="text-[10px] font-bold text-[var(--subtext)] group-hover:text-white uppercase tracking-widest">{blogUI.viewAllFeatured[lang]}</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                        </a>
+                        <div class="mt-6 p-3 rounded-xl bg-[var(--peach)]/10 border border-[var(--peach)]/20 text-center">
+                            <span class="text-[9px] font-bold text-[var(--peach)] uppercase tracking-widest">You are here</span>
+                        </div>
                     </div>
             )}
         </aside>
 
-        <div class="lg:col-span-3 space-y-6 order-1 lg:order-2">
+        <!-- 内容主体 -->
+        <div class="lg:col-span-3 space-y-8 order-1 lg:order-2">
+            <div class="px-2 pb-6 border-b border-white/5">
+                <h1 class="text-5xl font-black text-white italic tracking-tighter mb-3 leading-none">{blogUI.title[lang]}</h1>
+                <p class="text-[var(--subtext)] text-sm font-bold opacity-60 uppercase tracking-[0.2em]">{blogUI.subtitle[lang]}</p>
+            </div>
+
             <div id="posts-container" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {page.data.map((post) => {
+                {allFeaturedPosts.map((post) => {
                     const { formattedCount, readingTime } = getStats(post.body || '');
                     return (
-                            <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="bento-card flex flex-col group w-full overflow-hidden">
+                            <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="bento-card flex flex-col group w-full overflow-hidden border-[var(--peach)]/20 shadow-[0_0_30px_rgba(250,179,135,0.03)] hover:border-[var(--peach)]/40 transition-all duration-500">
                                 <div class="w-full h-44 relative overflow-hidden bg-[#181825]">
                                     <img src={post.data.coverImage} class="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:scale-105 transition duration-[1.5s]" alt={post.data.title} />
+                                    <div class="absolute top-4 right-4 bg-[var(--peach)] text-[#1e1e2e] p-1.5 rounded-lg shadow-xl z-10">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.75-6.172 3.245 1.179-6.873-4.993-4.867 6.9-1.002L12 2l3.086 6.253 6.9 1.002-4.993 4.867 1.179 6.873z"/></svg>
+                                    </div>
                                 </div>
                                 <div class="p-5 flex flex-col justify-between flex-1 text-left bg-gradient-to-br from-white/[0.02] to-transparent">
                                     <div>
                                         <div class="flex items-center gap-3 mb-3 text-[9px] font-mono font-bold uppercase tracking-wider flex-wrap">
-                                            <span class="text-[var(--accent)] bg-[var(--accent)]/10 px-2 py-0.5 rounded border border-[var(--accent)]/20">{post.data.category}</span>
+                                            <span class="text-[var(--peach)] bg-[var(--peach)]/10 px-2 py-0.5 rounded border border-[var(--peach)]/20">{post.data.category}</span>
                                             <span class="text-gray-500">{post.data.date}</span>
                                             <span class="w-1 h-1 rounded-full bg-white/10 hidden sm:block"></span>
                                             <span class="flex items-center gap-1 text-gray-500">
@@ -156,67 +144,21 @@ function getStats(body: string) {
                                                 {readingTime} {blogUI.stats.mins[lang]}
                                         </span>
                                         </div>
-                                        <h3 class="text-lg font-bold text-white mb-3 group-hover:text-[var(--accent)] transition duration-300 leading-snug line-clamp-2">
+                                        <h3 class="text-lg font-bold text-white mb-3 group-hover:text-[var(--peach)] transition duration-300 leading-snug line-clamp-2">
                                             {post.data.title}
                                         </h3>
                                         {post.data.summary && <p class="text-[12px] text-[var(--subtext)] leading-relaxed line-clamp-2 opacity-80">{post.data.summary}</p>}
                                     </div>
                                     <div class="mt-5 pt-4 border-t border-white/5 flex justify-end">
-                                <span class="text-[var(--accent)] font-black flex items-center gap-2 text-[9px] uppercase tracking-widest">
-                                    {t('readMore', lang)}
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                                </span>
+                                    <span class="text-[var(--peach)] font-black flex items-center gap-2 text-[9px] uppercase tracking-widest">
+                                        {t('readMore', lang)}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                                    </span>
                                     </div>
                                 </div>
                             </a>
                     )
                 })}
-            </div>
-
-            <!-- 分页导航 -->
-            <div class="flex flex-col items-center gap-6 pt-12">
-                <div class="text-[10px] font-mono font-bold uppercase tracking-widest text-[var(--subtext)] opacity-60">
-                    {currentPage} {t('pageOf', lang)} {totalPages}
-                </div>
-
-                <div class="flex justify-center items-center gap-2">
-                    {currentPage > 1 ? (
-                            <a href="/blog" class="p-3 text-[var(--subtext)] hover:text-white transition-colors" title={t('firstPage', lang)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg>
-                            </a>
-                    ) : (
-                            <div class="p-3 opacity-10 cursor-not-allowed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m11 17-5-5 5-5"/><path d="m18 17-5-5 5-5"/></svg></div>
-                    )}
-
-                    {page.url.prev ?
-                            <a href={page.url.prev} class="p-3 text-[var(--subtext)] hover:text-white transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                            </a> :
-                            <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></div>
-                    }
-
-                    {visiblePages.map(num => (
-                            <a href={num === 1 ? "/blog" : `/blog/${num}`}
-                               class={`w-12 h-12 rounded-2xl border flex items-center justify-center transition-all duration-300 text-sm font-bold ${num === currentPage ? 'bg-[var(--accent)] text-[#1e1e2e] border-[var(--accent)] scale-110 shadow-lg' : 'border-white/5 text-[var(--subtext)] hover:bg-white/5'}`}>
-                                {num}
-                            </a>
-                    ))}
-
-                    {page.url.next ?
-                            <a href={page.url.next} class="p-3 text-[var(--subtext)] hover:text-white transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                            </a> :
-                            <div class="p-3 opacity-10"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></div>
-                    }
-
-                    {currentPage < totalPages ? (
-                            <a href={`/blog/${totalPages}`} class="p-3 text-[var(--subtext)] hover:text-white transition-colors" title={t('lastPage', lang)}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg>
-                            </a>
-                    ) : (
-                            <div class="p-3 opacity-10 cursor-not-allowed"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 17 5-5-5-5"/><path d="m13 17 5-5-5-5"/></svg></div>
-                    )}
-                </div>
             </div>
         </div>
     </div>

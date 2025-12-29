@@ -1,19 +1,35 @@
 ---
-import {getCollection} from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import {SITE_CONFIG, t} from '../data/site-config';
+import { SITE_CONFIG, t } from '../data/site-config';
 
 const lang = 'ja';
-const allPosts = await getCollection('blog', ({data}) => data.lang === lang);
+const allPosts = await getCollection('blog', ({ data }) => data.lang === lang);
 
-// 1. 按时间倒序排列
+// 1. 数据准备：按时间倒序排列
 const sortedPosts = allPosts.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
 
-// 2. 按年份和月份分组逻辑
+// 2. 侧边栏逻辑同步
+const categoryCounts = allPosts.reduce((acc, post) => {
+    const cat = post.data.category;
+    acc[cat] = (acc[cat] || 0) + 1;
+    return acc;
+}, {} as Record<string, number>);
+
+const dynamicCategories = Object.entries(categoryCounts).map(([label, count]) => ({
+    id: label.toLowerCase(), label, count
+}));
+
+const featuredPosts = allPosts
+    .filter(p => p.data.featured)
+    .sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date))
+    .slice(0, 3);
+
+// 3. 归档分组逻辑
 const groupedPosts = sortedPosts.reduce((acc, post) => {
     const date = new Date(post.data.date);
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // 1-12
+    const month = date.getMonth() + 1;
 
     if (!acc[year]) acc[year] = {};
     if (!acc[year][month]) acc[year][month] = [];
@@ -22,69 +38,163 @@ const groupedPosts = sortedPosts.reduce((acc, post) => {
     return acc;
 }, {} as Record<number, Record<number, any[]>>);
 
-// 3. 获取排序后的年份列表（倒序）
 const years = Object.keys(groupedPosts).map(Number).sort((a, b) => b - a);
+
+// 4. UI 文本
+const blogUI = {
+    search: { ja: "検索", en: "Search" },
+    categories: { ja: "カテゴリー", en: "Categories" },
+    featured: { ja: "おすすめ", en: "Featured" },
+    viewAllFeatured: { ja: "すべてのおすすめを見る", en: "View All Featured" },
+    archiveSummary: {
+        ja: "これまでに綴ってきた思考の断片、技術的な備忘録、そして日々の記録を時系列で整理しました。過去から現在までの歩みを俯瞰することができます。",
+        en: "A chronological collection of thoughts, technical notes, and daily logs recorded over time."
+    }
+};
 ---
 
 <BaseLayout title={`${t('archive', lang)} - ${SITE_CONFIG.brand.logo}`} lang={lang}>
-    <div class="max-w-4xl mx-auto px-4 py-12">
-        <header class="mb-12 text-left">
-            <h1 class="text-4xl font-black text-white mb-4 flex items-center gap-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2.5">
-                    <path d="M20 10V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
-                    <path d="M12 15V5"/>
-                    <path d="m9 8 3-3 3 3"/>
-                </svg>
-                {t('archive', lang)}
-            </h1>
-            <p class="text-[var(--subtext)] font-mono text-sm">
-                Total: {allPosts.length} {t('postCount', lang)}
-            </p>
-        </header>
+    <!-- 修正：调整顶部间距为 pt-20 以对齐博客列表页面，并增加 max-w-7xl 确保水平对齐 -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-        <div class="space-y-16">
-            {years.map(year => (
-                    <section class="relative">
-                        <div class="sticky top-0 z-10 py-4 bg-[var(--bg)]/80 backdrop-blur-sm">
-                            <h2 class="text-6xl font-black opacity-10 absolute -top-4 -left-4 pointer-events-none">{year}</h2>
-                            <h2 class="text-3xl font-bold text-[var(--accent)] relative">{year}</h2>
-                        </div>
+        <!-- 侧边栏：与 blog 列表页完全对齐 -->
+        <aside class="space-y-6 order-2 lg:order-1 text-left">
+            <!-- 搜索 -->
+            <div class="bento-card rounded-3xl p-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    {blogUI.search[lang]}
+                </h3>
+                <input type="text" id="search-input" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-[var(--accent)]/50 transition-all" placeholder="Search archive..." />
+            </div>
 
-                        <div class="mt-8 space-y-12 pl-4 border-l-2 border-white/5">
-                            {Object.keys(groupedPosts[year]).map(Number).sort((a, b) => b - a).map(month => (
-                                    <div class="relative">
-                                        <h3 class="text-lg font-bold text-[var(--green)] mb-6 flex items-center gap-2">
-                                            <span class="w-2 h-2 rounded-full bg-[var(--green)]"></span>
-                                            {month}月
-                                        </h3>
+            <!-- 分类 -->
+            <div class="bento-card rounded-3xl p-6">
+                <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--green)] mb-4 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 2 7 12 12 22 7 12 2"/></svg>
+                    {blogUI.categories[lang]}
+                </h3>
+                <div class="space-y-1">
+                    {dynamicCategories.map(cat => (
+                            <a href={`/category/${cat.id}`} class="w-full flex justify-between items-center px-4 py-2 rounded-xl transition-all hover:bg-white/5 text-[var(--subtext)] group">
+                                <span class="text-sm font-semibold group-hover:text-white">{cat.label}</span>
+                                <span class="text-[10px] font-mono opacity-40">{cat.count}</span>
+                            </a>
+                    ))}
+                </div>
+            </div>
 
-                                        <ul class="space-y-4 ml-4">
-                                            {groupedPosts[year][month].map(post => (
-                                                    <li>
-                                                        <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`}
-                                                           class="group flex items-baseline justify-between gap-4">
-                                                <span class="text-white/80 group-hover:text-[var(--accent)] transition-colors text-base font-medium underline-offset-4 decoration-white/10 group-hover:underline">
-                                                    {post.data.title}
-                                                </span>
-                                                            <span class="shrink-0 font-mono text-xs text-gray-500">
-                                                    {post.data.date.split('-').slice(1).join('-')} </span>
-                                                        </a>
-                                                    </li>
-                                            ))}
-                                        </ul>
-                                    </div>
+            <!-- 归档：当前页面激活态 -->
+            <div class="bento-card rounded-3xl p-6 bg-[var(--accent)]/10 border-[var(--accent)]/20 shadow-[0_0_20px_rgba(137,180,250,0.05)]">
+                <div class="flex flex-col gap-2">
+                    <span class="text-xs font-bold uppercase tracking-widest text-[var(--accent)] flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 8h10"/><path d="M7 12h10"/><path d="M7 16h10"/></svg>
+                        {t('archive', lang)}
+                    </span>
+                    <span class="text-[10px] font-bold text-white/50 uppercase tracking-widest">
+                        Currently Viewing
+                    </span>
+                </div>
+            </div>
+
+            <!-- 推荐文章 -->
+            {featuredPosts.length > 0 && (
+                    <div class="bento-card rounded-3xl p-6 border-white/5">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-[var(--peach)] mb-4 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                            {blogUI.featured[lang]}
+                        </h3>
+                        <div class="space-y-4 mb-6">
+                            {featuredPosts.map(post => (
+                                    <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="flex flex-col gap-1 group">
+                                <span class="text-[9px] font-mono text-[var(--subtext)] opacity-50 uppercase tracking-tighter flex items-center gap-1.5">
+                                    <span class="w-1 h-1 rounded-full bg-[var(--peach)]"></span>
+                                    {post.data.date}
+                                </span>
+                                        <span class="text-sm font-bold text-white group-hover:text-[var(--accent)] transition-colors line-clamp-2 leading-snug">
+                                    {post.data.title}
+                                </span>
+                                    </a>
                             ))}
                         </div>
-                    </section>
-            ))}
+                        <a href="/blog/featured" class="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.08] transition-all group">
+                            <span class="text-[10px] font-bold text-[var(--subtext)] group-hover:text-white uppercase tracking-widest leading-none">{blogUI.viewAllFeatured[lang]}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="group-hover:translate-x-1 transition-transform"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </a>
+                    </div>
+            )}
+        </aside>
+
+        <!-- 主内容区：lg:col-span-3 -->
+        <div class="lg:col-span-3 space-y-12 order-1 lg:order-2">
+            <!-- 头部说明 -->
+            <header class="px-2 pb-10 border-b border-white/5">
+                <h1 class="text-5xl font-black text-white mb-6 flex items-center gap-4 italic tracking-tighter uppercase">
+                    {t('archive', lang)}
+                </h1>
+                <p class="text-[var(--subtext)] text-sm mb-6 leading-relaxed max-w-2xl font-medium opacity-80">
+                    {blogUI.archiveSummary[lang]}
+                </p>
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/10 text-[var(--subtext)] font-mono text-[10px] uppercase tracking-widest">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)] animate-pulse"></span>
+                    Total: {allPosts.length} {t('postCount', lang)}
+                </div>
+            </header>
+
+            <!-- 时间轴列表 -->
+            <div class="space-y-16">
+                {years.map(year => (
+                        <section class="relative">
+                            <div class="sticky top-0 z-10 py-4 bg-[var(--bg)]/80 backdrop-blur-sm">
+                                <h2 class="text-7xl font-black opacity-5 absolute -top-6 -left-6 pointer-events-none select-none">{year}</h2>
+                                <h2 class="text-3xl font-bold text-[var(--accent)] relative flex items-center gap-3">
+                                    {year}
+                                    <span class="h-px flex-1 bg-gradient-to-r from-[var(--accent)]/30 to-transparent"></span>
+                                </h2>
+                            </div>
+
+                            <div class="mt-8 space-y-12 pl-4 border-l border-white/10">
+                                {Object.keys(groupedPosts[year]).map(Number).sort((a, b) => b - a).map(month => (
+                                        <div class="relative">
+                                            <h3 class="text-lg font-bold text-[var(--green)] mb-6 flex items-center gap-2">
+                                                <span class="w-2 h-2 rounded-full bg-[var(--green)]"></span>
+                                                {month}月
+                                            </h3>
+
+                                            <ul class="space-y-8 ml-4">
+                                                {groupedPosts[year][month].map(post => (
+                                                        <li class="group">
+                                                            <a href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`} class="flex flex-col gap-1.5">
+                                                                <div class="flex items-baseline justify-between gap-6">
+                                                        <span class="text-white/80 group-hover:text-[var(--accent)] transition-all text-base font-medium underline-offset-8 decoration-white/5 group-hover:decoration-[var(--accent)]/30 group-hover:underline decoration-2">
+                                                            {post.data.title}
+                                                        </span>
+                                                                    <span class="shrink-0 font-mono text-[10px] text-gray-500 uppercase tracking-wider bg-white/5 px-2 py-0.5 rounded border border-white/5 group-hover:border-[var(--accent)]/20 transition-colors">
+                                                            {post.data.date.split('-').slice(1).join('/')}
+                                                        </span>
+                                                                </div>
+                                                                <!-- 文章摘要：对齐 blog 列表页的信息补全 -->
+                                                                {post.data.summary && (
+                                                                        <p class="text-[11px] text-[var(--subtext)] opacity-50 line-clamp-1 group-hover:opacity-80 transition-opacity font-medium">
+                                                                            {post.data.summary}
+                                                                        </p>
+                                                                )}
+                                                            </a>
+                                                        </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                ))}
+                            </div>
+                        </section>
+                ))}
+            </div>
         </div>
     </div>
 </BaseLayout>
 
 <style>
-    /* 针对归档页的微调 */
     :root {
-        --bg: #1e1e2e; /* 对应 Catppuccin Mocha */
+        --bg: #1e1e2e;
     }
 </style>
