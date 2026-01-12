@@ -3,6 +3,8 @@
 import { SITE_CONFIG } from '../data/site-config';
 import { ClientRouter } from 'astro:transitions';
 import { Icon } from 'astro-icon/components';
+// [!code ++] 导入 Google Analytics 组件
+import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 
 interface Props {
     title?: string;
@@ -80,6 +82,11 @@ const getSwitchLangHref = (targetLang: 'ja' | 'en') => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href={SITE_CONFIG.brand.favicon} />
     <meta name="generator" content={Astro.generator} />
+
+    {/* [!code ++] 注入 GA4 组件，ID 从 site-config.yaml 中读取 */}
+    {SITE_CONFIG.brand.googleAnalyticsId && (
+            <GoogleAnalytics id={SITE_CONFIG.brand.googleAnalyticsId} />
+    )}
 
     <title>{siteTitle}</title>
     <meta name="description" content={description} />

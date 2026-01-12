@@ -1,10 +1,10 @@
 ---
-title: "黑神话：悟空"
+title: "ホロウナイト・シルクソング"
 type: "status"
 category: "gaming"
 platform: "Steam"
-progress: 45
-cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=400"
+progress: 60
+cover: "/assets/now/game/2025/12/01_shirukusong.webp"
 status_text:
 ja: "遊んでいる"
 en: "Playing"

@@ -1,9 +1,8 @@
 ---
-// src/pages/blog/[...slug].astro
+// src/pages/blog/[...slug].astro - 增强图片/视频响应式、灯箱导航及元数据统计修复版
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { SITE_CONFIG } from '../../data/site-config';
-import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
     const blogEntries = await getCollection('blog');
@@ -36,14 +35,7 @@ export async function getStaticPaths() {
 const { entry, prevPost, nextPost } = Astro.props;
 
 if (!entry) return Astro.redirect('/404');
-
 const { Content, headings } = await render(entry);
-
-// --- 统计逻辑 ---
-const rawContent = entry.body || '';
-const wordCount = rawContent.match(/[\u4e00-\u9fa5]|[\u3040-\u309F]|[\u30A0-\u30FF]|\w+/g)?.length || 0;
-const readingTime = Math.max(1, Math.ceil(wordCount / 400));
-const formattedWordCount = wordCount > 1000 ? (wordCount / 1000).toFixed(1) + 'k' : wordCount;
 
 const {
     title,
@@ -56,6 +48,10 @@ const {
     series
 } = entry.data;
 
+// 计算字数与阅读时间
+const wordCount = entry.body ? entry.body.length : 0;
+const readingTime = Math.ceil(wordCount / 400);
+
 const postDescription = summary;
 const toc = (headings || []).filter((h) => h.depth === 2 || h.depth === 3);
 
@@ -67,7 +63,7 @@ const postUI = {
     returnIdx: { ja: "記事一覧へ戻る", en: "Return to Index" },
     stats: {
         words: { ja: "文字", en: "words" },
-        mins: { ja: "分", en: "min" }
+        minutes: { ja: "分", en: "min" }
     }
 };
 
@@ -82,18 +78,18 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
         lang={lang as 'ja' | 'en'}
 >
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
-        <!-- 左侧边栏 -->
+        <!-- 侧边栏 -->
         <aside class="hidden lg:block lg:col-span-3">
             <div class="sticky top-32 space-y-10">
-                <a href="/blog" class="flex items-center gap-2 text-sm text-[var(--subtext)] hover:text-[var(--accent)] transition group font-bold">
-                    <Icon name="lucide:chevron-left" class="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <a href="/blog" class="flex items-center gap-2 text-sm text-[var(--subtext)] hover:text-[var(--accent)] transition group">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-translate-x-1 transition-transform"><path d="m15 18-6-6 6-6"/></svg>
                     <span>{postUI.back[lang]}</span>
                 </a>
 
                 {series && (
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--pink)]">
-                                <Icon name="lucide:book-open" class="w-3.5 h-3.5" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
                                 <span>{series.title[lang]}</span>
                             </div>
                             <div class="flex flex-col text-[11px] bg-white/[0.02] rounded-2xl overflow-hidden border border-white/5 font-bold">
@@ -111,7 +107,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
                 {toc.length > 0 && (
                         <div class="space-y-4">
                             <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[var(--accent)]">
-                                <Icon name="lucide:list" class="w-3.5 h-3.5" />
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="3" y1="6"/><line x1="15" x2="3" y1="12"/><line x1="17" x2="3" y1="18"/></svg>
                                 <span>{postUI.toc[lang]}</span>
                             </div>
                             <nav class="flex flex-col gap-1 text-[11px] font-bold text-[var(--subtext)] border-l border-white/5">
@@ -126,48 +122,29 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
             </div>
         </aside>
 
-        <!-- 内容主体 -->
+        <!-- 内容区 -->
         <article class="lg:col-span-9 xl:col-span-8 mx-auto w-full max-w-3xl">
             <header class="mb-16 space-y-8">
-                <!-- 元数据 -->
                 <div class="flex flex-wrap items-center gap-y-4 gap-x-6 text-[10px] font-black font-mono tracking-widest uppercase">
-                    <span class="px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md border border-[var(--accent)]/20">{category}</span>
-
-                    <div class="flex items-center gap-4 text-gray-500">
-                        <span class="flex items-center gap-1.5">
-                            <Icon name="lucide:calendar" class="w-3 h-3 text-[var(--peach)]" />
-                            {date}
-                        </span>
-
-                        <div class="flex items-center gap-3 border-l border-white/10 pl-4">
-                             <span class="flex items-center gap-1.5">
-                                <Icon name="lucide:file-text" class="w-3 h-3 text-[var(--accent)]" />
-                                 {formattedWordCount} <span class="opacity-40">{postUI.stats.words[lang]}</span>
-                            </span>
-                            <span class="flex items-center gap-1.5">
-                                <Icon name="lucide:clock" class="w-3 h-3 text-[var(--green)]" />
-                                {readingTime} <span class="opacity-40">{postUI.stats.mins[lang]}</span>
-                            </span>
+                    <div class="flex items-center gap-2">
+                        <span class="px-3 py-1 bg-[var(--accent)]/10 text-[var(--accent)] rounded-md border border-[var(--accent)]/20">{category}</span>
+                        <span class="text-gray-500">{date}</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-gray-500 border-l border-white/10 pl-6">
+                        <div class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--pink)]"><path d="M4 13.5V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                            <span>{wordCount} {postUI.stats.words[lang]}</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="text-[var(--accent)]"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>{readingTime} {postUI.stats.minutes[lang]}</span>
                         </div>
                     </div>
                 </div>
 
-                <h1 class="text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight text-left italic">
+                <h1 class="text-5xl md:text-6xl font-black text-white leading-[1.1] tracking-tight text-left">
                     {title}
                 </h1>
-
-                <!-- 新增：文章摘要显示区域 -->
-                {summary && (
-                        <div class="relative py-8 px-10 bg-white/[0.02] border-l-4 border-[var(--accent)] rounded-r-3xl overflow-hidden group/summary shadow-lg">
-                            <p class="text-lg text-[var(--subtext)] font-medium leading-relaxed italic opacity-90 relative z-10">
-                                {summary}
-                            </p>
-                            <!-- 装饰用大括号 -->
-                            <div class="absolute -top-2 -left-2 text-[var(--accent)] opacity-[0.05] group-hover/summary:opacity-10 transition-opacity">
-                                <Icon name="lucide:quote" class="w-20 h-20 rotate-180" />
-                            </div>
-                        </div>
-                )}
 
                 <div class="flex flex-wrap gap-3">
                     {tags.map((tag) => (
@@ -176,18 +153,17 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
                 </div>
 
                 {coverImage && (
-                        <div class="rounded-[2.5rem] overflow-hidden border border-white/5 aspect-video bg-white/5 shadow-2xl relative group">
+                        <div class="rounded-[2.5rem] overflow-hidden border border-white/5 aspect-video bg-white/5 shadow-2xl relative group cursor-zoom-in" id="blog-cover-container">
                             <img src={coverImage} class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt={title} />
                             <div class="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-50"></div>
                         </div>
                 )}
             </header>
 
-            <div class="article-content prose prose-invert max-w-none mb-20">
+            <div class="article-content prose prose-invert max-w-none mb-20" id="blog-content">
                 <Content />
             </div>
 
-            <!-- 底部导航 -->
             <nav class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t border-white/10 pt-20 mt-32">
                 {prevPost ? (
                         <a href={getPostUrl(prevPost.id)} class="p-8 bg-white/[0.02] hover:bg-white/5 border border-white/5 rounded-[2.5rem] transition-all group">
@@ -215,10 +191,165 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
             </nav>
         </article>
     </div>
+
+    <!-- 动态灯箱容器 -->
+    <div id="blog-lightbox" class="fixed inset-0 z-[1000] hidden flex-col items-center justify-center bg-[#1e1e2e]/95 backdrop-blur-2xl p-4 md:p-10" aria-hidden="true">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-4 z-[1010]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+
+        <button id="lightbox-prev" class="absolute left-4 md:left-10 top-1/2 -translate-y-1/2 p-4 text-white/30 hover:text-white transition-all bg-white/5 hover:bg-white/10 rounded-full z-[1010] hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <button id="lightbox-next" class="absolute right-4 md:right-10 top-1/2 -translate-y-1/2 p-4 text-white/30 hover:text-white transition-all bg-white/5 hover:bg-white/10 rounded-full z-[1010] hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+
+        <div class="relative flex flex-col items-center justify-center max-w-full max-h-full cursor-default" onclick="event.stopPropagation()">
+            <img id="lightbox-img" src="" alt="Large View" class="max-w-full max-h-[80vh] rounded-[2rem] object-contain shadow-2xl animate-in zoom-in-95 duration-300" />
+            <div class="mt-6 flex flex-col items-center gap-2">
+                <p id="lightbox-caption" class="font-mono text-[10px] text-[var(--accent)] uppercase tracking-[0.3em] font-black text-center max-w-xl"></p>
+                <span id="lightbox-counter" class="text-[9px] font-mono text-white/20 font-bold tracking-widest bg-white/5 px-3 py-1 rounded-full"></span>
+            </div>
+        </div>
+    </div>
 </BaseLayout>
 
+<script is:inline define:vars={{ lang }}>
+    let allImages = [];
+    let currentIndex = 0;
+
+    function initBlogMedia() {
+        allImages = [];
+        const content = document.getElementById('blog-content');
+        const coverContainer = document.getElementById('blog-cover-container');
+        const lightbox = document.getElementById('blog-lightbox');
+        const lbImg = document.getElementById('lightbox-img');
+        const lbCaption = document.getElementById('lightbox-caption');
+        const lbCounter = document.getElementById('lightbox-counter');
+        const btnPrev = document.getElementById('lightbox-prev');
+        const btnNext = document.getElementById('lightbox-next');
+        const btnClose = document.getElementById('lightbox-close');
+
+        if (!lightbox || !lbImg) return;
+
+        // 1. 处理图片 (封面图)
+        if (coverContainer) {
+            const img = coverContainer.querySelector('img');
+            if (img) {
+                const globalIdx = allImages.length;
+                allImages.push({ src: img.src, alt: img.alt });
+                coverContainer.onclick = () => openLightbox(globalIdx);
+            }
+        }
+
+        // 2. 处理正文媒体 (图片与视频 iframe)
+        if (content) {
+            // 图片处理
+            const images = content.querySelectorAll('img');
+            images.forEach((img) => {
+                const globalIdx = allImages.length;
+                allImages.push({ src: img.src, alt: img.alt });
+
+                img.style.maxWidth = "100%";
+                img.style.maxHeight = "360px";
+                img.style.width = "100%";
+                img.style.height = "100%";
+                img.style.objectFit = "cover";
+                img.style.objectPosition = "center";
+                img.style.cursor = "zoom-in";
+                img.style.borderRadius = "1.25rem";
+                img.style.margin = "3.5rem auto";
+                img.style.display = "block";
+                img.style.border = "1px solid rgba(255,255,255,0.08)";
+                img.style.boxShadow = "0 30px 60px -15px rgba(0, 0, 0, 0.5)";
+
+                img.onclick = () => openLightbox(globalIdx);
+            });
+
+            // 视频 iframe 响应式处理
+            const iframes = content.querySelectorAll('iframe');
+            iframes.forEach((iframe) => {
+                const w = parseInt(iframe.getAttribute('width') || "560");
+                const h = parseInt(iframe.getAttribute('height') || "315");
+                const isVertical = h > w; // 判断是否为纵屏视频 (如 Shorts)
+
+                iframe.style.width = "100%";
+                iframe.style.height = "auto";
+                iframe.style.aspectRatio = `${w} / ${h}`;
+                iframe.style.borderRadius = "1.5rem";
+                iframe.style.margin = "4rem auto";
+                iframe.style.display = "block";
+                iframe.style.border = "1px solid rgba(255,255,255,0.08)";
+                iframe.style.boxShadow = "0 40px 80px -20px rgba(0, 0, 0, 0.6)";
+
+                // 如果是纵屏视频，限制桌面端宽度，防止占据过多空间
+                if (isVertical) {
+                    iframe.style.maxWidth = "420px";
+                }
+            });
+        }
+
+        function updateLightbox() {
+            const current = allImages[currentIndex];
+            if (!current) return;
+
+            lbImg.src = current.src;
+            lbCaption.textContent = current.alt || "";
+            lbCounter.textContent = `${currentIndex + 1} / ${allImages.length}`;
+
+            if (allImages.length > 1) {
+                btnPrev.classList.remove('hidden');
+                btnNext.classList.remove('hidden');
+            } else {
+                btnPrev.classList.add('hidden');
+                btnNext.classList.add('hidden');
+            }
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            lightbox.classList.remove('hidden');
+            lightbox.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            document.body.style.overflow = '';
+            lbImg.src = "";
+        }
+
+        window.blogLightboxNext = () => {
+            currentIndex = (currentIndex + 1) % allImages.length;
+            updateLightbox();
+        };
+
+        window.blogLightboxPrev = () => {
+            currentIndex = (currentIndex - 1 + allImages.length) % allImages.length;
+            updateLightbox();
+        };
+
+        btnPrev.onclick = (e) => { e.stopPropagation(); window.blogLightboxPrev(); };
+        btnNext.onclick = (e) => { e.stopPropagation(); window.blogLightboxNext(); };
+        btnClose.onclick = closeLightbox;
+        lightbox.onclick = closeLightbox;
+
+        document.onkeydown = (e) => {
+            if (lightbox.classList.contains('hidden')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowRight') window.blogLightboxNext();
+            if (e.key === 'ArrowLeft') window.blogLightboxPrev();
+        };
+    }
+
+    initBlogMedia();
+    document.addEventListener('astro:after-swap', initBlogMedia);
+</script>
+
 <style is:global>
-    /* 排版设计还原 */
     .article-content h2 {
         font-size: 2.25rem; font-weight: 900; font-style: italic; color: #ffffff;
         line-height: 1.1; margin: 5rem 0 1.5rem; position: relative; padding-left: 1.5rem; border-left: 6px solid var(--accent);
@@ -234,8 +365,15 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
     .article-content li { position: relative; padding-left: 2rem; margin-bottom: 1.2rem; color: var(--subtext); line-height: 1.8; }
     .article-content li::before { content: ""; position: absolute; left: 0; top: 0.8em; width: 8px; height: 2px; background: var(--accent); }
     .article-content strong { color: #ffffff; font-weight: 900; }
-    .article-content table { width: 100%; border-collapse: collapse; margin-bottom: 4rem; background: rgba(255, 255, 255, 0.02); border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.05); }
-    .article-content th { padding: 1.25rem; font-weight: 900; color: var(--accent); border-bottom: 2px solid rgba(137, 180, 250, 0.1); background: rgba(137, 180, 250, 0.03); text-align: left; }
-    .article-content td { padding: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.03); color: var(--subtext); text-align: left; }
+
+    .article-content img, .article-content iframe {
+        transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+    }
+    .article-content img:hover {
+        transform: translateY(-8px) scale(1.005);
+        box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.7);
+        border-color: rgba(137, 180, 250, 0.5) !important;
+    }
+
     :target { scroll-margin-top: 120px; }
 </style>

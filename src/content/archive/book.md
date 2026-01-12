@@ -1,10 +1,10 @@
 ---
 type: "books"
-title: "地上の庭、デジタルの庭"
-meta: "著者: 鈴木 一郎"
-date: "2024-11-15"
-status: "読了"
-imgId: "1516979187457-637abb4f9353"
+title: "改訂版 採用側の本音を知れば就職面接は９割成功する"
+meta: "著者: 渡部 幸"
+date: "2025-12-15"
+status: "精読中"
+cover: "/assets/now/game/2025/12/01_shirukusong.webp"
 hasReview: true
 reviewLink: "/blog/digital-garden-review"
 ---

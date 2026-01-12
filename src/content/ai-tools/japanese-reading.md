@@ -1,10 +1,10 @@
 ---
 title: "FlashSpeak AI"
 description: "このツールは、SRT字幕ファイルを読み込み、AIが一行ずつ発音の練習をサポートする「パーソナルスピーキングコーチ」です。Geminiの最新の音声解析モデルを搭載しており、ユーザーの録音データを多角的に分析します。"
-url: "https://gemini.google.com/share/b0cec622c403"
+url: "https://gemini.google.com/share/85257ca1e208"
 componentId: "ReadingMock"
 icon: "Mic"
-date: "2025-12-27"
+date: "2026-01-10"
 featured: true
 lang: "ja"
 category: ["日本語", "AI Coach"]
