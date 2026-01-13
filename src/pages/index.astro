@@ -190,14 +190,22 @@ const ICON_MAP: Record<string, string> = {
                     </a>
                 </div>
                 <div class="absolute inset-0 z-10 carousel-container">
-                    {featuredPhotos.map((photo, index) => (
-                            <div class={`absolute inset-0 transition-opacity duration-1000 ease-in-out carousel-slide ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
-                                <img src={photo.data.image} class="w-full h-full object-cover transition-all duration-[1.5s] group-hover:scale-110" alt="" />
-                                <div class="absolute bottom-6 left-6 right-6 text-white/85 font-mono text-[9px] tracking-widest uppercase truncate bg-[#1e1e2e]/50 backdrop-blur-md px-3 py-2 rounded-xl">
-                                    {photo.data.title[lang] || photo.data.title}
-                                </div>
-                            </div>
-                    ))}
+                    {featuredPhotos.map((photo, index) => {
+                        const images = photo.data.images || [];
+                        const coverImage = photo.data.cover || (images.length > 0 ? images[0].url : '/assets/blog/default.webp');
+                        const title = (typeof photo.data.title === 'object' && photo.data.title !== null)
+                            ? (photo.data.title[lang] || photo.data.title.en || Object.values(photo.data.title)[0] || '')
+                            : photo.data.title;
+
+                        return (
+                                <a href={getLink('/photos/' + photo.slug)} class={`absolute inset-0 transition-opacity duration-1000 ease-in-out carousel-slide ${index === 0 ? 'opacity-100' : 'opacity-0'}`}>
+                                    <img src={coverImage} class="w-full h-full object-cover transition-all duration-[1.5s] group-hover:scale-110" alt="" />
+                                    <div class="absolute bottom-6 left-6 right-6 text-white/85 font-mono text-[9px] tracking-widest uppercase truncate bg-[#1e1e2e]/50 backdrop-blur-md px-3 py-2 rounded-xl">
+                                        {title}
+                                    </div>
+                                </a>
+                        );
+                    })}
                 </div>
             </div>
 

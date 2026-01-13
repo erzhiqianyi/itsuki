@@ -6,12 +6,15 @@ title:
 location:
   ja: "タイ、バンコク"
   en: "Bankogku, Tailand"
-image: "/assets/photos/2025/04/02-tai-neko.webp"
+cover: "/assets/photos/2025/04/01-tai.webp"
+images:
+  - url: "/assets/photos/2025/04/01-tai.webp"
+  - url: "/assets/photos/2025/04/02-tai-neko.webp"
 date: "2025-04-01"
 location_tag: "tai"
 year_tag: "2025"
 collection_tag: "tai"
-featured: true
+featured: false
 gear: "Sony"
 exif:
   camera: "Sony"

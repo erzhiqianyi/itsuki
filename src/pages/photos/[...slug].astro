@@ -1,21 +1,120 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import MasonryGallery from '../../components/MasonryGallery';
+import { ArrowLeft, Calendar, MapPin, Grid } from 'lucide-react';
 
 export async function getStaticPaths() {
     const photos = await getCollection('photos');
-    // 排除掉 'tags' 这个关键词，防止与 tags 文件夹冲突
-    return photos.filter(p => p.id !== 'tags').map(entry => ({
-        params: { slug: entry.id },
+    return photos.map(entry => ({
+        params: { slug: entry.slug },
         props: { entry },
     }));
 }
+
 const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+// 辅助函数：处理多语言字段，防止 React 渲染对象报错
+const getLocaleContent = (data) => {
+    if (typeof data === 'string') return data;
+    if (data && typeof data === 'object') {
+        return data.ja || data.en || Object.values(data)[0] || '';
+    }
+    return data || '';
+};
+
+const title = getLocaleContent(entry.data.title);
+const description = getLocaleContent(entry.data.description);
+const location = getLocaleContent(entry.data.location);
+
+// 数据处理逻辑
+let galleryImages = entry.data.images || [];
+if (galleryImages.length === 0 && entry.data.cover) {
+    galleryImages = [{
+        url: entry.data.cover,
+        width: 1200,
+        height: 800,
+        title: title
+    }];
+}
+
+// 格式化日期
+const formattedDate = entry.data.date ? new Date(entry.data.date).toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+}) : null;
 ---
-<BaseLayout title={entry.data.title}>
-    <div class="max-w-4xl mx-auto px-6 py-20 text-center">
-        <img src={entry.data.image} class="w-full rounded-[2.5rem] shadow-2xl mb-8" />
-        <h1 class="text-3xl font-bold text-white">{entry.data.title}</h1>
-        <p class="text-[var(--peach)] font-mono mt-4">{entry.data.location}</p>
+
+<BaseLayout title={title} description={description}>
+    <div class="min-h-screen bg-ctp-base text-ctp-text pb-20">
+
+        {/* 头部 Hero 区域 */}
+        <div class="relative w-full h-[40vh] md:h-[50vh] overflow-hidden mb-8 md:mb-12 group/hero">
+            <div class="absolute inset-0 bg-gradient-to-t from-ctp-base via-ctp-base/60 to-transparent z-10"></div>
+
+            {/* 背景封面图 */}
+            {(entry.data.cover || galleryImages.length > 0) && (
+                    <img
+                            src={entry.data.cover || galleryImages[0].url}
+                            alt="Cover"
+                            class="w-full h-full object-cover blur-sm opacity-50 scale-105 transition-transform duration-[2s] group-hover/hero:scale-110"
+                    />
+            )}
+
+            {/* 顶部导航栏 - 返回按钮 */}
+            <div class="absolute top-0 left-0 w-full p-4 md:p-8 z-30 flex justify-between items-start">
+                <a
+                        href="/photos"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-ctp-surface0/30 hover:bg-ctp-surface0/60 backdrop-blur-md border border-white/10 text-white transition-all duration-300 hover:-translate-x-1 group"
+                >
+                    <ArrowLeft size={18} class="group-hover:-translate-x-1 transition-transform" />
+                    <span class="font-medium text-sm">Gallery</span>
+                </a>
+            </div>
+
+            <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 z-20 max-w-7xl mx-auto">
+                <h1 class="text-3xl md:text-5xl font-bold text-ctp-text mb-4 leading-tight drop-shadow-lg">
+                    {title}
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-4 md:gap-6 text-sm md:text-base text-ctp-subtext1">
+                    {formattedDate && (
+                            <div class="flex items-center gap-2">
+                                <Calendar size={18} class="text-ctp-mauve" />
+                                <span>{formattedDate}</span>
+                            </div>
+                    )}
+                    {location && (
+                            <div class="flex items-center gap-2">
+                                <MapPin size={18} class="text-ctp-green" />
+                                <span>{location}</span>
+                            </div>
+                    )}
+                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-ctp-surface0/30 border border-white/10 backdrop-blur-md text-xs font-mono text-white/90">
+                        <Grid size={14} />
+                        <span>{galleryImages.length} PHOTOS</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* 主要内容区域 */}
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            {/* 文章前言/描述 */}
+            {entry.body && entry.body.length > 0 && (
+                    <div class="prose prose-invert prose-ctp max-w-3xl mx-auto mb-16 text-lg text-ctp-overlay2 leading-relaxed">
+                        <Content />
+                    </div>
+            )}
+
+            {/* 相册瀑布流展示区 */}
+            <div class="min-h-[300px]">
+                <MasonryGallery client:load images={galleryImages} />
+            </div>
+
+        </main>
     </div>
 </BaseLayout>

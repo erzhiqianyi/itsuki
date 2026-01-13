@@ -36,6 +36,13 @@ const photos = defineCollection({
             shutter: z.string().optional(),
             iso: z.string().optional(),
         }).optional(),
+        // 新增 images 数组验证
+        images: z.array(z.object({
+            url: z.string(),
+            width: z.number().optional(),  // 可选，但在代码中最好有回退值
+            height: z.number().optional(), // 可选
+            title: z.string().optional()
+        })).optional()
     }),
 });
 

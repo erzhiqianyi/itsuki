@@ -1,125 +1,158 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { SITE_CONFIG } from '../../data/site-config';
+import { Image } from 'astro:assets';
+import { MapPin, Calendar, Layers, ArrowRight } from 'lucide-react';
 
 export async function getStaticPaths({ paginate }) {
-    const allPhotos = await getCollection('photos') || [];
-    const sortedPhotos = allPhotos.sort((a, b) => Date.parse(b.data.date) - Date.parse(a.data.date));
-    return paginate(sortedPhotos, { pageSize: 3 });
+    const allPhotos = await getCollection('photos');
+    // 按日期倒序排列
+    const sortedPhotos = allPhotos.sort((a, b) =>
+        new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+    );
+
+    // 每页显示 9 个相册
+    return paginate(sortedPhotos, { pageSize: 9 });
 }
 
 const { page } = Astro.props;
-const lang = Astro.url.pathname.startsWith('/en') ? 'en' : 'ja';
 
-// --- 提取所有标签用于生成导航菜单 ---
-const allForNav = await getCollection('photos');
-const getUniqueTags = (key) => ['All', ...new Set(allForNav.map(p => p.data[key]).filter(Boolean))].sort();
-
-const navOptions = {
-    collections: getUniqueTags('collection_tag'),
-    locations: getUniqueTags('location_tag'),
-    years: getUniqueTags('year_tag'),
+// 辅助函数：处理多语言字段 (title/description 可能为对象 {ja, en})
+const getLocaleContent = (data) => {
+    if (typeof data === 'string') return data;
+    if (data && typeof data === 'object') {
+        return data.ja || data.en || Object.values(data)[0] || '';
+    }
+    return data || '';
 };
-
-const ui = {
-    heading: { ja: "フォトギャラリー", en: "Photo Gallery" },
-    labels: { location: "Location", time: "Time", collection: "Collection" }
-};
-
-// 序列化给灯箱的数据
-const clientPhotos = page.data.map(p => ({
-    image: p.data.image,
-    title: typeof p.data.title === 'string' ? p.data.title : (p.data.title[lang] || p.data.title['ja']),
-    location: typeof p.data.location === 'string' ? p.data.location : (p.data.location[lang] || p.data.location['ja']),
-    gear: p.data.gear
-}));
-
-// 计算分页按钮 (显示当前页附近的3个)
-const range = 3;
-let startPage = Math.max(1, page.currentPage - Math.floor(range / 2));
-let endPage = Math.min(page.lastPage, startPage + range - 1);
-if (endPage - startPage + 1 < range) startPage = Math.max(1, endPage - range + 1);
-const pageButtons = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 ---
 
-<BaseLayout title={ui.heading[lang]} lang={lang}>
-    <div class="max-w-6xl mx-auto px-6 py-10 space-y-12">
+<BaseLayout title="Photos" description="Photography Journey">
+    <div class="min-h-screen bg-ctp-base text-ctp-text py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
 
-        <header class="pt-8">
-            <h1 class="text-5xl font-black text-white italic border-b-4 border-[var(--peach)]/10 inline-block pb-1">
-                {ui.heading[lang]}
-            </h1>
-        </header>
+            {/* 页面头部 */}
+            <header class="mb-12 text-center md:text-left border-b border-ctp-surface0 pb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-ctp-mauve mb-4 flex items-center justify-center md:justify-start gap-4">
+                    <Layers className="w-10 h-10 md:w-12 md:h-12" />
+                    <span>Gallery</span>
+                </h1>
+                <p class="text-ctp-subtext0 text-lg max-w-2xl">
+                    光影记录。收录了 {page.total} 个瞬间集合。
+                </p>
+            </header>
 
-        <nav class="space-y-2 bg-white/[0.01] p-6 rounded-[2.5rem] border border-white/5 backdrop-blur-xl">
-            {Object.entries({ collection: navOptions.collections, location: navOptions.locations, year: navOptions.years }).map(([type, tags]) => (
-                    <div class="flex flex-col md:flex-row md:items-center gap-4 py-2 border-b last:border-0 border-white/5">
-                        <div class="w-24 shrink-0 text-[9px] font-black text-white/20 uppercase tracking-widest font-mono">
-                            {ui.labels[type === 'year' ? 'time' : type]}
-                        </div>
-                        <div class="flex flex-wrap gap-1.5">
-                            {tags.map(val => {
-                                // 在主页，只有 "All" 是激活状态
-              const isActive = val === 'All';
-                                const link = val === 'All' ? '/photos' : `/photos/tags/${val}/1`;
-                                return (
-                                        <a href={link} class={`px-3 py-1 rounded-lg border text-[10px] font-mono transition-all ${isActive ? 'bg-[var(--peach)] text-[#1e1e2e] border-[var(--peach)] font-black' : 'bg-white/5 text-[var(--subtext)] border-white/5 hover:text-white'}`}>
-                                            {val}
-                                        </a>
-                                )
-                            })}
-                        </div>
-                    </div>
-            ))}
-        </nav>
+            {/* 相册网格 */}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {page.data.map((album) => {
+                    // 数据回退逻辑：优先取 cover，没有则取 images 第一张，再没有则为空
+          // 注意：旧数据可能没有 images 数组，只有 cover
+          const images = album.data.images || [];
+                    const coverImage = album.data.cover || (images.length > 0 ? images[0].url : '/assets/blog/default.webp');
+                    const imageCount = images.length > 0 ? images.length : (album.data.cover ? 1 : 0);
 
-        <main class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {page.data.map((p, index) => (
-                    <article class="group cursor-zoom-in relative rounded-[2.5rem] overflow-hidden border border-white/5 bg-[#313244]/20" onclick={`window.openLightbox(${index})`}>
-                        <img src={p.data.image} alt="" class="w-full aspect-square object-cover group-hover:scale-110 transition-transform duration-700" />
-                        <div class="absolute bottom-0 p-4 w-full bg-gradient-to-t from-black/80 to-transparent">
-                            <p class="text-white text-xs font-bold">{typeof p.data.title === 'string' ? p.data.title : p.data.title[lang]}</p>
-                        </div>
-                    </article>
-            ))}
-        </main>
+                    const dateObj = new Date(album.data.date);
+                    const formattedDate = dateObj.toLocaleDateString('zh-CN', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
 
-        <nav class="flex justify-center items-center gap-2 pb-20">
-            <a href={page.url.prev || "#"} class={`p-3 rounded-xl bg-white/5 ${!page.url.prev && 'opacity-10 pointer-events-none'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
-            </a>
-            {pageButtons.map(num => (
-                    <a href={num === 1 ? "/photos" : `/photos/${num}`} class={`w-10 h-10 flex items-center justify-center rounded-xl font-mono text-xs ${num === page.currentPage ? 'bg-[var(--peach)] text-black font-black' : 'bg-white/5 text-white/40'}`}>
-                        {num}
-                    </a>
-            ))}
-            <a href={page.url.next || "#"} class={`p-3 rounded-xl bg-white/5 ${!page.url.next && 'opacity-10 pointer-events-none'}`}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-            </a>
-        </nav>
-    </div>
+                    // 解析标题和描述，防止对象渲染导致错误
+          const title = getLocaleContent(album.data.title);
+                    const description = getLocaleContent(album.data.description);
+                    const location = getLocaleContent(album.data.location);
 
-    <div id="lightbox" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-2xl p-4" onclick="if(event.target===this)window.closeLightbox()">
-        <img id="lb-img" src="" class="max-w-full max-h-[75vh] rounded-3xl object-contain shadow-2xl" />
-        <div class="mt-6 text-center text-white">
-            <h3 id="lb-title" class="text-xl font-black italic"></h3>
-            <p id="lb-meta" class="font-mono text-[10px] text-[var(--peach)] mt-1 uppercase"></p>
+                    return (
+                            <a
+                                    href={`/photos/${album.slug}`}
+                                    class="group block relative bg-ctp-surface0 rounded-2xl overflow-hidden shadow-lg border border-ctp-surface1/50 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:border-ctp-mauve/50"
+                            >
+                                {/* 封面图区域 */}
+                                <div class="aspect-[4/3] overflow-hidden relative">
+                                    <div class="absolute inset-0 bg-ctp-surface1 animate-pulse" /> {/* Loading 占位 */}
+                                    <img
+                                            src={coverImage}
+                                            alt={title}
+                                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            loading="lazy"
+                                    />
+
+                                    {/* 遮罩层 - 悬停显示 */}
+                                    <div class="absolute inset-0 bg-gradient-to-t from-ctp-base/90 via-ctp-base/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+
+                                    {/* 右上角数量标记 */}
+                                    <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-md text-white text-xs font-mono px-3 py-1 rounded-full border border-white/10 flex items-center gap-1.5">
+                                        <Layers size={12} />
+                                        <span>{imageCount} ITEMS</span>
+                                    </div>
+                                </div>
+
+                                {/* 内容区域 */}
+                                <div class="p-6 relative">
+                                    <div class="flex items-center justify-between mb-3 text-xs font-medium text-ctp-subtext0">
+                                        <div class="flex items-center gap-1.5">
+                                            <Calendar size={14} class="text-ctp-mauve" />
+                                            <time datetime={dateObj.toISOString()}>{formattedDate}</time>
+                                        </div>
+                                        {location && (
+                                                <div class="flex items-center gap-1.5 text-ctp-teal">
+                                                    <MapPin size={14} />
+                                                    <span>{location}</span>
+                                                </div>
+                                        )}
+                                    </div>
+
+                                    <h2 class="text-xl font-bold text-ctp-text mb-2 line-clamp-1 group-hover:text-ctp-mauve transition-colors">
+                                        {title}
+                                    </h2>
+
+                                    <p class="text-sm text-ctp-overlay2 line-clamp-2 mb-4 h-10">
+                                        {description || '暂无描述...'}
+                                    </p>
+
+                                    <div class="flex items-center text-sm font-medium text-ctp-blue group-hover:underline decoration-2 underline-offset-4">
+                                        浏览相册 <ArrowRight size={16} class="ml-1 transition-transform group-hover:translate-x-1" />
+                                    </div>
+                                </div>
+                            </a>
+                    );
+                })}
+            </div>
+
+            {/* 分页控制 */}
+            <div class="mt-16 flex justify-center items-center gap-6">
+                {page.url.prev ? (
+                        <a
+                                href={page.url.prev}
+                                class="px-6 py-2 rounded-full bg-ctp-surface0 text-ctp-text hover:bg-ctp-mauve hover:text-ctp-base transition-colors border border-ctp-surface1"
+                        >
+                            上一页
+                        </a>
+                ) : (
+                        <span class="px-6 py-2 rounded-full bg-ctp-surface0/50 text-ctp-overlay0 cursor-not-allowed border border-ctp-surface1/50">
+            上一页
+          </span>
+                )}
+
+                <span class="text-ctp-subtext0 font-mono">
+          {page.currentPage} / {page.lastPage}
+        </span>
+
+                {page.url.next ? (
+                        <a
+                                href={page.url.next}
+                                class="px-6 py-2 rounded-full bg-ctp-surface0 text-ctp-text hover:bg-ctp-mauve hover:text-ctp-base transition-colors border border-ctp-surface1"
+                        >
+                            下一页
+                        </a>
+                ) : (
+                        <span class="px-6 py-2 rounded-full bg-ctp-surface0/50 text-ctp-overlay0 cursor-not-allowed border border-ctp-surface1/50">
+            下一页
+          </span>
+                )}
+            </div>
+
         </div>
     </div>
-
-    <script is:inline define:vars={{ clientPhotos }}>
-        window.openLightbox = (index) => {
-            const photo = clientPhotos[index];
-            document.getElementById('lb-img').src = photo.image;
-            document.getElementById('lb-title').innerText = photo.title;
-            document.getElementById('lb-meta').innerText = `${photo.location} | ${photo.gear}`;
-            document.getElementById('lightbox').classList.replace('hidden', 'flex');
-            document.body.style.overflow = 'hidden';
-        };
-        window.closeLightbox = () => {
-            document.getElementById('lightbox').classList.replace('flex', 'hidden');
-            document.body.style.overflow = '';
-        };
-    </script>
 </BaseLayout>

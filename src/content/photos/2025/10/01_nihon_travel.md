@@ -6,7 +6,10 @@ title:
 location:
     ja: "日本、河口湖"
     en: "Kamakura, Japan"
-image: "/assets/photos/2025/10/01-fujisan.webp"
+cover: "/assets/photos/2025/10/01-fujisan.webp"
+images: 
+  - url: "/assets/photos/2025/10/01-fujisan.webp"
+  - url: "/assets/photos/2025/10/02-umibe.webp"
 date: "2025-10-01"
 location_tag: "kawaguchiko"
 year_tag: "2025"

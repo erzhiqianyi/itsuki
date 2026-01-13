@@ -1,17 +1,20 @@
 ---
 lang: ja
 title:
-    ja: "鎌倉の海"
-    en: "The Sea of Kamakura"
+    ja: "鎌倉からの富士山"
+    en: "Mount Fuji from Kamakura"
 location:
     ja: "日本、鎌倉"
     en: "Kamakura, Japan"
-image: "/assets/photos/2024/10/02-umi.webp"
+cover: "/assets/photos/2024/10/01-fujisan.webp"
+images:
+  - url: "/assets/photos/2024/10/01-fujisan.webp"
+  - url: "/assets/photos/2024/10/02-umi.webp"
 date: "2024-10-01"
 location_tag: "kamakura"
 year_tag: "2024"
 collection_tag: "nihon"
-featured: false
+featured: true
 gear: "Sony"
 exif:
     camera: "Sony"
