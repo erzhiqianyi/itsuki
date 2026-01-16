@@ -4,7 +4,7 @@ title:
     ja: "中山の1日"
     en: "One Day in zhongshang"
 location:
-    ja: "日本、河口湖"
+    ja: "中国、中山"
     en: "Kamakura, Japan"
 cover: "/assets/photos/2026/01/11/IMG_4012.jpg"
 images: 
