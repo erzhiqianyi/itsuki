@@ -1,5 +1,12 @@
 ---
 items:
+    - date: "2026"
+      location: "広州"
+      title: "日本留学準備"
+      desc: "2026年の入学に向けて書類準備と高度な日本語学習を継続。"
+      color: "bg-accent"
+      cover: "/assets/about/journey/2025-4.webp"
+      
     - date: "2025"
       location: "広州 / 日本"
       title: "日本留学準備"
