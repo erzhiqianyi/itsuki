@@ -1,21 +1,23 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-
+import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
+import '../../styles/photography.css';
 export async function getStaticPaths() {
-    const photos = await getCollection('photos');
-    // 排除掉 'tags' 这个关键词，防止与 tags 文件夹冲突
-    return photos.filter(p => p.id !== 'tags').map(entry => ({
-        params: { slug: entry.id },
-        props: { entry },
-    }));
+  const albums = (await getCollection('photos')).sort((a,b) => Date.parse(b.data.date) - Date.parse(a.data.date));
+  return albums.map((entry,index) => ({ params: { slug: entry.slug }, props: { entry, next: albums[index + 1], previous: albums[index - 1], number: index + 1 } }));
 }
-const { entry } = Astro.props;
+const { entry, next, previous, number } = Astro.props;
+const { Content } = await render(entry);
+const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
+const title = locale(entry.data.title);
+const images = entry.data.images?.length ? entry.data.images : entry.data.cover ? [{url:entry.data.cover,title}] : [];
 ---
-<BaseLayout title={entry.data.title}>
-    <div class="max-w-4xl mx-auto px-6 py-20 text-center">
-        <img src={entry.data.image} class="w-full rounded-[2.5rem] shadow-2xl mb-8" />
-        <h1 class="text-3xl font-bold text-white">{entry.data.title}</h1>
-        <p class="text-[var(--peach)] font-mono mt-4">{entry.data.location}</p>
-    </div>
-</BaseLayout>
+<EditorialLayout title={title} description={locale(entry.data.description) || title} image={entry.data.cover}>
+  <a class="photo-back" href="/photos"><Icon name="lucide:arrow-left" />写真一覧</a>
+  <header class="album-heading"><span class="album-heading-number">{String(number).padStart(2,'0')}</span><div><p class="photo-kicker">PHOTOGRAPHIC RECORD / {entry.data.year_tag}</p><h1>{title}</h1><div class="album-metadata"><time datetime={entry.data.date}>{entry.data.date?.replaceAll('-','.')}</time><span>{locale(entry.data.location)}</span><span>{images.length} PHOTOS</span></div></div></header>
+  {entry.body?.trim() && <div class="album-prose"><Content /></div>}
+  <PhotoGallery images={images} albumTitle={title} />
+  <nav class="album-adjacent" aria-label="アルバムのナビゲーション"><div>{previous && <a href={'/photos/' + previous.slug}><Icon name="lucide:arrow-left" /><span><small>NEWER ALBUM</small>{locale(previous.data.title)}</span></a>}</div><div>{next && <a href={'/photos/' + next.slug}><span><small>OLDER ALBUM</small>{locale(next.data.title)}</span><Icon name="lucide:arrow-right" /></a>}</div></nav>
+</EditorialLayout>

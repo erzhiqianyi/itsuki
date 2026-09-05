@@ -1,0 +1,20 @@
+/* Bridge existing collection templates to the editorial palette without changing their data or interactions. */
+.legacy-editorial { color: var(--ink); --green: #32734d; --peach: #b23a21; --red: #c52215; --pink: #b23a21; --ctp-base: #fafbf9; --ctp-text: #161616; --ctp-subtext0: #62645e; }
+.legacy-editorial [class*="bg-"] { background-color: transparent !important; background-image: none !important; }
+.legacy-editorial [class*="text-white"], .legacy-editorial [class*="text-[#"], .legacy-editorial [class*="text-ctp"], .legacy-editorial [class*="text-gray"], .legacy-editorial [class*="text-pink"], .legacy-editorial [class*="text-green"], .legacy-editorial [class*="text-peach"] { color: var(--ink) !important; }
+.legacy-editorial [class*="border-"] { border-color: var(--rule) !important; }
+.legacy-editorial [class*="shadow"] { box-shadow: none !important; text-shadow: none !important; }
+.legacy-editorial [class*="rounded"] { border-radius: 4px !important; }
+.legacy-editorial .italic { font-style: normal !important; }
+.legacy-editorial .font-black { font-weight: 600 !important; }
+.legacy-editorial .blur-3xl, .legacy-editorial .blur-2xl, .legacy-editorial .animate-ping { display: none !important; }
+.legacy-editorial .bento-card { border: 0; border-bottom: 1px solid var(--rule); background: transparent; box-shadow: none; }
+.legacy-editorial a:hover { color: var(--vermillion) !important; }
+.legacy-editorial h1 { font-size: 34px !important; line-height: 1.5 !important; font-weight: 700 !important; overflow-wrap: anywhere; }
+.legacy-editorial h2 { line-height: 1.6; font-style: normal; }
+.legacy-editorial p { line-height: 1.85; }
+.legacy-editorial input, .legacy-editorial select { border: 1px solid var(--rule) !important; background: white !important; color: var(--ink) !important; }
+.legacy-editorial img { box-shadow: none !important; }
+.legacy-editorial [id*="lightbox"] { background: var(--paper) !important; }
+.legacy-editorial [class*="fixed"][class*="inset-0"] { background: var(--paper) !important; }
+@media(max-width:760px) { .legacy-editorial h1 { font-size: 28px !important; } .legacy-editorial > main, .legacy-editorial > div { padding-inline: 0; } }

@@ -57,15 +57,14 @@ const ui = {
 
     <!-- 1. 精选视频 (Featured Hero Section) -->
 {featuredVideo && (
-    <section class="group relative rounded-[2.5rem] overflow-hidden aspect-video md:aspect-[21/9] border border-white/10 shadow-2xl bg-[#11111b]">
+    <section class="featured-video">
     <img
         src={getImageUrl(featuredVideo.data.image)}
-class="absolute inset-0 w-full h-full object-cover transition duration-1000 group-hover:scale-105 opacity-60"
+class="featured-video-image"
 alt=""
 />
-<div class="absolute inset-0 bg-gradient-to-t from-[#1e1e2e] via-transparent to-transparent"></div>
 
-    <div class="absolute bottom-0 left-0 p-8 md:p-12 w-full md:w-2/3 space-y-4">
+    <div class="py-6 space-y-4">
 <div class="flex flex-wrap gap-2">
     {featuredVideo.data.tags?.map(tag => (
             <span class="px-2.5 py-1 bg-red/10 text-red text-[10px] font-mono font-bold uppercase rounded-md tracking-wider border border-red/20 backdrop-blur-md">
@@ -240,6 +239,8 @@ inputField?.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend(
 </script>
 
 <style>
+.featured-video { border-bottom:1px solid var(--rule); }
+.featured-video-image { width:100%; max-height:420px; object-fit:contain; display:block; }
 .scroller::-webkit-scrollbar { width: 4px; }
 .scroller::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 .video-card:hover { box-shadow: 0 20px 50px -15px rgba(243, 139, 168, 0.2); }
