@@ -1,0 +1,40 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../layouts/EditorialLayout.astro';
+const { page, category } = Astro.props;
+const allPosts = await getCollection('blog', ({ data }) => data.lang === 'ja');
+const categories = [...new Set(allPosts.map(p => p.data.category.toLowerCase()))];
+const label = (key) => key === 'japanese' ? '日本語学習' : key === 'journals' ? '日記' : key;
+const base = category ? '/category/' + category : '/blog';
+const pageHref = (n) => n === 1 ? base : base + '/' + n;
+const numbers = Array.from({ length: page.lastPage }, (_, i) => i + 1).filter(n => n === 1 || n === page.lastPage || Math.abs(n - page.currentPage) <= 1);
+const entries = await Promise.all(page.data.map(async post => ({ post, excerpt: post.data.summary || (await render(post)).headings.filter(h => h.depth <= 3).slice(0, 5).map(h => h.text).join(' / ') })));
+---
+<EditorialLayout title={category ? label(category) : '記事'}>
+  <div class="post-index">
+    <header class="index-title"><span class="display-type">01</span><h1>{category ? label(category) : '記事'}</h1><p>{category ? allPosts.filter(p => p.data.category.toLowerCase() === category).length : allPosts.length} 記事</p></header>
+    <nav class="index-categories" aria-label="カテゴリー"><a href="/blog" aria-current={!category ? 'page' : undefined}>すべて</a>{categories.map(c => <a href={'/category/' + c} aria-current={category === c ? 'page' : undefined}>{label(c)}</a>)}<a href="/blog/featured">おすすめ</a></nav>
+    <div class="index-entries">{entries.map(({ post, excerpt }) => <article><time datetime={post.data.date}>{post.data.date?.replaceAll('-', '.')}</time><div><h2><a href={'/blog/' + post.id.replace(/\.(md|mdx)$/, '')}>{post.data.title || post.data.date}</a></h2>{excerpt && <p>{excerpt}</p>}<a class="entry-category" href={'/category/' + post.data.category.toLowerCase()}>{label(post.data.category.toLowerCase())}</a></div><a class="entry-arrow" href={'/blog/' + post.id.replace(/\.(md|mdx)$/, '')} aria-label={(post.data.title || post.data.date) + 'を読む'}><Icon name="lucide:arrow-up-right" /></a></article>)}</div>
+    <nav class="index-pages" aria-label="ページ切り替え">{page.url.prev && <a href={page.url.prev} aria-label="前のページ"><Icon name="lucide:arrow-left" /></a>}{numbers.map((n, i) => <>{i > 0 && n - numbers[i - 1] > 1 && <span>…</span>}<a href={pageHref(n)} aria-current={n === page.currentPage ? 'page' : undefined}>{n}</a></>)}{page.url.next && <a href={page.url.next} aria-label="次のページ"><Icon name="lucide:arrow-right" /></a>}</nav>
+  </div>
+</EditorialLayout>
+<style>
+  .post-index { max-width:980px; margin:auto; }
+  .index-title { display:flex; align-items:baseline; gap:24px; padding-bottom:24px; }
+  .index-title > span { font-size:70px; line-height:1; color:var(--vermillion); }
+  .index-title h1 { font-size:32px; font-weight:700; }
+  .index-title p { margin-left:auto; font-size:13px; color:var(--muted); }
+  .index-categories { display:flex; flex-wrap:wrap; gap:28px; border-bottom:2px solid var(--ink); padding-bottom:18px; font-size:15px; }
+  .index-categories [aria-current=page] { color:var(--vermillion); text-decoration:underline; text-underline-offset:8px; }
+  .index-entries article { display:grid; grid-template-columns:110px minmax(0,1fr) 24px; gap:28px; padding:30px 0; border-bottom:1px solid var(--rule); }
+  .index-entries time { font-size:13px; color:var(--muted); padding-top:6px; }
+  .index-entries h2 { font-size:23px; font-weight:600; line-height:1.55; overflow-wrap:anywhere; }
+  .index-entries p { font-size:15px; line-height:1.9; color:var(--muted); margin-top:10px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .entry-category { display:inline-block; font-size:12px; margin-top:12px; color:var(--vermillion); }
+  .entry-arrow { align-self:start; padding-top:8px; }
+  .index-pages { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:32px 0; }
+  .index-pages a { display:grid; place-items:center; min-width:40px; height:40px; border-bottom:2px solid transparent; }
+  .index-pages [aria-current=page] { color:var(--vermillion); border-color:var(--vermillion); }
+  @media(max-width:760px) { .index-title { gap:14px; } .index-title h1 { font-size:27px; } .index-title > span { font-size:48px; } .index-categories { gap:20px; font-size:14px; } .index-entries article { grid-template-columns:minmax(0,1fr) 20px; gap:12px; padding:24px 0; } .index-entries time { grid-column:1/-1; } .index-entries h2 { font-size:20px; } }
+</style>

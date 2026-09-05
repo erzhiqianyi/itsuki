@@ -1,0 +1,38 @@
+---
+import { Icon } from 'astro-icon/components';
+import { SITE_CONFIG } from '../data/site-config';
+import GoogleAnalytics from '../components/GoogleAnalytics.astro';
+import '../styles/editorial.css';
+interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en'; home?: boolean; }
+const { title = SITE_CONFIG.brand.logo, description = SITE_CONFIG.brand.description.ja, image, article = false, lang = 'ja', home = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE_CONFIG.brand.siteUrl);
+const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/#projects' }, { label: '動画', href: '/videos' }, { label: '写真', href: '/photos' }];
+---
+<!doctype html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`}</title>
+  <meta name="description" content={description} /><link rel="canonical" href={canonical} />
+  <link rel="icon" href={SITE_CONFIG.brand.favicon} type="image/svg+xml" />
+  <meta property="og:title" content={title} /><meta property="og:description" content={description} /><meta property="og:url" content={canonical} /><meta property="og:type" content={article ? 'article' : 'website'} />
+  {image && <meta property="og:image" content={new URL(image, SITE_CONFIG.brand.siteUrl)} />}
+  <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+  <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  {SITE_CONFIG.brand.googleAnalyticsId && <GoogleAnalytics id={SITE_CONFIG.brand.googleAnalyticsId} />}
+</head>
+<body class:list={['editorial', { 'editorial-home': home, 'editorial-article': article }]}>
+  <a class="skip-link" href="#main-content">本文へ移動</a>
+  <div class="edition-shell">
+    {!home && <header class="edition-header"><a class="edition-wordmark" href="/" aria-label="Itsuki ホーム">ITSUKI.</a><nav aria-label="メインナビゲーション">{nav.map((item, i) => <a href={item.href} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
+    <main id="main-content"><slot /></main>
+    <footer class="edition-footer">
+      <nav aria-label="その他のページ"><a href="/japanese">日本語学習</a><a href="/now">現在</a><a href="/archive">アーカイブ</a><a href="/about">私について</a><a href="/ja/changelog">更新履歴</a></nav>
+      <div class="edition-colophon"><div>{SITE_CONFIG.socials.map(s => <a href={s.href} target="_blank" rel="noreferrer">{s.label}<Icon name="lucide:arrow-up-right" /></a>)}</div><span>{SITE_CONFIG.brand.footer}</span></div>
+      {home && <div class="edition-signoff" aria-hidden="true"><span>WRITE</span><span>/</span><span>BUILD</span><span>/</span><span>RECORD</span></div>}
+      <nav class="edition-webring" aria-label="Webring"><a href={SITE_CONFIG.brand.webring.prev} aria-label="Previous site"><Icon name="lucide:arrow-left" /></a><a href={SITE_CONFIG.brand.webring.home}>{SITE_CONFIG.brand.webring.label}</a><a href={SITE_CONFIG.brand.webring.next} aria-label="Next site"><Icon name="lucide:arrow-right" /></a></nav>
+    </footer>
+  </div>
+</body>
+</html>

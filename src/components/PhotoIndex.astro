@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../layouts/EditorialLayout.astro';
+import '../styles/photography.css';
+import { photoPreview } from './photo-preview';
+const { page, tag } = Astro.props;
+const all = await getCollection('photos');
+const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
+const years = [...new Set(all.map(p => p.data.year_tag).filter(Boolean))].sort().reverse();
+const places = [...new Map(all.filter(p => p.data.location_tag).map(p => [p.data.location_tag, locale(p.data.location)])).entries()];
+const totalPhotos = all.reduce((n,p) => n + (p.data.images?.length || (p.data.cover ? 1 : 0)),0);
+const covers = await Promise.all(page.data.map(album => photoPreview(album.data.cover || album.data.images?.[0]?.url)));
+---
+<EditorialLayout title={tag ? `写真 / ${tag}` : '写真'}>
+  <header class="photo-masthead"><div><p class="photo-kicker">04 / VISUAL JOURNAL</p><h1 class="photo-wordmark">PHOTOGRAPHS<span>写真</span></h1></div><dl class="photo-totals"><div><dt>アルバム</dt><dd>{all.length.toString().padStart(2,'0')}</dd></div><div><dt>写真</dt><dd>{totalPhotos}</dd></div></dl></header>
+  <nav class="photo-filters" aria-label="写真の絞り込み"><div><span>YEAR</span><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{years.map(year => <a href={`/photos/tags/${year}/1`} aria-current={tag === year ? 'page' : undefined}>{year}</a>)}</div><div><span>PLACE</span>{places.map(([key,label]) => <a href={`/photos/tags/${key}/1`} aria-current={tag === key ? 'page' : undefined}>{label}</a>)}</div></nav>
+  <div class="photo-index-caption"><span>{tag ? `${tag} / ${page.total} ALBUMS` : '旅先で、日常で。'}</span><span>NEWEST FIRST</span></div>
+  <div class="album-index">{page.data.map((album,index) => <article class="album-sheet"><a href={`/photos/${album.slug}`}><div class="album-sheet-top"><span class="photo-serial">{String((page.start || 0) + index + 1).padStart(2,'0')}</span><time datetime={album.data.date}>{album.data.date?.replaceAll('-','.')}</time><Icon name="lucide:arrow-up-right" /></div><figure><div class="album-print"><img {...covers[index]} alt={locale(album.data.title)} loading={index < 2 ? 'eager' : 'lazy'} /></div><figcaption><div><h2>{locale(album.data.title)}</h2><p>{locale(album.data.location)}</p></div><span>{String(album.data.images?.length || 1).padStart(2,'0')} PHOTOS</span></figcaption></figure></a></article>)}</div>
+  {page.lastPage > 1 && <nav class="photo-pagination" aria-label="相冊のページ">{page.url.prev && <a href={page.url.prev} aria-label="前のページ"><Icon name="lucide:arrow-left" /></a>}<span>{page.currentPage} / {page.lastPage}</span>{page.url.next && <a href={page.url.next} aria-label="次のページ"><Icon name="lucide:arrow-right" /></a>}</nav>}
+  <div class="photo-endmark" aria-hidden="true">LOOK / PAUSE / REMEMBER</div>
+</EditorialLayout>
