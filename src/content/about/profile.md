@@ -1,6 +1,6 @@
 ---
 name: "樹(itsuki)"
-avatar: "/assets/about/bio.svg"
+avatar: "/assets/about/nyashiki-avatar.png"
 tags:
     - "Full-stack"
     - "Minimalist"
@@ -8,7 +8,7 @@ tags:
 attributes:
     - icon: "map-pin"
       label: "Location"
-      value: "広州、中国"
+      value: "日本"
       color: "text-red"
     - icon: "mail"
       label: "Contact"

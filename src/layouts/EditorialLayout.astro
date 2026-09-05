@@ -5,8 +5,13 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/editorial.css';
 interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en'; home?: boolean; }
 const { title = SITE_CONFIG.brand.logo, description = SITE_CONFIG.brand.description.ja, image, article = false, lang = 'ja', home = false } = Astro.props;
+const railGroups = [
+  [{label:'ホーム',href:'/',icon:'house'}, {label:'記事',href:'/blog',icon:'notebook-pen'}, {label:'つくる',href:'/projects',icon:'hammer'}, {label:'動画',href:'/videos',icon:'play'}, {label:'写真',href:'/photos',icon:'camera'}, {label:'俳句',href:'https://haiku.erzhiqian.cc/',icon:'feather'}],
+  [{label:'現在',href:'/now',icon:'clock'}, {label:'私について',href:'/about',icon:'user-round'}, {label:'日本語学習',href:'/japanese',icon:'languages'}, {label:'アーカイブ',href:'/archive',icon:'archive'}, {label:'更新履歴',href:'/'+lang+'/changelog',icon:'history'}],
+];
+const railActive = (href: string) => href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname === href || Astro.url.pathname.startsWith(href + '/');
 const canonical = new URL(Astro.url.pathname, SITE_CONFIG.brand.siteUrl);
-const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/#projects' }, { label: '動画', href: '/videos' }, { label: '写真', href: '/photos' }];
+const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/projects' }, { label: '動画', href: '/videos' }, { label: '写真', href: '/photos' }, { label: '俳句', href: 'https://haiku.erzhiqian.cc/' }];
 ---
 <!doctype html>
 <html lang={lang}>
@@ -24,6 +29,13 @@ const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/#
 </head>
 <body class:list={['editorial', { 'editorial-home': home, 'editorial-article': article }]}>
   <a class="skip-link" href="#main-content">本文へ移動</a>
+  <nav class="edition-rail" aria-label="サイトナビゲーション">
+    {railGroups.map((group,i) => <div class:list={['rail-group', {'rail-secondary':i===1}]}>{group.map(item => <a href={item.href} aria-label={item.label} aria-current={railActive(item.href) ? 'page' : undefined}><Icon name={'lucide:'+item.icon} /><span class="rail-tooltip" aria-hidden="true">{item.label}</span></a>)}{i === 1 && <button class="rail-social-toggle" type="button" popovertarget="rail-social-links" aria-label="ソーシャルリンク"><Icon name="lucide:contact-round" /><span class="rail-tooltip" aria-hidden="true">ソーシャルリンク</span></button>}</div>)}
+  </nav>
+  <div id="rail-social-links" popover="auto" class="rail-social-popover">
+    <p>ELSEWHERE</p>
+    {SITE_CONFIG.socials.map(s => <a href={s.href} target="_blank" rel="noreferrer">{s.label}<Icon name="lucide:arrow-up-right" /></a>)}
+  </div>
   <div class="edition-shell">
     {!home && <header class="edition-header"><a class="edition-wordmark" href="/" aria-label="Itsuki ホーム">ITSUKI.</a><nav aria-label="メインナビゲーション">{nav.map((item, i) => <a href={item.href} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
     <main id="main-content"><slot /></main>

@@ -37,3 +37,32 @@
   .edition-footer nav, .edition-colophon > div { gap: 16px; }
 }
 @media (prefers-reduced-motion: reduce) { .editorial *, .editorial *::before, .editorial *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+.edition-rail { display:none; }
+@media(min-width:761px) {
+  .editorial { padding-left:64px; }
+  .edition-rail { display:flex; position:fixed; left:8px; top:0; bottom:0; width:64px; padding:26px 0; flex-direction:column; justify-content:space-between; gap:24px; background:var(--paper); border-right:1px solid var(--rule); z-index:100; }
+  .rail-group { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .edition-rail a { display:flex; position:relative; justify-content:center; align-items:center; width:42px; height:42px; border-radius:4px; }
+  .edition-rail a[aria-current=page] { color:var(--vermillion); background:#d527180a; }
+  .edition-rail a:hover { background:#d527180a; }
+  .edition-rail svg { width:20px; height:20px; }
+  .rail-tooltip { position:absolute; left:calc(100% + 12px); top:50%; transform:translateY(-50%); background:var(--ink); color:var(--paper); padding:7px 10px; white-space:nowrap; font-size:12px; line-height:1.5; border-radius:3px; visibility:hidden; pointer-events:none; }
+  .edition-rail a:hover .rail-tooltip,.edition-rail a:focus-visible .rail-tooltip { visibility:visible; }
+}
+@media(min-width:761px) and (max-height:650px) {
+  .edition-rail { padding:12px 0; gap:12px; }
+  .rail-group { gap:2px; }
+  .edition-rail a { height:32px; }
+}
+@media(min-width:761px) and (max-height:430px) {
+  .edition-rail { overflow-y:auto; justify-content:flex-start; }
+}
+
+.rail-social-toggle { display:flex; position:relative; align-items:center; justify-content:center; width:42px; height:42px; border:0; border-radius:4px; background:transparent; color:var(--ink); cursor:pointer; padding:0; flex-shrink:0; }
+.rail-social-toggle:hover { color:var(--vermillion); background:#d527180a; }
+.rail-social-toggle:hover .rail-tooltip,.rail-social-toggle:focus-visible .rail-tooltip { visibility:visible; }
+.rail-social-popover { position:fixed; inset:auto auto 24px 84px; margin:0; padding:20px; min-width:190px; background:var(--paper); color:var(--ink); border:1px solid var(--rule); box-shadow:0 8px 24px #16161612; }
+.rail-social-popover p { margin:0 0 10px; font-size:10px; letter-spacing:.14em; color:var(--muted); }
+.rail-social-popover a { display:flex; align-items:center; justify-content:space-between; gap:28px; padding:10px 0; font-size:14px; }
+@media(min-width:761px) and (max-height:650px) { .rail-social-toggle { height:32px; } }

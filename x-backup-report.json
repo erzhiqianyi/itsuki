@@ -1,0 +1,27 @@
+{
+  "profile": "https://x.com/itsuki_maer",
+  "capturedAt": "2026-09-05",
+  "ownPosts": 379,
+  "days": 62,
+  "dateFrom": "2026-07-04",
+  "dateTo": "2026-09-05",
+  "profileCount": 380,
+  "reposts": [
+    {
+      "note": "Observed in profile Reposts tab; repost time not exposed.",
+      "originalPublishedAt": "2026-07-10T07:06:13.000Z",
+      "repostedAt": null,
+      "sourceUrl": "https://x.com/kamakura_kyokai/status/2075476670237077593",
+      "type": "repost"
+    }
+  ],
+  "imagesSaved": 524,
+  "imageFailures": [],
+  "officialArchive": false,
+  "videoFilesSaved": 0,
+  "notes": [
+    "Rendered browser capture, not a guarantee of deleted or hidden post coverage.",
+    "Images are observed display renditions, not guaranteed originals.",
+    "Repost timestamp not exposed; do not assign original publication date as repost date."
+  ]
+}

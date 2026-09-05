@@ -1,8 +1,7 @@
 ---
 // src/pages/[lang]/changelog.astro
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+import { getCollection, render } from 'astro:content';
 import { SITE_CONFIG } from '../../data/site-config';
 
 // 1. 生成多语言路径
@@ -27,108 +26,47 @@ const sortedLogs = allLogs.sort((a, b) =>
     new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
 
-// 类型对应的 Catppuccin 配色
-const typeColors = {
-    feat: 'bg-green-500/10 text-green-400 border-green-500/20',
-    fix: 'bg-red-500/10 text-red-400 border-red-500/20',
-    refactor: 'bg-[#89b4fa]/10 text-[#89b4fa] border-[#89b4fa]/20',
-    style: 'bg-pink-500/10 text-pink-400 border-pink-500/20',
-    perf: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-};
+const logs = await Promise.all(sortedLogs.map(async log => ({...log, Content:(await render(log)).Content})));
 ---
-
-<BaseLayout
-        lang={lang}
-        title={t('archive')}
-        description={t('changelogIntro')}
->
-    <div class="max-w-4xl mx-auto px-4">
-        <header class="mb-16 border-b border-white/5 pb-10">
-            <h1 class="text-4xl md:text-5xl font-extrabold text-[#f5e0dc] mb-6 tracking-tight flex items-center gap-4">
-                <Icon name="lucide:history" class="w-10 h-10 text-[#89b4fa]" />
-                {t('archive')}
-            </h1>
-            <p class="text-[#bac2de] text-lg opacity-80 leading-relaxed font-medium">
-                {t('changelogIntro')}
-            </p>
-        </header>
-
-        <div class="relative ml-2 sm:ml-6 space-y-16 before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-gradient-to-b before:from-[#89b4fa] before:via-[#585b70] before:to-transparent pb-10">
-
-            {sortedLogs.map((log) => (
-                    <div class="relative group">
-                        <div class="absolute -left-[9px] top-2 w-4 h-4 rounded-full border-4 border-[#1e1e2e] bg-[#89b4fa] shadow-[0_0_10px_rgba(137,180,250,0.5)] z-20 group-hover:scale-150 transition-transform duration-300"></div>
-
-                        <div class="pl-8 mb-4">
-                            <time class="text-sm font-mono font-bold tracking-tighter text-[#6c7086] group-hover:text-[#89b4fa] transition-colors flex items-center gap-2">
-                                <Icon name="lucide:calendar" class="w-3.5 h-3.5" />
-                                {log.data.date.replace(/-/g, '/')}
-                            </time>
-                        </div>
-
-                        <div class="ml-8 bento-card p-6 md:p-10 border border-white/5 hover:border-[#89b4fa]/30 transition-all duration-500">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                                <div class="flex flex-col gap-3">
-                                    <div class="flex items-center gap-3">
-                                    <span class={`text-[10px] uppercase tracking-widest font-black px-2 py-0.5 rounded border ${typeColors[log.data.type as keyof typeof typeColors]}`}>
-                                        {log.data.type}
-                                    </span>
-                                        <div class="flex items-center gap-2 text-xs font-mono text-[#89b4fa]/60">
-                                            <Icon name="lucide:tag" class="w-3 h-3" />
-                                            {log.data.version}
-                                        </div>
-                                    </div>
-                                    <h2 class="text-2xl md:text-3xl font-bold text-[#f5e0dc] group-hover:text-[#89b4fa] transition-colors leading-tight">
-                                        {log.data.title}
-                                    </h2>
-                                </div>
-                            </div>
-
-                            <div class="prose prose-invert prose-sm md:prose-base max-w-none text-[#a6adc8]
-                            prose-li:my-3 prose-li:leading-relaxed
-                            prose-strong:text-[#f5e0dc] prose-strong:font-bold
-                            prose-code:text-[#f5c2e7] prose-code:bg-white/5 prose-code:px-1 prose-code:rounded">
-                                {/* 异步加载 Markdown 正文 */}
-                                {log.render().then(({ Content }) => <Content />)}
-                            </div>
-                        </div>
-                    </div>
-            ))}
-        </div>
-
-        <div class="mt-20 pb-20"></div>
+<EditorialLayout lang={lang} title={lang === 'ja' ? '更新履歴' : 'Changelog'} description={t('changelogIntro')}>
+  <div class="changelog-page">
+    <header class="changelog-heading">
+      <p class="kicker">CHANGELOG</p>
+      <h1>{lang === 'ja' ? '更新履歴' : 'Changelog'}</h1>
+      <p class="intro">{t('changelogIntro')}</p>
+    </header>
+    <div class="log-list">
+      {logs.map(log => <article class="log-entry" id={'release-'+log.data.version}>
+        <aside class="log-meta"><time datetime={log.data.date}>{log.data.date.replaceAll('-', '.')}</time><span class="version">{log.data.version}</span><span class="change-type">{log.data.type}</span></aside>
+        <div class="log-main"><h2>{log.data.title}</h2><div class="log-content"><log.Content /></div></div>
+      </article>)}
     </div>
-</BaseLayout>
-
+  </div>
+</EditorialLayout>
 <style>
-    /* 标准 CSS 属性，确保无语法错误 */
-    .bento-card {
-        backdrop-filter: blur(16px);
-        background: linear-gradient(
-                160deg,
-                rgba(49, 50, 68, 0.4) 0%,
-                rgba(30, 30, 46, 0.6) 100%
-        );
-    }
-
-    /* 列表点美化 */
-    .prose ul {
-        list-style-type: none;
-        padding-left: 0.5rem;
-    }
-    .prose li {
-        position: relative;
-        padding-left: 1.75rem;
-    }
-    .prose li::before {
-        content: "";
-        position: absolute;
-        left: 0;
-        top: 0.7em;
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background-color: #89b4fa;
-        box-shadow: 0 0 8px rgba(137, 180, 250, 0.6);
-    }
+.changelog-page { max-width:1040px; margin:auto; padding:16px 0 64px; }
+.changelog-heading { margin-bottom:48px; }
+.kicker { font-size:12px; letter-spacing:.16em; color:var(--muted); }
+h1 { font-size:clamp(34px,5vw,52px); font-weight:600; line-height:1.4; margin:16px 0 22px; }
+.intro { font-size:16px; line-height:1.9; color:var(--muted); }
+.log-entry { display:grid; grid-template-columns:150px minmax(0,1fr); gap:48px; padding:40px 0 48px; border-top:1px solid var(--rule); scroll-margin-top:24px; }
+.log-meta { display:flex; flex-direction:column; align-items:flex-start; gap:12px; font-size:13px; line-height:1.6; }
+.log-meta time { font-weight:500; }
+.version { color:var(--vermillion); }
+.change-type { color:var(--muted); text-transform:uppercase; font-size:10px; letter-spacing:.12em; }
+.log-main { min-width:0; }
+h2 { font-size:clamp(22px,2.5vw,28px); font-weight:600; line-height:1.65; margin:0 0 28px; overflow-wrap:anywhere; }
+.log-content { font-size:16px; line-height:1.95; overflow-wrap:anywhere; }
+.log-content :global(p) { margin:0 0 1.3em; }
+.log-content :global(h2),.log-content :global(h3) { font-size:19px; font-weight:600; line-height:1.7; margin:32px 0 14px; }
+.log-content :global(ul),.log-content :global(ol) { padding-left:1.4em; margin:18px 0 26px; }
+.log-content :global(ul) { list-style:disc; }
+.log-content :global(ol) { list-style:decimal; }
+.log-content :global(li) { padding-left:4px; margin-bottom:14px; }
+.log-content :global(a) { color:var(--vermillion); text-decoration:underline; text-underline-offset:4px; }
+.log-content :global(strong) { font-weight:600; }
+.log-content :global(pre) { overflow:auto; padding:16px; }
+.log-content :global(img) { max-width:100%; height:auto; }
+.log-content :global(> :last-child) { margin-bottom:0; }
+@media(max-width:680px) { .changelog-heading { margin-bottom:32px; } .log-entry { grid-template-columns:1fr; gap:20px; padding:28px 0 36px; } .log-meta { flex-direction:row; flex-wrap:wrap; align-items:center; gap:16px; } .log-content { font-size:15px; } }
 </style>

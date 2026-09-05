@@ -75,6 +75,10 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   <div class="reading-layout">
     <aside class="reading-sidebar">
       <a href="/blog" class="back-link"><Icon name="lucide:arrow-left" />{postUI.back[lang]}</a>
+      <nav class="sidebar-pagination" aria-label={lang === 'en' ? 'Adjacent articles' : '前後の記事'}>
+        {prevPost && <a href={getPostUrl(prevPost.id)}><span><Icon name="lucide:arrow-left" />{postUI.prev[lang]}</span><strong>{prevPost.data.title || prevPost.data.date}</strong></a>}
+        {nextPost && <a href={getPostUrl(nextPost.id)}><span>{postUI.next[lang]}<Icon name="lucide:arrow-right" /></span><strong>{nextPost.data.title || nextPost.data.date}</strong></a>}
+      </nav>
       {toc.length > 0 && <details class="reading-toc" open><summary>{postUI.toc[lang]}</summary><nav aria-label={postUI.toc[lang]}>{toc.map(h => <a href={'#' + h.slug} class:list={{ nested: h.depth === 3 }}>{h.text}</a>)}</nav></details>}
       {series && <details class="reading-toc"><summary>{series.title[lang]}</summary><nav>{series.items.map(item => <a href={item.href} aria-current={item.active ? 'page' : undefined}>{item.title[lang]}</a>)}</nav></details>}
     </aside>
@@ -84,7 +88,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
         <h1>{title || date}</h1>
         {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <span>#{tag}</span>)}</p>}
       </header>
-      {coverImage && <details class="article-cover"><summary>{lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
+      {coverImage && <details class="article-cover" open><summary>{lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
       <div class="article-content" id="blog-content"><Content /></div>
       <nav class="reading-pagination" aria-label="記事のナビゲーション">
         <a href={prevPost ? getPostUrl(prevPost.id) : '/blog'}><span><Icon name="lucide:arrow-left" />{prevPost ? postUI.prev[lang] : postUI.returnIdx[lang]}</span><strong>{prevPost?.data.title || prevPost?.data.date}</strong></a>
@@ -128,8 +132,14 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
 </script>
 <style is:global>
   .reading-layout { max-width:1100px; margin:auto; display:grid; grid-template-columns:210px minmax(0,720px); gap:64px; }
-  .reading-sidebar { align-self:start; position:sticky; top:30px; font-size:13px; }
+  .reading-sidebar { align-self:start; position:sticky; top:30px; max-height:calc(100dvh - 60px); overflow-y:auto; font-size:13px; }
   .back-link { display:flex; gap:8px; align-items:center; margin-bottom:30px; }
+  .sidebar-pagination { display:grid; gap:20px; padding-bottom:24px; margin-bottom:24px; border-bottom:1px solid var(--rule); }
+  .sidebar-pagination a { min-width:0; }
+  .sidebar-pagination span { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+  .sidebar-pagination strong { display:block; margin-top:8px; font-size:13px; font-weight:500; line-height:1.7; overflow-wrap:anywhere; }
+  .sidebar-pagination a:hover strong { color:var(--vermillion); }
+  @media(min-width:761px) { .reading-article > .reading-pagination { display:none; } }
   .reading-toc { margin-bottom:24px; }
   .reading-toc summary { cursor:pointer; font-weight:600; margin-bottom:14px; }
   .reading-toc nav { display:grid; gap:12px; border-left:1px solid var(--rule); padding-left:16px; line-height:1.7; }
@@ -155,6 +165,10 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .article-content li { padding-left:.2em; margin-bottom:.5em; }
   .article-content blockquote { border-left:2px solid var(--vermillion); padding-left:22px; margin:28px 0; color:var(--muted); }
   .article-content img { display:block; width:auto; max-width:100%; height:auto; margin:28px auto; cursor:zoom-in; }
+  .article-content .x-photo-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:24px 0; }
+  .article-content .x-photo-grid img { width:100%; height:100%; aspect-ratio:1; object-fit:cover; margin:0; border-radius:4px; }
+  .article-content .x-photo-grid img:only-child { grid-column:1 / -1; width:auto; height:auto; max-height:560px; aspect-ratio:auto; object-fit:contain; justify-self:start; }
+  .article-content .x-photo-grid img:focus-visible { outline:2px solid var(--vermillion); outline-offset:3px; }
   .article-content iframe { width:100%; height:auto; aspect-ratio:16/9; border:0; margin:28px auto; display:block; }
   .article-content pre { overflow:auto; padding:20px; font-size:14px; border-radius:4px; margin:24px 0; }
   .article-content :not(pre) > code { background:#eceee9; padding:2px 5px; font-size:.9em; }
@@ -177,7 +191,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   @media(max-width:1000px) { .reading-layout { grid-template-columns:170px minmax(0,1fr); gap:36px; } }
   @media(max-width:760px) {
     .reading-layout { display:flex; flex-direction:column; gap:20px; }
-    .reading-sidebar { position:static; width:100%; } .reading-sidebar .reading-toc { display:none; }
+    .reading-sidebar { position:static; width:100%; max-height:none; overflow:visible; } .sidebar-pagination { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-bottom:0; padding-bottom:18px; } .reading-sidebar .reading-toc { display:none; }
     .back-link { margin-bottom:0; } .reading-heading h1 { font-size:27px; line-height:1.6; }
     .article-content { font-size:17px; } .article-content h2 { font-size:23px; }
     #article-lightbox { padding:44px 8px 12px; } #article-lightbox[open] { gap:2px; }

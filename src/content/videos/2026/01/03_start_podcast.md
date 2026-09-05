@@ -1,21 +1,13 @@
 ---
-lang: ja
-image: "/assets/videos/2026/01/03_start_podcast.webp"
-duration: "05:50"
-category: "VLOG"
-views: "1.2k"
-date: "2026-01-13"
-featured: true
+lang: "ja"
+title: "Vol 1 退職まで10日。なぜ今、ポッドキャストを始めるのか？"
+desc: "今日（2026年1月6日）は僕にとって特別な日です。ついにポッドキャストを始めることにしました。このエピソードでは、以下の内容についてお話ししています： 動と決断： YouTubeの投稿計画や退職前の引き継ぎで一番忙しいこの時期に、なぜあえてポッドキャストを始めたのか。"
+image: "/assets/videos/youtube/KDQCnWhViT4.jpg"
+tags: []
+duration: "5:50"
+category: "PODCAST"
+date: "2026-01-13T22:33:11+09:00"
+featured: false
 type: "long"
-title: "Vol.1 退職まで10日。なぜ今、ポッドキャストを始めるのか？"
-url: "https://youtu.be/KDQCnWhViT4?si=4l8Ivs2PNXdpwtm5"
-"tags":
-  - "新しい挑戦"
-  - "ポッドキャスト初心者"
-  - "YouTube影響"
-  - "音声配信"
-  - "行動力"
-  - "日本語学習"
-desc: "YouTubeの投稿計画や退職前の引き継ぎで一番忙しいこの時期に、なぜあえてポッドキャストを始めたのか。"
+url: "https://www.youtube.com/watch?v=KDQCnWhViT4"
 ---
-

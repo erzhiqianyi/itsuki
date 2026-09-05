@@ -65,11 +65,20 @@ const videos = defineCollection({
     }),
 });
 
+const projects = defineCollection({
+    type: 'content',
+    schema: z.object({
+        id: z.string(), order: z.number(), name: z.string(), description: z.string(),
+        kind: z.string(), href: z.string().url(), icon: z.string(), action: z.string(),
+    }),
+});
+
 // 4. Now 页面 - 核心状态集合
 const now = defineCollection({
     loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/now"}),
     schema: z.object({
         type: z.enum(['mission', 'status']),
+        updated: z.string().optional(),
         lang: z.enum(['ja', 'en']).default('ja'),
         title: z.string(),
         description: z.string().optional(),
@@ -199,4 +208,4 @@ const changelog = defineCollection({
     }),
 });
 
-export const collections = {blog, photos, videos, now, archive, about, japanese, changelog};
+export const collections = {projects, blog, photos, videos, now, archive, about, japanese, changelog};

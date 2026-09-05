@@ -1,23 +1,16 @@
 ---
-lang: ja
-image: "/assets/videos/2025/12/02_nihong.webp"
-duration: "05:24"
+lang: "ja"
+title: "【EP2】ロックダウンの絶望から日本へ。中国を離れ、僕が「日本語」を選んだ本当の理由"
+desc: "🇯🇵 心地よい風、青い空、そして波に乗るサーファーたち。 鎌倉の海を見た瞬間、僕は「いつかここで生きていく」と心に決めました。"
+image: "/assets/videos/youtube/5TC2j7BgjPY.jpg"
+tags: []
+duration: "5:25"
 category: "VLOG"
-views: "1.2k"
-date: "2025-12-31"
-featured: true
+date: "2025-12-31T14:25:15+09:00"
+featured: false
 type: "long"
-title: "ロックダウンの絶望から日本へ。中国を離れ、僕が「日本語」を選んだ本当の理由"
 url: "https://www.youtube.com/watch?v=5TC2j7BgjPY"
-"tags":
-  - "丁寧な暮らし"
-  - "一人旅"
-  - "温泉"
-  - "マインドフルネス"
-  - "再出発"
-desc: "ロックダウンの絶望から救ってくれたのは、日本の景色でした。英語圏ではなく日本を選んだ、私だけの個人的な物語"
 ---
-
 終わりのないPCR検査、家から出られない恐怖。
 2021年、絶望の中にいた僕の頭に浮かんだのは「日本へ行こう」という一言でした。アニメが好きだっただけの青年が、人生のすべてを賭けて日本を目指した理由。
 

@@ -23,13 +23,27 @@ const localImage = (src) => typeof src === 'string' && src.startsWith('/') && ex
 const locale = (value) => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const visibleAlbums = albums.map(album => ({ album, cover: [album.data.cover, ...(album.data.images || []).map(i => i.url)].find(localImage) })).filter(a => a.cover).slice(0, 2);
 const visibleVideos = videos.filter(video => video.data.url).slice(0, 2);
-const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '02', label: 'つくる', href: '#projects' }, { number: '03', label: '動画', href: '/videos' }, { number: '04', label: '写真', href: '/photos' }];
-const projects = [
-  { name: 'Digital Garden', description: '個人サイトと日々の記録', href: 'https://github.com/erzhiqianyi/itsuki', icon: 'square-code', external: true },
-  { name: '日本語学習ノート', description: '学んだ言葉と、考えたこと。', href: '/category/japanese', icon: 'book-open', external: false },
-];
+const projects = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order).map(entry=>entry.data);
+const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '02', label: 'つくる', href: '/projects' }, { number: '03', label: '動画', href: '/videos' }, { number: '04', label: '写真', href: '/photos' }, { number: '05', label: '俳句', href: 'https://haiku.erzhiqian.cc/' }];
+
 ---
 <EditorialLayout home>
+  <div class="edition-clock" hidden data-home-clock><span>TOKYO / JST</span><time aria-label="日本の現在日時"></time></div>
+  <script>
+    const clock = document.querySelector<HTMLElement>('[data-home-clock]');
+    const time = clock?.querySelector('time');
+    const formatter = new Intl.DateTimeFormat('ja-JP', { timeZone:'Asia/Tokyo', year:'numeric', month:'2-digit', day:'2-digit', weekday:'short', hour:'2-digit', minute:'2-digit', second:'2-digit', hourCycle:'h23' });
+    const updateClock = () => {
+      if (!clock || !time) return;
+      const now = new Date();
+      time.dateTime = now.toISOString();
+      time.textContent = formatter.format(now);
+      clock.hidden = false;
+    };
+    updateClock();
+    const clockTimer = window.setInterval(updateClock, 1000);
+    document.addEventListener('astro:before-swap', () => window.clearInterval(clockTimer), { once:true });
+  </script>
   <header class="masthead">
     <div class="brand-lockup"><h1 class="masthead-name">ITSUKI.</h1><span class="vertical-brand">{SITE_CONFIG.brand.logo}</span></div>
     <div class="masthead-intro"><h2>こんにちは、樹です。</h2><p>日々の記録と、つくっているもの。<br />考えたこと、学んだこと、<br />その断片を、未来の自分へ。</p><a href="/now" class="now-link"><span class="status-dot"></span>現在のこと<Icon name="lucide:arrow-up-right" /></a></div>
@@ -45,27 +59,30 @@ const projects = [
         {post.excerpt && <p>{post.excerpt}</p>}
       </article>)}</div>
     </section>
-    <div class="making-column">
       <section id="projects">
-        <header class="section-heading"><span class="section-number display-type" aria-hidden="true">02</span><h2>プロジェクト</h2><a href="https://github.com/erzhiqianyi?tab=repositories" target="_blank" rel="noreferrer" aria-label="GitHub のプロジェクトを見る"><Icon name="lucide:arrow-up-right" /></a></header>
-        <div class="project-list">{projects.map(project => <a href={project.href} target={project.external ? '_blank' : undefined} rel={project.external ? 'noreferrer' : undefined} class="project-entry"><Icon name={'lucide:' + project.icon} /><div><h3>{project.name}</h3><p>{project.description}</p></div><Icon name="lucide:arrow-up-right" class="project-arrow" /></a>)}</div>
+        <header class="section-heading"><span class="section-number display-type" aria-hidden="true">02</span><h2>つくる</h2><a href="/projects" aria-label="つくっているものを詳しく見る"><Icon name="lucide:arrow-up-right" /></a></header>
+        <div class="project-list">{projects.map(project => <a href={'/projects#' + project.id} class="project-entry"><Icon name={'lucide:' + project.icon} /><div><span class="project-kind">{project.kind}</span><h3>{project.name}</h3><p>{project.description}</p></div><Icon name="lucide:arrow-up-right" class="project-arrow" /></a>)}</div>
       </section>
       <section id="motion">
         <header class="section-heading"><span class="section-number display-type" aria-hidden="true">03</span><h2>動画</h2><a href="/videos" aria-label="すべての動画を見る">すべて見る<Icon name="lucide:arrow-up-right" /></a></header>
         {visibleVideos.map((video, index) => <a class:list={['video-entry', { 'video-secondary': index > 0 }]} href={video.data.url} target="_blank" rel="noreferrer">
           {index === 0 && localImage(video.data.image) ? <div class="video-image"><img src={video.data.image} alt={video.data.title} width="560" height="315" loading="lazy" /><span class="play-mark"><Icon name="lucide:play" /></span></div> : <Icon name="lucide:circle-play" />}
-          <div><h3>{video.data.title}</h3><time datetime={video.data.date}>{video.data.date?.replaceAll('-', '.')}</time></div>
+          <div><h3>{video.data.title}</h3><time datetime={video.data.date}>{video.data.date?.slice(0, 10).replaceAll('-', '.')}</time></div>
         </a>)}
       </section>
-    </div>
     <section id="photography">
       <header class="section-heading"><span class="section-number display-type" aria-hidden="true">04</span><h2>写真<span class="album-label">（アルバム）</span></h2><a href="/photos" aria-label="すべてのアルバムを見る">すべて見る<Icon name="lucide:arrow-up-right" /></a></header>
       <div class="album-list">{visibleAlbums.map(({ album, cover }) => <a class="album-entry" href={'/photos/' + album.slug}><figure><img src={cover} alt={locale(album.data.title)} loading="lazy" /><figcaption><span>{locale(album.data.title)}</span><time datetime={album.data.date}>{album.data.date?.slice(0, 7).replace('-', '.')}</time></figcaption></figure></a>)}</div>
     </section>
   </div>
-  {latestDate && <p class="edition-updated">最終更新 <time datetime={latestDate}>{latestDate.replaceAll('-', '.')}</time></p>}
+  {latestDate && <p class="edition-updated">最終更新 <time datetime={latestDate}>{latestDate.slice(0, 10).replaceAll('-', '.')}</time></p>}
 </EditorialLayout>
 <style>
+  .edition-clock { display:flex; justify-content:flex-start; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:18px; color:var(--ink); font-size:12px; font-variant-numeric:tabular-nums; }
+  .edition-clock[hidden] { display:none; }
+  .edition-clock span { font-size:10px; letter-spacing:.12em; }
+
+  .project-kind { display:block; margin-bottom:5px; color:var(--muted); font-size:10px; letter-spacing:.04em; }
   .masthead { display:grid; grid-template-columns:1.6fr 1fr .8fr; align-items:center; gap:40px; padding-bottom:28px; }
   .brand-lockup { display:flex; align-items:center; gap:16px; min-width:0; }
   .masthead-name { font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:208px; line-height:.87; font-weight:900; margin:0; }
@@ -78,13 +95,13 @@ const projects = [
   .edition-stats > div { display:flex; flex-direction:column-reverse; }
   .edition-stats dd { font:600 42px/1.1 'Barlow Condensed',sans-serif; font-variant-numeric:tabular-nums; }
   .edition-stats dt { font-size:13px; margin-top:5px; }
-  .chapter-index { display:grid; grid-template-columns:repeat(4,1fr); border-block:2px solid var(--ink); margin:0 0 32px; }
+  .chapter-index { display:grid; grid-template-columns:repeat(5,1fr); border-block:2px solid var(--ink); margin:0 0 32px; }
   .chapter-index a { display:flex; align-items:center; gap:16px; padding:14px 8px; font-size:28px; font-weight:600; }
   .chapter-number { font-size:46px; font-weight:400; line-height:1; }
   .chapter-index :global(svg) { width:26px; height:26px; transition:transform 180ms ease; }
   .chapter-index a:hover :global(svg) { transform:translate(3px,-3px); }
-  .front-grid { display:grid; grid-template-columns:1.35fr 1fr 1.08fr; gap:42px; }
-  .front-grid > *, .making-column > * { min-width:0; scroll-margin-top:24px; }
+  .front-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); column-gap:72px; row-gap:56px; }
+  .front-grid > * { min-width:0; scroll-margin-top:24px; }
   .section-heading { display:flex; align-items:center; gap:14px; min-height:48px; margin-bottom:22px; }
   .section-number { font-size:48px; font-weight:400; line-height:1; color:var(--paper); -webkit-text-stroke:.7px var(--muted); }
   .section-heading h2 { font-size:18px; font-weight:700; white-space:nowrap; }
@@ -100,12 +117,15 @@ const projects = [
   .writing-list h3 a { text-decoration:underline; text-decoration-color:transparent; text-underline-offset:6px; text-decoration-thickness:2px; transition:text-decoration-color 180ms; }
   .writing-list article:first-child h3 a, .writing-list a:hover { text-decoration-color:var(--vermillion); }
   .writing-list p { margin-top:12px; font-size:14px; line-height:1.9; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
-  .making-column { display:flex; flex-direction:column; gap:28px; }
-  .project-entry { display:flex; align-items:flex-start; gap:16px; padding:4px 0 20px; }
-  .project-entry > :global(svg:first-child) { width:46px; height:46px; stroke-width:1.25; }
-  .project-entry h3 { font-size:16px; font-weight:700; line-height:1.5; }
-  .project-entry p { font-size:13px; margin-top:5px; line-height:1.6; }
-  .project-entry :global(.project-arrow) { margin-left:auto; width:14px; height:14px; opacity:0; }
+  #motion, #photography { border-top:2px solid var(--ink); padding-top:28px; }
+  .project-entry { display:flex; align-items:flex-start; gap:20px; padding:16px 0; border-bottom:1px solid var(--rule); }
+  .project-entry:first-child { padding-top:0; }
+  .project-entry:last-child { border-bottom:0; padding-bottom:0; }
+  .project-entry > div { min-width:0; }
+  .project-entry > :global(svg:first-child) { width:38px; height:38px; flex-shrink:0; stroke-width:1.25; }
+  .project-entry h3 { font-size:18px; font-weight:700; line-height:1.5; }
+  .project-entry p { font-size:14px; margin-top:7px; line-height:1.8; }
+  .project-entry :global(.project-arrow) { margin-left:auto; width:14px; height:14px; flex-shrink:0; opacity:.55; }
   .project-entry:hover :global(.project-arrow), .project-entry:focus-visible :global(.project-arrow) { opacity:1; }
   .video-entry { display:block; }
   .video-image { position:relative; }
@@ -117,20 +137,20 @@ const projects = [
   .video-secondary { display:flex; align-items:flex-start; gap:12px; padding-top:14px; margin-top:14px; border-top:1px solid var(--rule); }
   .video-secondary h3 { margin-top:0; font-size:12px; }
   .video-secondary > :global(svg) { width:26px; height:26px; }
-  .album-list { display:grid; gap:22px; }
+  .album-list { display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:24px; }
   .album-entry img { display:block; width:auto; max-width:100%; height:auto; max-height:250px; }
   .album-entry figcaption { display:flex; justify-content:space-between; gap:12px; font-size:12px; margin-top:8px; line-height:1.6; }
   .album-entry time { flex-shrink:0; color:var(--muted); }
   .edition-updated { text-align:right; color:var(--muted); font-size:11px; margin-top:28px; }
   @media(max-width:1380px) {
     .masthead { gap:26px; grid-template-columns:1.4fr 1fr .8fr; } .masthead-name { font-size:132px; }
-    .front-grid { gap:26px; } .section-heading { gap:8px; } .section-heading h2 { font-size:15px; }
+    .front-grid { column-gap:48px; } .section-heading { gap:8px; } .section-heading h2 { font-size:15px; }
     .section-number { font-size:38px; } .album-label { display:none; } .writing-list { padding-left:0; }
   }
   @media(max-width:1000px) {
     .masthead { grid-template-columns:1.3fr 1fr; } .masthead-name { font-size:160px; }
     .edition-stats { grid-column:1/-1; grid-template-columns:repeat(4,1fr); gap:16px; border-top:1px solid var(--rule); padding-top:18px; }
-    .front-grid { grid-template-columns:1.3fr 1fr; gap:32px; } #photography { grid-column:1/-1; }
+    .front-grid { column-gap:32px; row-gap:40px; }
     .album-list { grid-template-columns:1fr 1fr; align-items:start; }
     .chapter-index a { font-size:23px; gap:10px; } .chapter-number { font-size:36px; }
   }
@@ -141,11 +161,13 @@ const projects = [
     .masthead-intro p { font-size:13px; } .masthead-intro p br { display:none; } .now-link { align-self:end; margin-left:14px; }
     .edition-stats dd { font-size:31px; } .edition-stats dt { font-size:11px; }
     .chapter-index { grid-template-columns:1fr 1fr; margin-bottom:26px; }
-    .chapter-index a { font-size:22px; padding:12px 0; } .chapter-index a:nth-child(-n+2) { border-bottom:1px solid var(--rule); }
+    .chapter-index a { font-size:22px; padding:12px 0; } .chapter-index a:nth-child(-n+4) { border-bottom:1px solid var(--rule); }
     .chapter-index a:nth-child(2n) { padding-left:14px; } .chapter-index :global(svg) { width:20px; height:20px; margin-left:auto; margin-right:12px; }
     .front-grid { display:flex; flex-direction:column; gap:32px; } .section-heading h2 { font-size:18px; }
     .section-heading { gap:14px; margin-bottom:18px; } .section-heading > a { font-size:12px; }
-    .writing-list h3 { font-size:20px; } .entry-meta { font-size:12px; } .making-column { gap:28px; }
+    .writing-list h3 { font-size:20px; } .entry-meta { font-size:12px; }
+    #motion, #photography { padding-top:24px; }
+    .project-entry { gap:16px; }
     .album-list { grid-template-columns:1fr; } .album-entry img { max-height:360px; } .album-label { display:inline; } .video-entry h3 { font-size:15px; }
   }
   @media(max-width:360px) { .masthead-name { font-size:88px; } .edition-stats { gap:8px; } }

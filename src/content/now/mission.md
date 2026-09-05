@@ -1,16 +1,7 @@
 ---
 type: mission
+updated: "2026-09-05"
 lang: ja
-title: "2026年4月、東京へ"
-description: "日本語学校への入学と、日本での新しいキャリア形成に向けた準備期間です。"
-metrics:
-- label: { ja: "貯金目標", en: "Savings" }
-  value: "100%"
-  color: "text-green"
-- label: { ja: "日本語", en: "Language" }
-  value: "N2 Level"
-  color: "text-peach"
-- label: { ja: "仕事", en: "Status" }
-  value: "在職"
-  color: "text-peach"
+title: "日本で暮らし、学ぶ日々。"
+description: "2026年4月に来日しました。いまは日本語学校で学びながら、本を読み、ものをつくり、ときどきゲームを楽しんでいます。"
 ---
