@@ -187,24 +187,6 @@ const japanese = defineCollection({
 });
 
 
-const aiTools = defineCollection({
-    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/ai-tools"}),
-    schema: z.object({
-        lang: z.enum(['ja', 'en']).default('ja'),
-        title: z.string(),
-        description: z.string(),
-        // 1. 新增：跳转到 Gemini Canvas 或具体网页的链接
-        url: z.string().url(),
-        // 2. 预定义图标名 (Lucide)
-        icon: z.string().default('Wrench'),
-        category: z.array(z.string()).default([]),
-        // 3. 关联的 React 演示组件名
-        componentId: z.string().optional(),
-        date: z.string(),
-        featured: z.boolean().default(false),
-    }),
-});
-
 
 const changelog = defineCollection({
     type: 'content',
@@ -217,4 +199,4 @@ const changelog = defineCollection({
     }),
 });
 
-export const collections = {blog, photos, videos, now, archive, about, japanese, 'ai-tools': aiTools, changelog};
+export const collections = {blog, photos, videos, now, archive, about, japanese, changelog};

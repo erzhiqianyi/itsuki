@@ -35,11 +35,6 @@ navigation:
     label: { ja: "アーカイブ", en: "Archive" }
     color: "hover:text-accent"
     icon: 'archive' # 抽屉/存档文件夹的语义
-  - id: "nav-ai"
-    href: "/ai-tools"
-    label: { ja: "AIツール", en: "AI Tools" }
-    color: "hover:text-blue-400"
-    icon: 'sparkles' # AI 的通用视觉符号（闪烁、魔法、智能）
   - id: "nav-photo"
     href: "/photos"
     label: { ja: "写真", en: "Photos" }
@@ -120,7 +115,6 @@ ui:
     ai: { ja: "花园之灵 ✨", en: "Garden Spirit ✨" }
     resources: { ja: "学習リソース", en: "Resources" }
     wordOfDay: { ja: "今日の単語", en: "Word of the Day" }
-    aiTools: { ja: "AIツール・コレクション", en: "AI Tool Collection" }
   labels:
     viewAll: { ja: "すべて見る ->", en: "View All ->" }
     gallery: { ja: "ギャラリー ->", en: "Gallery ->" }
@@ -144,7 +138,6 @@ ui:
     viewDemo: { ja: "デモを見る", en: "View Demo" }
     openWeb: { ja: "サイトを開く", en: "Open Web" }
     backToGallery: { ja: "ギャラリーに戻る", en: "Back to Gallery" }
-    aiToolsIntro: { ja: "Gemini Canvas で作成したクリエイティブなツール群", en: "Creative tools crafted with Gemini Canvas" }
     all: { ja: "すべて", en: "All" }
     changelogIntro: { ja: "サイトの進化の軌跡、マイルストーンを記録しています。",  en: "Recording the milestones and evolution of this site." }
 
@@ -158,8 +151,6 @@ stats:
     label: { ja: "動画", en: "Videos" }
   - id: "words"
     label: { ja: "総字数", en: "Words" }
-  - id: "ai-tools"
-    label: { ja: "AI道具", en: "AI Tools" }
 
 # 8. 个人简介 (Profile)
 profile:
