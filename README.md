@@ -1,38 +1,40 @@
-# Itsuki's Digital Garden
+# 樹のデジタルガーデン
 
-樹のデジタルガーデン：一个持续更新的个人网站，记录软件开发、日语学习、摄影、视频与日常思考。
+**日本語** · [English](README.en.md)
 
-[访问网站](https://erzhiqian.cc) · [报告问题](https://github.com/erzhiqianyi/itsuki/issues) · [内容维护指南](docs/content-maintenance.md)
+ソフトウェア開発、日本語学習、写真、動画、日々の考えを記録する個人サイトです。少しずつ手を入れながら育てています。
 
-这是个人网站的源码仓库，可作为搭建数字花园的参考。仓库包含作者的真实内容和站点配置；复用时需要替换个人资料、媒体及外部链接。
+[サイトを見る](https://erzhiqian.cc) · [問題を報告する](https://github.com/erzhiqianyi/itsuki/issues) · [コンテンツの管理](docs/content-maintenance.md)
 
-## 功能
+このリポジトリにはサイトのソースコードと作者自身のコンテンツが含まれています。デジタルガーデンを作る際の参考として利用できます。自分のサイトとして使う場合は、プロフィール、画像、外部リンクなどを差し替えてください。
 
-- **文章**：Markdown 内容、分类、标签、精选文章和分页浏览。
-- **摄影**：相册、照片预览和标签浏览。
-- **项目与视频**：项目介绍、截图、视频资料及外部访问入口。
-- **个人记录**：近况、个人介绍、日语学习、书影音归档和更新历史。
-- **静态发布**：构建时生成 HTML 和 sitemap，无需部署应用后端或数据库。
+## 主な機能
 
-网站以日语内容为主，部分内容和配置提供英语字段，并非所有页面都有完整的双语版本。
+- **記事**：Markdown による執筆、カテゴリ、タグ、おすすめ記事、ページ分割。
+- **写真**：アルバム、写真プレビュー、タグ別の閲覧。
+- **プロジェクトと動画**：紹介文、スクリーンショット、動画情報、外部サイトへのリンク。
+- **個人の記録**：近況、自己紹介、日本語学習、読書・映画・ゲームのアーカイブ、更新履歴。
+- **静的サイト生成**：ビルド時に HTML とサイトマップを生成。アプリケーション用のバックエンドやデータベースは不要です。
 
-## 技术栈
+サイトの主な言語は日本語です。一部のコンテンツや設定には英語のフィールドもありますが、すべてのページが二言語に対応しているわけではありません。
 
-Astro 5、TypeScript、React 19、Tailwind CSS 3、Astro Icon / Lucide。内容主要通过 Markdown、YAML 和 Astro Content Collections 管理。
+## 技術構成
 
-依赖及命令以 [package.json](package.json) 为准。
+Astro 5、TypeScript、React 19、Tailwind CSS 3、Astro Icon / Lucide を使用しています。コンテンツは主に Markdown、YAML、Astro Content Collections で管理しています。
 
-## 本地运行
+依存関係とコマンドの定義は [package.json](package.json) を参照してください。
 
-### 环境
+## ローカルで起動する
 
-- Node.js 22 或更高版本（需满足所安装 Astro 版本的 `engines` 要求）。
-- npm 9.6.5 或更高版本。
+### 必要な環境
+
+- Node.js 22 以上（インストールする Astro の `engines` 要件を満たすバージョン）。
+- npm 9.6.5 以上。
 - Git。
 
-基本开发与构建无需 API 密钥或 `.env` 文件。X 日记导入脚本另需 Python 3，普通网站开发不需要运行它。
+通常の開発やビルドに API キーや `.env` ファイルは不要です。X の日記をインポートするスクリプトには Python 3 が必要ですが、サイトを起動するだけなら実行する必要はありません。
 
-### 启动
+### 起動手順
 
 ```sh
 git clone https://github.com/erzhiqianyi/itsuki.git
@@ -41,58 +43,58 @@ npm install
 npm run dev
 ```
 
-默认打开 [localhost:3000](http://localhost:3000)，实际地址以终端输出为准。当前配置允许局域网访问。需要指定端口或仅本机访问时：
+既定のアドレスは [localhost:3000](http://localhost:3000) です。実際のアドレスはターミナルの表示を確認してください。現在の設定では LAN 内からもアクセスできます。ポートを指定し、ローカルホストからのアクセスだけにする場合は次のように起動します。
 
 ```sh
 npm run dev -- --host 127.0.0.1 --port 4322
 ```
 
-### 常用命令
+### コマンド一覧
 
-| 命令 | 用途 |
+| コマンド | 用途 |
 | --- | --- |
-| `npm run dev` | 启动开发服务器 |
-| `npm start` | 与 `npm run dev` 相同 |
-| `npm run build` | 构建静态网站，输出至 `dist/` |
-| `npm run preview` | 在本地预览已构建的网站；先运行构建 |
-| `npm run astro -- check` | 运行 Astro / TypeScript 诊断 |
+| `npm run dev` | 開発サーバーを起動 |
+| `npm start` | `npm run dev` と同じ |
+| `npm run build` | 静的サイトをビルドし、`dist/` に出力 |
+| `npm run preview` | ビルド済みサイトをローカルでプレビュー。先にビルドが必要 |
+| `npm run astro -- check` | Astro / TypeScript の診断を実行 |
 
-目前没有独立的 `test` 或 `lint` 脚本。构建与类型检查是不同的检查步骤。
+現在、独立した `test` や `lint` スクリプトはありません。ビルドと型チェックは別々の確認手順です。
 
-## 目录结构
+## ディレクトリ構成
 
 ```text
 src/
-├── pages/                    # 页面与动态路由
-├── layouts/                  # 页面布局
-├── components/               # Astro / React 组件
-├── styles/                   # 全局与页面样式
+├── pages/                    # ページと動的ルート
+├── layouts/                  # ページレイアウト
+├── components/               # Astro / React コンポーネント
+├── styles/                   # 共通・ページ別のスタイル
 ├── data/
-│   ├── site-config.yaml      # 品牌、社交链接和通用文案
-│   └── site-config.ts        # 配置读取与类型定义
+│   ├── site-config.yaml      # サイト情報、SNS リンク、共通テキスト
+│   └── site-config.ts        # 設定の読み込みと型定義
 └── content/
-    ├── content.config.ts     # 内容集合与字段定义
-    ├── blog/                 # 文章与日记
-    ├── photos/               # 摄影与相册
-    ├── projects/             # 项目资料
-    ├── videos/               # 视频资料
-    ├── page-copy/            # 页面文案
-    ├── now/                  # 近况
-    ├── about/                # 个人介绍
-    ├── japanese/             # 日语学习
-    ├── archive/              # 书影音归档
-    └── changelog/            # 更新历史
-public/                       # 原样复制到构建产物的静态文件
-scripts/                      # 内容导入工具
-docs/                         # 内容维护与同步说明
-astro.config.mjs              # 站点 URL、集成和构建配置
+    ├── content.config.ts     # コレクションとフィールドの定義
+    ├── blog/                 # 記事と日記
+    ├── photos/               # 写真とアルバム
+    ├── projects/             # プロジェクト情報
+    ├── videos/               # 動画情報
+    ├── page-copy/            # ページの文言
+    ├── now/                  # 近況
+    ├── about/                # 自己紹介
+    ├── japanese/             # 日本語学習
+    ├── archive/              # 読書・映画・ゲームの記録
+    └── changelog/            # 更新履歴
+public/                       # ビルド時にそのままコピーされる静的ファイル
+scripts/                      # コンテンツのインポートツール
+docs/                         # コンテンツ管理と同期の説明
+astro.config.mjs              # サイト URL、連携機能、ビルド設定
 ```
 
-## 内容维护
+## コンテンツを管理する
 
-内容字段以 [集合定义](src/content/content.config.ts) 和同目录的现有文件为准。新增内容时，优先复制同类文件并修改 frontmatter；图片通常放入 `public/assets/`，在正文中以 `/assets/...` 引用。
+フィールドの仕様は [コレクション定義](src/content/content.config.ts) と同じディレクトリの既存ファイルを参照してください。追加時は同種のファイルをコピーし、frontmatter を編集すると進めやすくなります。画像は通常 `public/assets/` に置き、本文から `/assets/...` で参照します。
 
-例如，在 `src/content/blog/ja/` 下新增一篇 `.md` 文章：
+たとえば、`src/content/blog/ja/` に次のような `.md` ファイルを追加します。
 
 ```markdown
 ---
@@ -109,57 +111,55 @@ featured: false
 ここから本文を書きます。
 ```
 
-请同时将示例封面替换为真实图片，并确认路径存在。保存后检查文章列表和详情页，再运行构建。
+サンプルのカバー画像は実際の画像に差し替え、パスが存在することを確認してください。保存後は記事一覧と詳細ページを確認してからビルドします。
 
-更多维护说明：
+詳しい運用手順は以下のドキュメントを参照してください。これらの補足資料は現在、中国語で記述されています。
 
-- [内容维护](docs/content-maintenance.md)：各类内容的位置及修改方式。
-- [X 日记备份](docs/x-backup.md)：采集范围、外部原始数据位置、导入命令及备份限制。
-- [YouTube 视频同步](docs/youtube-sync.md)：同步范围与后续更新步骤；目前不是自动定时同步。
+- [コンテンツ管理](docs/content-maintenance.md)：各コンテンツの保存先と編集方法。
+- [X 日記のバックアップ](docs/x-backup.md)：収集範囲、外部の元データ、インポート手順、バックアップの制限。
+- [YouTube 動画の同期](docs/youtube-sync.md)：同期対象と更新手順。現在、定期的な自動同期は行いません。
 
-X 原始采集数据保存在仓库外，克隆本项目不会包含这些数据。网站已有内容可以直接构建，重新导入时需自行提供源文件。
+X の元データはリポジトリ外に保存されているため、clone には含まれません。既存コンテンツのビルドには不要ですが、再インポートする場合は元ファイルを別途用意してください。
 
-## 复用与站点配置
+## 自分のサイトとして使う
 
-搭建自己的站点时，检查以下位置：
+1. [astro.config.mjs](astro.config.mjs) の `site` を公開先のドメインに変更します。サイトマップなどの生成に使われます。
+2. [site-config.yaml](src/data/site-config.yaml) の `brand.siteUrl`、サイト情報、SNS リンク、自己紹介文を更新し、公開先と一致させます。
+3. `brand.googleAnalyticsId` を自分の ID に変更します。空文字列にすると、現在のレイアウトでは Google Analytics が無効になります。
+4. `src/content/` の個人コンテンツ、`public/` の画像とアイコンを差し替えます。レイアウトやページ内に直接記述されたナビゲーションと外部リンクも確認してください。
 
-1. 在 [astro.config.mjs](astro.config.mjs) 中修改 `site` 为目标域名，用于生成站点地图等信息。
-2. 在 [site-config.yaml](src/data/site-config.yaml) 中修改 `brand.siteUrl`、品牌信息、社交链接和个人文案，使其与目标域名一致。
-3. 将 `brand.googleAnalyticsId` 替换为自己的 ID，或设为空字符串以关闭当前布局中的 Google Analytics。
-4. 替换 `src/content/` 中的个人内容、`public/` 中的图片和图标，并检查布局、页面中直接写入的导航及外部链接。
+現在のページは Google Fonts を使用し、設定に応じて Google Analytics を読み込みます。一部のコンテンツには外部メディアも含まれます。すべてのリソースを自分で配信する場合は、これらも調整してください。
 
-当前页面使用 Google Fonts，并可按配置加载 Google Analytics；部分内容也引用外部媒体。需要完全自托管时，应一并调整这些资源。
-
-## 构建与部署
+## ビルドとデプロイ
 
 ```sh
 npm run build
 npm run preview
 ```
 
-检查预览页面后，将 `dist/` 发布到支持静态网站的托管平台。常用构建设置：
+プレビューを確認した後、`dist/` を静的サイト対応のホスティングサービスに公開します。
 
-| 设置 | 值 |
+| 設定項目 | 値 |
 | --- | --- |
-| 项目根目录 | 仓库根目录 |
-| 依赖安装 | `npm install` |
-| 构建命令 | `npm run build` |
-| 输出目录 | `dist` |
-| Node.js | 与本地使用的兼容版本一致 |
+| プロジェクトのルート | リポジトリのルート |
+| 依存関係のインストール | `npm install` |
+| ビルドコマンド | `npm run build` |
+| 出力ディレクトリ | `dist` |
+| Node.js | ローカルと同じ互換バージョン |
 
-仓库未提供自动部署工作流；域名绑定、发布分支和托管平台配置需要在平台侧设置。`npm run preview` 仅用于本地检查，不会发布网站。
+このリポジトリには自動デプロイ用のワークフローは含まれていません。ドメイン、公開対象のブランチ、ホスティングの設定はサービス側で行ってください。`npm run preview` はローカル確認用で、サイトを公開するコマンドではありません。
 
-## 参与贡献
+## コントリビューション
 
-欢迎通过 [Issue](https://github.com/erzhiqianyi/itsuki/issues) 报告问题或讨论改进，也欢迎提交 Pull Request。较大的功能或设计调整请先通过 Issue 讨论。
+不具合の報告や改善案は [Issue](https://github.com/erzhiqianyi/itsuki/issues) で受け付けています。Pull Request も歓迎します。大きな機能追加やデザイン変更は、先に Issue で相談してください。
 
-1. Fork 仓库并创建独立分支。
-2. 保持修改范围集中，必要时同步更新文档。
-3. 运行 `npm run astro -- check` 和 `npm run build`，在 PR 中说明结果及遇到的问题。
-4. 涉及界面时，检查桌面和移动端，并附上截图；涉及内容时，检查列表、详情和图片链接。
+1. リポジトリを Fork し、作業用のブランチを作成します。
+2. 変更範囲を絞り、必要に応じてドキュメントも更新します。
+3. `npm run astro -- check` と `npm run build` を実行し、結果や問題点を PR に記載します。
+4. UI の変更はデスクトップとモバイルで確認し、スクリーンショットを添付してください。コンテンツの変更では一覧、詳細、画像リンクを確認してください。
 
-问题报告请附复现步骤、预期与实际行为，以及相关浏览器或 Node.js 版本。请勿提交密钥、账户凭据或私人采集数据。
+不具合報告には再現手順、期待する動作、実際の動作、関連するブラウザーや Node.js のバージョンを記載してください。API キー、認証情報、非公開の収集データはコミットしないでください。
 
-## 许可证
+## ライセンス
 
-本仓库提供 [Apache License 2.0](LICENSE)。第三方依赖及素材请同时参阅各自的许可与来源说明。
+本リポジトリには [Apache License 2.0](LICENSE) が付属しています。第三者の依存ライブラリや素材については、それぞれのライセンスと出典も確認してください。
