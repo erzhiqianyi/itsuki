@@ -3,8 +3,8 @@ import { Icon } from 'astro-icon/components';
 import { photoPreview } from './photo-preview';
 const { images, albumTitle } = Astro.props;
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
-const previews = await Promise.all(images.map(photo => photoPreview(photo.url)));
-const viewerImages = await Promise.all(images.map(photo => photoPreview(photo.url,1920)));
+const previews = await Promise.all(images.map(photo => photoPreview(photo)));
+const viewerImages = await Promise.all(images.map(photo => photoPreview(photo,1920)));
 ---
 <div class="photo-contact-sheet" style={`--photo-columns:${Math.min(images.length,3) || 1}`}>{images.map((photo,index) => <figure class="contact-print"><a href={photo.url} data-photo-open data-viewer-src={viewerImages[index].src} data-caption={locale(photo.title) || albumTitle} aria-label={`写真 ${index + 1} を拡大`}><img {...previews[index]} alt={locale(photo.title) || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" /><span class="photo-unavailable" hidden>画像を読み込めません</span></a><figcaption><span>{String(index + 1).padStart(2,'0')}</span><span>{locale(photo.title)}</span><Icon name="lucide:plus" /></figcaption></figure>)}</div>
 <dialog class="photo-viewer" aria-label="写真ビューアー"><div class="viewer-bar"><span data-viewer-count aria-live="polite"></span><a data-viewer-original target="_blank" rel="noreferrer" aria-label="原寸画像を開く" title="原寸画像を開く"><Icon name="lucide:external-link" /></a><button type="button" data-viewer-close aria-label="閉じる" title="閉じる"><Icon name="lucide:x" /></button></div><figure class="viewer-stage"><img data-viewer-image alt="" /><figcaption data-viewer-caption></figcaption></figure><div class="viewer-navigation"><button type="button" data-viewer-prev aria-label="前の写真" title="前の写真"><Icon name="lucide:arrow-left" /></button><button type="button" data-viewer-next aria-label="次の写真" title="次の写真"><Icon name="lucide:arrow-right" /></button></div></dialog>

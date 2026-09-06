@@ -1,0 +1,160 @@
+{
+  "title": "Résumé",
+  "htmlLang": "en",
+  "reading": "",
+  "role": "Backend, data platforms & product development",
+  "summary": "Software engineer with about nine years of experience spanning financial data platforms and performance improvement, healthcare domain modelling and reusable systems, and building a startup product from scratch. My strength is turning complex business requirements into maintainable, extensible systems and carrying the work through design, development and operations.",
+  "facts": [
+    "~9 years in software development",
+    "Based in Tokyo · available from October 2026",
+    "JLPT N2 · studying at a language school"
+  ],
+  "ui": {
+    "about": "About me",
+    "updated": "Updated",
+    "language": "Language",
+    "toc": "On this page",
+    "contact": "Get in touch",
+    "work": "Independent projects",
+    "skills": "Technical experience",
+    "education": "Education & languages",
+    "professional": "Professional experience",
+    "personal": "Independent development",
+    "details": "View project",
+    "allProjects": "Explore all projects",
+    "projectNote": "Personal projects that I take from idea to development and release, using AI-assisted development to address needs from everyday life.",
+    "languages": "Chinese (native) · English (professional use) · Japanese (JLPT N2)",
+    "technology": "Key technologies"
+  },
+  "experience": [
+    {
+      "company": "iSoftStone Information Technology (Group)",
+      "project": "Client project: HSBC FRTB CVA",
+      "period": "Sep 2021 – Jan 2026",
+      "summary": "Contributed to a financial-regulation data platform for global business teams, from requirements analysis and technical design to data-processing and calculation frameworks, production delivery and operational support. Worked in English with quants, business analysts, project managers and overseas users to turn regulatory and business requirements into maintainable systems.",
+      "points": [
+        "Built Java backend services for upstream data intake, ETL scheduling and data import into Opensee. Learned Spark and Scala from scratch and built a configurable ETL framework adopted by six business teams, supporting over 2,000 daily processing jobs.",
+        "Optimised Spark resource allocation and processing logic, reducing a workload of over 100 million records from about two hours to under 45 minutes.",
+        "Worked with business analysts, quants and users to clarify requirements and validate prototypes, delivering a Python framework for Basel SA-CVA capital calculations. Verified results against ISDA sample data and enabled global business teams to retrieve data and run calculations themselves.",
+        "Provided global production support and on-call coverage across time zones. Supported users in the US and other regions in English, coordinating with teams and vendors to resolve data delays, performance degradation and system incidents.",
+        "Independently identified the causes of four or more defects and performance issues and drove vendor fixes. Resolved a service slowdown affecting all users with the team.",
+        "Reduced manual work through Jenkins regression automation, enabling repeatable validation of calculation results after business changes. Contributed to production delivery through pre-release validation, operating procedures and data migration.",
+        "Handled task breakdown, developer guidance and code review. Documented and regularly shared implementation, operational and troubleshooting knowledge as a team reference for development and handover."
+      ],
+      "role": "Senior Software Engineer (Full-stack)",
+      "tech": [
+        "Java",
+        "Python",
+        "Scala",
+        "Spark",
+        "ClickHouse",
+        "Jenkins"
+      ]
+    },
+    {
+      "company": "Guangzhou Hexie Medical Technology",
+      "project": "Chronic-disease management and healthcare systems",
+      "period": "Jul 2017 – Sep 2021",
+      "summary": "As a core developer, handled requirements analysis, technical and architectural design, task breakdown, implementation and production maintenance. Turned medical and operational expertise into reusable software capabilities for chronic-disease management, health questionnaires and genetic-test reports.",
+      "points": [
+        "Led domain modelling for the chronic-disease platform, separating shared management workflows from disease-specific rules. Extended diabetes management to hypertension and supported rollout to agents across China.",
+        "Redesigned questionnaire evaluation and genetic-report systems, separating shared processing from frequently changing business rules. Enabled doctors to configure questionnaires in Excel, reducing delivery time from about two weeks to three days; enabled genetic-test specialists to configure, test and publish report rules themselves.",
+        "Led the team to release an insurance sales-channel system in one week, integrating customer management, inventory and third-party shipping systems to support order processing, dispatch and reconciliation.",
+        "Introduced Spring Boot, DDD, Spock and code review to the team, with unit tests for management plans and core business rules."
+      ],
+      "role": "Mid-level Java Engineer",
+      "tech": [
+        "Java",
+        "Spring Boot",
+        "Spring Data JPA",
+        "DDD",
+        "MySQL",
+        "Redis",
+        "Spock"
+      ]
+    },
+    {
+      "company": "Early-stage startup",
+      "project": "Construction-machinery repair platform",
+      "period": "Oct 2016 – May 2017",
+      "summary": "As the company's sole developer, built a construction-machinery repair platform from scratch around a WeChat official account, taking the initial product through development and release.",
+      "points": [
+        "Implemented the workflow from an owner's repair request through fault confirmation to technician dispatch.",
+        "Owned requirements, system design, Java backend development, deployment and day-to-day operations."
+      ],
+      "role": "Engineer (sole developer)",
+      "tech": [
+        "Java",
+        "MySQL",
+        "Git"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "id": "nyashiki",
+      "body": "An iOS app for people living in Japan and studying Japanese, combining receipt-based expense tracking with real-life vocabulary learning. On-device OCR via Vision, storage in SQLite, and the user's own choice of AI provider through an API key held in Keychain."
+    },
+    {
+      "id": "michinori",
+      "body": "An offline-first iPhone railway-travel app with itinerary timelines, offline route maps, GPS arrival reminders, and local travel journals. Trilingual, no account, no ads, data stays on the device."
+    },
+    {
+      "id": "jlpt",
+      "body": "A web app that connects with AI agents such as Codex and Claude Code through MCP, organising vocabulary, grammar and questions from study conversations into a structured personal learning knowledge base. Preserves knowledge beyond individual chats and uses it to generate JLPT review cards and exercises, with multilingual support and study records."
+    },
+    {
+      "id": "haiku",
+      "body": "Independently designed and developed a personal haiku website to publish original poems inspired by everyday scenes and seasonal observations. Simple typography and generous spacing create a quiet reading experience for exploring and revisiting the poems."
+    }
+  ],
+  "skills": [
+    {
+      "title": "Professional experience",
+      "items": [
+        {
+          "k": "Backend",
+          "v": "Java, Spring Boot, Spring Data JPA, MyBatis, REST API, DDD"
+        },
+        {
+          "k": "Data & DB",
+          "v": "MySQL, Redis, ClickHouse, Spark, ETL, Pandas"
+        },
+        {
+          "k": "Cloud & Ops",
+          "v": "GCP Compute Engine, Jenkins Pipeline, Linux, Tomcat, JUnit, Spock"
+        },
+        {
+          "k": "Programming languages",
+          "v": "Java, Python, Scala, SQL"
+        }
+      ]
+    },
+    {
+      "title": "Independent development",
+      "items": [
+        {
+          "k": "Apps",
+          "v": "Swift, SwiftUI, SQLite, Vision OCR, Keychain, LLM API"
+        },
+        {
+          "k": "Web",
+          "v": "Astro, TypeScript, JavaScript, Chrome Extension"
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "school": "Akamonkai Japanese Language School",
+      "meta": "Apr 2026 – Present",
+      "note": "Passed JLPT N2 in December 2024. Currently enrolled in the school's Shin-Chukyu 2 class, developing practical Japanese skills through conversation and group discussion."
+    },
+    {
+      "school": "Inner Mongolia University of Science & Technology",
+      "meta": "Sep 2012 – Jul 2016",
+      "note": "B.Eng., Mineral Processing Engineering"
+    }
+  ],
+  "cta": "For a résumé or a work history tailored to a specific role, please reach out by email."
+}

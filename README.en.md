@@ -13,7 +13,7 @@ This repository contains the site's source code and the author's own content. Yo
 - **Articles**: Markdown content, categories, tags, featured posts, and pagination.
 - **Photography**: Albums, photo previews, and browsing by tag.
 - **Projects and videos**: Descriptions, screenshots, video metadata, and external links.
-- **Personal records**: A Now page, biography, Japanese learning, books/films/games archive, and changelog.
+- **Personal records**: A Now page, biography, books/films/games archive, and changelog.
 - **Static publishing**: HTML and a sitemap are generated at build time. No application backend or database is required.
 
 The site is primarily in Japanese. Some content and configuration fields support English, but not every page has a complete bilingual version.
@@ -81,7 +81,6 @@ src/
     ├── page-copy/            # Page copy
     ├── now/                  # Current activities
     ├── about/                # Biography
-    ├── japanese/             # Japanese learning
     ├── archive/              # Books, films, and games
     └── changelog/            # Update history
 public/                       # Static files copied unchanged to the build

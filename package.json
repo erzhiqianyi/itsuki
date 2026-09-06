@@ -7,7 +7,9 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "photos:add": "node scripts/photo-import.mjs",
+    "photos:studio": "node scripts/photo-studio.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.82",

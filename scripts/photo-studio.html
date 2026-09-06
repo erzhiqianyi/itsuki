@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>写真スタジオ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#161616; --paper:#fafbf9; --vermillion:#d52718; --rule:#d7d9d5; --muted:#62645e; --card:#f1f2ef; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--paper); color:var(--ink); font:400 14px/1.7 'Noto Sans JP',sans-serif; border-left:8px solid var(--vermillion); }
+h1,h2 { margin:0; font-weight:600; }
+.wrap { max-width:1240px; margin:0 auto; padding:36px 40px 140px; }
+
+header { display:flex; align-items:flex-end; justify-content:space-between; gap:32px; border-bottom:2px solid var(--ink); padding-bottom:20px; }
+h1 { font:700 52px/.95 'Barlow Condensed',sans-serif; letter-spacing:.01em; }
+h1 span { display:inline-block; margin-left:20px; font:600 17px/1.5 'Noto Sans JP',sans-serif; }
+.target { text-align:right; font-size:11px; color:var(--muted); line-height:1.9; }
+.target b { display:block; font:600 15px/1.4 'Barlow Condensed',sans-serif; letter-spacing:.06em; color:var(--ink); }
+.probe { display:block; margin-top:5px; padding-left:14px; position:relative; max-width:340px; }
+.probe::before { content:''; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%; background:var(--muted); }
+.probe[data-ok=yes]::before { background:#2e7d32; }
+.probe[data-ok=no] { color:var(--vermillion); }
+.probe[data-ok=no]::before { background:var(--vermillion); }
+
+.kicker { font-size:11px; letter-spacing:.14em; color:var(--vermillion); margin:0 0 14px; }
+.columns { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:56px; margin-top:36px; align-items:start; }
+@media (max-width:960px) { .columns { grid-template-columns:1fr; gap:40px; } }
+
+#drop { border:1px dashed var(--rule); background:var(--card); padding:44px 24px; text-align:center; cursor:pointer; transition:.15s; }
+#drop:hover, #drop.over { border-color:var(--vermillion); color:var(--vermillion); background:#d527180a; }
+#drop strong { display:block; font:600 20px/1.5 'Noto Sans JP',sans-serif; }
+#drop small { display:block; margin-top:8px; font-size:12px; color:var(--muted); }
+#drop.over small, #drop:hover small { color:inherit; }
+
+.sheet { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:26px 22px; margin-top:28px; }
+.sheet:empty { display:none; }
+.frame { position:relative; min-width:0; cursor:grab; }
+.frame.dragging { opacity:.35; }
+.frame.over { outline:2px solid var(--vermillion); outline-offset:6px; }
+.frame .plate { height:150px; display:flex; align-items:center; justify-content:center; background:var(--card); }
+.frame img { max-width:100%; max-height:100%; display:block; }
+.frame figcaption { display:flex; align-items:baseline; gap:8px; font-size:11px; color:var(--muted); padding:9px 0 8px; border-bottom:1px solid var(--rule); }
+.frame .serial { color:var(--vermillion); font-variant-numeric:tabular-nums; }
+.frame .file { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.frame .dim { margin-left:auto; flex-shrink:0; font-size:10px; }
+.acts { display:flex; gap:14px; padding-top:7px; font-size:11px; }
+.acts button { background:none; border:0; padding:0; font:inherit; color:var(--muted); cursor:pointer; }
+.acts button:hover { color:var(--vermillion); }
+.frame[data-cover] .acts .setcover { color:var(--vermillion); font-weight:600; }
+.frame[data-cover] .plate { outline:2px solid var(--vermillion); outline-offset:3px; }
+.frame[data-state=done] .serial::after { content:' ✓'; }
+.frame[data-state=failed] .plate { outline:2px solid var(--vermillion); }
+
+.panel { position:sticky; top:36px; display:grid; gap:18px; }
+label { display:block; font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:6px; }
+input[type=text], input[type=date] { width:100%; padding:9px 11px; font:inherit; color:var(--ink); background:var(--paper); border:1px solid var(--rule); border-radius:0; }
+input:focus { outline:2px solid var(--vermillion); outline-offset:1px; border-color:transparent; }
+.pair { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.check { display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink); }
+.check input { accent-color:var(--vermillion); width:15px; height:15px; }
+.readout { border-top:1px solid var(--rule); padding-top:14px; font-size:12px; color:var(--muted); }
+.readout div { display:flex; justify-content:space-between; gap:16px; }
+.readout b { color:var(--ink); font-weight:500; }
+
+footer { position:fixed; left:8px; right:0; bottom:0; background:var(--paper); border-top:2px solid var(--ink); padding:14px 40px; }
+.bar { max-width:1240px; margin:0 auto; display:flex; align-items:center; gap:24px; }
+#status { flex:1; min-width:0; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#status.bad { color:var(--vermillion); }
+#status a { color:var(--vermillion); }
+.meter { flex:0 0 200px; height:3px; background:var(--rule); }
+.meter i { display:block; height:100%; width:0; background:var(--vermillion); transition:width .2s; }
+#publish { padding:12px 30px; font:600 13px/1 'Noto Sans JP',sans-serif; letter-spacing:.06em; color:var(--paper); background:var(--ink); border:0; cursor:pointer; }
+#publish:hover:not(:disabled) { background:var(--vermillion); }
+#publish:disabled { opacity:.35; cursor:not-allowed; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>PHOTO STUDIO<span>写真スタジオ</span></h1>
+    <p class="target">アップロード先<b id="bucket">—</b><span id="host">—</span><span id="preflight" class="probe">接続を確認中…</span></p>
+  </header>
+
+  <div class="columns">
+    <section>
+      <p class="kicker">01 / 写真</p>
+      <div id="drop" tabindex="0" role="button">
+        <strong>写真をここにドロップ</strong>
+        <small>クリックして選択もできます。並び替えはドラッグ、表紙はクリックで指定。</small>
+      </div>
+      <input id="picker" type="file" accept="image/*" multiple hidden>
+      <div class="sheet" id="sheet"></div>
+    </section>
+
+    <section class="panel">
+      <p class="kicker">02 / アルバム情報</p>
+      <div class="pair">
+        <div><label for="titleJa">アルバム名 日本語</label><input id="titleJa" type="text"></div>
+        <div><label for="titleEn">英語</label><input id="titleEn" type="text"></div>
+      </div>
+      <div class="pair">
+        <div><label for="locationJa">場所 日本語</label><input id="locationJa" type="text"></div>
+        <div><label for="locationEn">英語</label><input id="locationEn" type="text"></div>
+      </div>
+      <div class="pair">
+        <div><label for="date">撮影日</label><input id="date" type="date"></div>
+        <div><label for="slug">スラッグ</label><input id="slug" type="text"></div>
+      </div>
+      <div class="pair">
+        <div><label for="locationTag">場所タグ</label><input id="locationTag" type="text"></div>
+        <div><label for="collectionTag">コレクションタグ</label><input id="collectionTag" type="text"></div>
+      </div>
+      <label class="check"><input id="featured" type="checkbox">トップページに出す</label>
+      <div class="readout" id="readout"></div>
+    </section>
+  </div>
+</div>
+
+<footer><div class="bar">
+  <span id="status">写真を追加してください。</span>
+  <span class="meter"><i id="meter"></i></span>
+  <button id="publish" disabled>アップロードして公開</button>
+</div></footer>
+
+<script type="module">
+const $ = id => document.getElementById(id);
+const photos = [];
+let cover = null;
+
+const api = async (path, options) => {
+  const response = await fetch(path, options);
+  const payload = await response.json();
+  if (!response.ok) throw new Error(payload.error || response.statusText);
+  return payload;
+};
+
+const say = (text, bad = false) => { $('status').innerHTML = text; $('status').classList.toggle('bad', bad); };
+const progress = ratio => { $('meter').style.width = `${Math.round(ratio * 100)}%`; };
+const slugify = value => value.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const mode = values => {
+  const tally = new Map();
+  for (const value of values.filter(Boolean)) tally.set(value, (tally.get(value) || 0) + 1);
+  return [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+};
+
+api('/api/config').then(config => {
+  $('bucket').textContent = config.bucket;
+  $('host').textContent = `${config.host}/${config.prefix}/…`;
+});
+
+// Surface a missing login or bucket here, rather than at the first failed upload.
+api('/api/preflight').then(result => {
+  $('preflight').textContent = result.message;
+  $('preflight').dataset.ok = result.ok ? 'yes' : 'no';
+}).catch(error => {
+  $('preflight').textContent = error.message;
+  $('preflight').dataset.ok = 'no';
+});
+
+// --- staging ---------------------------------------------------------------
+async function add(files) {
+  const list = [...files].filter(file => !file.name.startsWith('.'));
+  if (!list.length) return;
+  let done = 0;
+  for (const file of list) {
+    say(`読み込み中 ${++done}/${list.length} — ${file.name}`);
+    progress(done / list.length);
+    try {
+      const staged = await api(`/api/stage?name=${encodeURIComponent(file.name)}`, { method: 'POST', body: file });
+      photos.push({ ...staged, state: 'ready' });
+    } catch (error) { say(`${error.message}`, true); }
+  }
+  photos.sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
+  cover ??= photos[0]?.id;
+  progress(0);
+  render();
+  say(`${photos.length} 枚を読み込みました。位置情報などのメタデータは削除済みです。`);
+}
+
+// --- rendering -------------------------------------------------------------
+function render() {
+  $('sheet').replaceChildren(...photos.map((photo, index) => {
+    const frame = document.createElement('figure');
+    frame.className = 'frame';
+    frame.draggable = true;
+    frame.dataset.id = photo.id;
+    frame.dataset.state = photo.state;
+    if (photo.id === cover) frame.dataset.cover = '';
+    frame.innerHTML = `
+      <div class="plate"><img src="/api/thumb?id=${photo.id}" alt=""></div>
+      <figcaption>
+        <span class="serial">${String(index + 1).padStart(2, '0')}</span>
+        <span class="file">${photo.name}</span>
+        <span class="dim">${photo.width}×${photo.height}</span>
+      </figcaption>
+      <div class="acts">
+        <button type="button" class="setcover">${photo.id === cover ? '表紙' : '表紙にする'}</button>
+        <button type="button" class="remove">外す</button>
+      </div>`;
+    frame.querySelector('.setcover').onclick = () => { cover = photo.id; render(); };
+    frame.querySelector('.remove').onclick = () => {
+      photos.splice(photos.indexOf(photo), 1);
+      if (cover === photo.id) cover = photos[0]?.id ?? null;
+      render(); refresh();
+    };
+    return frame;
+  }));
+  refresh();
+}
+
+function refresh() {
+  const exif = {
+    カメラ: mode(photos.map(p => p.exif?.camera)),
+    絞り: mode(photos.map(p => p.exif?.aperture)),
+    シャッター: mode(photos.map(p => p.exif?.shutter)),
+    ISO: mode(photos.map(p => p.exif?.iso)),
+  };
+  $('readout').innerHTML = [`<div><span>枚数</span><b>${photos.length}</b></div>`]
+    .concat(Object.entries(exif).filter(([, v]) => v).map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`)).join('');
+  const taken = photos.map(p => p.exif?.taken).filter(Boolean).sort()[0];
+  if (taken && !$('date').value) $('date').value = taken;
+  $('publish').disabled = !(photos.length && $('titleJa').value.trim() && $('date').value && $('slug').value.trim());
+}
+
+// --- drag & drop -----------------------------------------------------------
+$('drop').onclick = () => $('picker').click();
+$('drop').onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); $('picker').click(); } };
+$('picker').onchange = event => { add(event.target.files); event.target.value = ''; };
+for (const type of ['dragenter', 'dragover']) $('drop').addEventListener(type, event => { event.preventDefault(); $('drop').classList.add('over'); });
+for (const type of ['dragleave', 'drop']) $('drop').addEventListener(type, () => $('drop').classList.remove('over'));
+$('drop').addEventListener('drop', event => { event.preventDefault(); add(event.dataTransfer.files); });
+document.addEventListener('dragover', event => event.preventDefault());
+document.addEventListener('drop', event => event.preventDefault());
+
+let dragging = null;
+$('sheet').addEventListener('dragstart', event => {
+  dragging = event.target.closest('.frame');
+  dragging?.classList.add('dragging');
+});
+$('sheet').addEventListener('dragend', () => { dragging?.classList.remove('dragging'); dragging = null; });
+$('sheet').addEventListener('dragover', event => {
+  const over = event.target.closest('.frame');
+  if (!dragging || !over || over === dragging) return;
+  event.preventDefault();
+  document.querySelectorAll('.frame.over').forEach(frame => frame.classList.remove('over'));
+  over.classList.add('over');
+});
+$('sheet').addEventListener('drop', event => {
+  const over = event.target.closest('.frame');
+  over?.classList.remove('over');
+  if (!dragging || !over || over === dragging) return;
+  event.preventDefault();
+  const from = photos.findIndex(photo => photo.id === dragging.dataset.id);
+  const to = photos.findIndex(photo => photo.id === over.dataset.id);
+  photos.splice(to, 0, ...photos.splice(from, 1));
+  render();
+});
+
+// --- form ------------------------------------------------------------------
+for (const id of ['titleJa', 'titleEn', 'locationJa', 'locationEn', 'date', 'slug', 'locationTag', 'collectionTag']) {
+  $(id).addEventListener('input', refresh);
+}
+$('titleEn').addEventListener('input', () => { if (!$('slug').dataset.touched) $('slug').value = slugify($('titleEn').value); refresh(); });
+$('locationEn').addEventListener('input', () => {
+  if (!$('locationTag').dataset.touched) $('locationTag').value = slugify($('locationEn').value);
+  if (!$('collectionTag').dataset.touched) $('collectionTag').value = $('locationTag').value;
+  refresh();
+});
+for (const id of ['slug', 'locationTag', 'collectionTag']) $(id).addEventListener('input', event => { event.target.dataset.touched = '1'; });
+
+// --- publish ---------------------------------------------------------------
+$('publish').onclick = async () => {
+  const album = {
+    titleJa: $('titleJa').value.trim(), titleEn: $('titleEn').value.trim(),
+    locationJa: $('locationJa').value.trim(), locationEn: $('locationEn').value.trim(),
+    date: $('date').value, slug: slugify($('slug').value),
+    locationTag: slugify($('locationTag').value), collectionTag: slugify($('collectionTag').value) || slugify($('locationTag').value),
+    featured: $('featured').checked,
+  };
+  $('publish').disabled = true;
+  try {
+    const { exists, path } = await api('/api/check', { method: 'POST', body: JSON.stringify({ date: album.date, slug: album.slug }) });
+    if (exists && !confirm(`${path} は既にあります。中止しますか？\n\nOK＝中止 / キャンセル＝続行（書き込みは失敗します）`)) throw new Error('中止しました。');
+    if (exists) throw new Error(`既に存在します: ${path}`);
+
+    const pending = photos.filter(photo => photo.state !== 'done');
+    for (const [index, photo] of pending.entries()) {
+      say(`アップロード中 ${index + 1}/${pending.length} — ${photo.name}`);
+      progress(index / pending.length);
+      try {
+        await api('/api/upload', { method: 'POST', body: JSON.stringify({ id: photo.id, date: album.date }) });
+        photo.state = 'done';
+      } catch (error) { photo.state = 'failed'; render(); throw new Error(`${photo.name}: ${error.message}`); }
+      render();
+    }
+    progress(1);
+
+    const result = await api('/api/publish', {
+      method: 'POST',
+      body: JSON.stringify({ album, order: photos.map(photo => photo.id), cover }),
+    });
+    say(`公開しました → ${result.path} ／ <a href="http://localhost:3000/photos/${result.slug}" target="_blank" rel="noreferrer">プレビュー</a>（npm run dev）`);
+  } catch (error) {
+    say(error.message, true);
+    progress(0);
+  } finally {
+    refresh();
+  }
+};
+</script>
+</body>
+</html>

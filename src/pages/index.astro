@@ -47,7 +47,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   </script>
   <header class="masthead">
     <div class="brand-lockup"><h1 class="masthead-name">ITSUKI.</h1><span class="vertical-brand">{SITE_CONFIG.brand.logo}</span></div>
-    <div class="masthead-intro"><h2>こんにちは、樹です。</h2><p>日々の記録と、つくっているもの。<br />考えたこと、学んだこと、<br />その断片を、未来の自分へ。</p><a href="/now" class="now-link"><span class="status-dot"></span>現在のこと<Icon name="lucide:arrow-up-right" /></a></div>
+    <div class="masthead-intro"><h2>こんにちは、樹です。</h2><p>日々の記録と、つくっているもの。<br />考えたこと、学んだこと、<br />その断片を、未来の自分へ。</p><div class="intro-links"><a href="/about" class="now-link">私について・経歴<Icon name="lucide:arrow-up-right" /></a><a href="/now" class="now-link"><span class="status-dot"></span>現在のこと<Icon name="lucide:arrow-up-right" /></a></div></div>
     <dl class="edition-stats">{stats.map(stat => <div><dt>{stat.label}</dt><dd><a href={stat.href}>{stat.value}</a></dd></div>)}</dl>
   </header>
   <nav class="chapter-index" aria-label="メインナビゲーション">{chapters.map(chapter => <a href={chapter.href} target={chapter.href.startsWith('https://') ? '_blank' : undefined} rel={chapter.href.startsWith('https://') ? 'noopener noreferrer' : undefined}><span class="chapter-number display-type">{chapter.number}</span><span>{chapter.label}</span><Icon name="lucide:arrow-up-right" /></a>)}</nav>
@@ -90,6 +90,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   .vertical-brand { writing-mode:vertical-rl; font-size:16px; font-weight:700; line-height:1.3; flex-shrink:0; }
   .masthead-intro h2 { font-size:20px; font-weight:700; margin-bottom:18px; }
   .masthead-intro p { font-size:14px; line-height:2; }
+  .intro-links { display:flex; flex-wrap:wrap; gap:0 20px; }
   .now-link { display:inline-flex; align-items:center; gap:7px; font-size:12px; margin-top:14px; color:var(--muted); }
   .status-dot { width:5px; height:5px; background:var(--vermillion); border-radius:50%; }
   .edition-stats { display:grid; grid-template-columns:1fr 1fr; gap:22px 30px; }

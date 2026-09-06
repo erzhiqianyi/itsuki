@@ -10,7 +10,9 @@ const locale = value => typeof value === 'string' ? value : value?.ja || value?.
 const years = [...new Set(all.map(p => p.data.year_tag).filter(Boolean))].sort().reverse();
 const places = [...new Map(all.filter(p => p.data.location_tag).map(p => [p.data.location_tag, locale(p.data.location)])).entries()];
 const totalPhotos = all.reduce((n,p) => n + (p.data.images?.length || (p.data.cover ? 1 : 0)),0);
-const covers = await Promise.all(page.data.map(album => photoPreview(album.data.cover || album.data.images?.[0]?.url)));
+// Prefer the images[] entry for the cover so its recorded width/height come along.
+const coverOf = album => album.data.images?.find(photo => photo.url === album.data.cover) || (album.data.cover ? {url:album.data.cover} : album.data.images?.[0]);
+const covers = await Promise.all(page.data.map(album => photoPreview(coverOf(album))));
 ---
 <EditorialLayout title={tag ? `写真 / ${tag}` : '写真'}>
   <header class="photo-masthead"><div><p class="photo-kicker">04 / VISUAL JOURNAL</p><h1 class="photo-wordmark">PHOTOGRAPHS<span>写真</span></h1></div><dl class="photo-totals"><div><dt>アルバム</dt><dd>{all.length.toString().padStart(2,'0')}</dd></div><div><dt>写真</dt><dd>{totalPhotos}</dd></div></dl></header>

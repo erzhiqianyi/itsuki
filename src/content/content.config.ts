@@ -156,47 +156,6 @@ const about = defineCollection({
     })
 });
 
-// 7. Japanese 页面 - 日语学习动态集合
-const japanese = defineCollection({
-    loader: glob({pattern: '**/[^_]*.{md,yaml}', base: "src/content/japanese"}),
-    schema: z.object({
-        lang: z.enum(['ja', 'en']).default('ja'),
-        type: z.enum(['jlpt', 'stats', 'word', 'resources', 'meta']),
-        // JLPT 进度 (type: 'jlpt')
-        jlpt_items: z.array(z.object({
-            level: z.string(),
-            date: z.string(),
-            status: z.string(),
-            progress: z.number(),
-            color: z.string(),
-            bg: z.string()
-        })).optional(),
-        // 学习统计 (type: 'stats')
-        stat_items: z.array(z.object({
-            icon: z.string(),
-            label: z.record(z.string()),
-            value: z.string(),
-            color: z.string()
-        })).optional(),
-        // 每日单词 (type: 'word')
-        kanji: z.string().optional(),
-        reading: z.string().optional(),
-        meaning: z.record(z.string()).optional(),
-        updatedAt: z.string().optional(),
-        // 学习资源 (type: 'resources')
-        resource_items: z.array(z.object({
-            name: z.string(),
-            href: z.string(),
-            icon: z.string(),
-            desc: z.record(z.string())
-        })).optional(),
-        // 页面元数据 (type: 'meta')
-        target_date: z.string().optional(),
-    })
-});
-
-
-
 const changelog = defineCollection({
     type: 'content',
     schema: z.object({
@@ -208,4 +167,4 @@ const changelog = defineCollection({
     }),
 });
 
-export const collections = {projects, blog, photos, videos, now, archive, about, japanese, changelog};
+export const collections = {projects, blog, photos, videos, now, archive, about, changelog};

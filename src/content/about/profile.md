@@ -12,7 +12,7 @@ attributes:
       color: "text-red"
     - icon: "mail"
       label: "Contact"
-      value: "itsuki@erzhiqian.cc"
+      value: "caofeng@erzhiqian.cc"
       color: "text-blue"
     - icon: "globe"
       label: "Languages"

@@ -27,3 +27,6 @@ replay_pid*
 node_modules/
 dist/
 .astro/
+
+# Local tool configuration
+.env

@@ -1,0 +1,70 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+import { careerProfile, resumeContent, resumeLanguages, type ResumeLocale } from '../../data/resume';
+import { SITE_CONFIG } from '../../data/site-config';
+import '../../styles/resume.css';
+
+export function getStaticPaths() {
+  return ['ja', 'zh', 'en'].map(locale => ({
+    params: { lang: locale === 'ja' ? undefined : locale }, props: { locale },
+  }));
+}
+const { locale } = Astro.props as { locale: ResumeLocale };
+const copy = resumeContent[locale];
+const projects = await getCollection('projects');
+const selectedProjects = copy.projects.map(project => {
+  const entry = projects.find(entry => entry.data.id === project.id);
+  if (!entry) throw new Error(`Missing resume project: ${project.id}`);
+  return { ...project, name: entry.data.name };
+});
+const sections = [
+  { id: 'experience', title: locale === 'ja' ? '職歴' : locale === 'zh' ? '工作经历' : 'Experience' },
+  { id: 'work', title: copy.ui.work },
+  { id: 'skills', title: copy.ui.skills },
+  { id: 'education', title: copy.ui.education },
+];
+---
+<EditorialLayout title={`${careerProfile.name} — ${copy.title}`} description={copy.summary} lang={locale}>
+  <Fragment slot="head">
+    {resumeLanguages.map(language => <link rel="alternate" hreflang={language.htmlLang} href={new URL(`${language.href}/`, SITE_CONFIG.brand.siteUrl)} />)}
+    <link rel="alternate" hreflang="x-default" href={new URL('/resume/', SITE_CONFIG.brand.siteUrl)} />
+  </Fragment>
+  <article class="resume-page">
+    <div class="resume-utility">
+      <a href="/about"><Icon name="lucide:arrow-left" />{copy.ui.about}</a>
+      <nav aria-label={copy.ui.language} class="resume-languages">
+        {resumeLanguages.map(language => <a href={language.href} lang={language.htmlLang} hreflang={language.htmlLang} aria-current={language.code === locale ? 'page' : undefined}>{language.label}</a>)}
+      </nav>
+    </div>
+    <header class="resume-hero">
+      <p class="resume-kicker">{copy.title} / SOFTWARE ENGINEER</p>
+      <h1>{careerProfile.name}</h1>
+      <p class="resume-alias">{copy.reading && <span>{copy.reading} / </span>}{careerProfile.alias}</p>
+      <p class="resume-role">{copy.role}</p>
+      <p class="resume-summary">{copy.summary}</p>
+      <ul class="resume-facts">{copy.facts.map(fact => <li>{fact}</li>)}</ul>
+      <div class="resume-contact-links"><a href={`mailto:${careerProfile.email}`}>Email<Icon name="lucide:arrow-up-right" /></a><a href={careerProfile.github} target="_blank" rel="noreferrer">GitHub<Icon name="lucide:arrow-up-right" /></a></div>
+      <p class="resume-updated">{copy.ui.updated} <time datetime={careerProfile.updated}>{careerProfile.updated.replaceAll('-', '.')}</time></p>
+    </header>
+    <nav class="resume-index" aria-label={copy.ui.toc}>{sections.map((section, index) => <a href={`#${section.id}`}><span>0{index + 1}</span>{section.title}</a>)}</nav>
+    {sections.map((section, index) => <section id={section.id} class="resume-section" aria-labelledby={`${section.id}-heading`}>
+      <header class="resume-section-heading"><span class="display-type" aria-hidden="true">0{index + 1}</span><h2 id={`${section.id}-heading`}>{section.title}</h2></header>
+      <div class="resume-section-body">
+        {section.id === 'experience' && copy.experience.map(item => <article class="resume-item resume-experience">
+          <header class="resume-job-heading"><h3>{item.role}</h3><p class="resume-period">{item.period}</p></header>
+          <p class="resume-company">{item.company}</p>
+          <p class="resume-meta">{item.project}</p>
+          <p class="resume-job-summary">{item.summary}</p>
+          <ul class="resume-points">{item.points.map(point => <li>{point}</li>)}</ul>
+          <p class="resume-job-tech"><span>{copy.ui.technology}</span>{item.tech.join(' · ')}</p>
+        </article>)}
+        {section.id === 'work' && <><p class="resume-section-intro">{copy.ui.projectNote}</p>{selectedProjects.map(project => <article class="resume-item"><h3>{project.name}</h3><p>{project.body}</p><a class="resume-text-link" href={`/projects#${project.id}`}>{copy.ui.details}<Icon name="lucide:arrow-up-right" /></a></article>)}<a class="resume-text-link" href="/projects">{copy.ui.allProjects}<Icon name="lucide:arrow-up-right" /></a></>}
+        {section.id === 'skills' && copy.skills.map(group => <div class="resume-item"><h3>{group.title}</h3><dl class="resume-skills">{group.items.map(skill => <div><dt>{skill.k}</dt><dd>{skill.v}</dd></div>)}</dl></div>)}
+        {section.id === 'education' && <>{copy.education.map(item => <article class="resume-item"><h3>{item.school}</h3><p class="resume-meta">{item.meta}</p><p>{item.note}</p></article>)}<p>{copy.ui.languages}</p></>}
+      </div>
+    </section>)}
+    <section class="resume-end" aria-labelledby="contact-heading"><h2 id="contact-heading">{copy.ui.contact}</h2><p>{copy.cta}</p><a class="resume-text-link" href={`mailto:${careerProfile.email}`}>{careerProfile.email}<Icon name="lucide:arrow-up-right" /></a></section>
+  </article>
+</EditorialLayout>

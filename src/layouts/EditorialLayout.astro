@@ -3,13 +3,20 @@ import { Icon } from 'astro-icon/components';
 import { SITE_CONFIG } from '../data/site-config';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/editorial.css';
-interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en'; home?: boolean; }
+interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en' | 'zh'; home?: boolean; }
 const { title = SITE_CONFIG.brand.logo, description = SITE_CONFIG.brand.description.ja, image, article = false, lang = 'ja', home = false } = Astro.props;
+const changelogLang = lang === 'en' ? 'en' : 'ja';
+const resumeHref = lang === 'ja' ? '/resume' : `/resume/${lang}`;
+const labels = {
+  ja: { home:'ホーム', articles:'記事', projects:'つくる', videos:'動画', photos:'写真', haiku:'俳句', now:'現在', about:'私について', resume:'経歴', archive:'アーカイブ', changes:'更新履歴', skip:'本文へ移動', navigation:'サイトナビゲーション', main:'メインナビゲーション', other:'その他のページ', social:'ソーシャルリンク' },
+  en: { home:'Home', articles:'Writing', projects:'Projects', videos:'Videos', photos:'Photos', haiku:'Haiku', now:'Now', about:'About', resume:'Résumé', archive:'Archive', changes:'Changelog', skip:'Skip to content', navigation:'Site navigation', main:'Main navigation', other:'More pages', social:'Social links' },
+  zh: { home:'首页', articles:'文章', projects:'作品', videos:'视频', photos:'照片', haiku:'俳句', now:'近况', about:'关于我', resume:'职业经历', archive:'归档', changes:'更新记录', skip:'跳转到正文', navigation:'网站导航', main:'主导航', other:'更多页面', social:'社交链接' },
+}[lang];
 const railGroups = [
-  [{label:'ホーム',href:'/',icon:'house'}, {label:'記事',href:'/blog',icon:'notebook-pen'}, {label:'つくる',href:'/projects',icon:'hammer'}, {label:'動画',href:'/videos',icon:'play'}, {label:'写真',href:'/photos',icon:'camera'}, {label:'俳句',href:'https://haiku.erzhiqian.cc/',icon:'feather'}],
-  [{label:'現在',href:'/now',icon:'clock'}, {label:'私について',href:'/about',icon:'user-round'}, {label:'日本語学習',href:'/japanese',icon:'languages'}, {label:'アーカイブ',href:'/archive',icon:'archive'}, {label:'更新履歴',href:'/'+lang+'/changelog',icon:'history'}],
+  [{label:labels.home,href:'/',icon:'house'}, {label:labels.articles,href:'/blog',icon:'notebook-pen'}, {label:labels.projects,href:'/projects',icon:'hammer'}, {label:labels.videos,href:'/videos',icon:'play'}, {label:labels.photos,href:'/photos',icon:'camera'}, {label:labels.haiku,href:'https://haiku.erzhiqian.cc/',icon:'feather'}],
+  [{label:labels.now,href:'/now',icon:'clock'}, {label:labels.about,href:'/about',icon:'user-round'}, {label:labels.archive,href:'/archive',icon:'archive'}, {label:labels.changes,href:'/'+changelogLang+'/changelog',icon:'history'}],
 ];
-const railActive = (href: string) => href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname === href || Astro.url.pathname.startsWith(href + '/');
+const railActive = (href: string) => href === '/' ? Astro.url.pathname === '/' : Astro.url.pathname === href || Astro.url.pathname.startsWith(href + '/') || (href === '/about' && Astro.url.pathname.startsWith('/resume'));
 // Match section roots so pagination, categories, and detail pages share their theme.
 const path = Astro.url.pathname;
 const signoffThemes: [RegExp, string[]][] = [
@@ -17,18 +24,18 @@ const signoffThemes: [RegExp, string[]][] = [
   [/^\/projects(\/|$)/, ['MAKE', 'BUILD', 'SHIP']],
   [/^\/videos(\/|$)/, ['WATCH', 'FEEL', 'CREATE']],
   [/^\/photos(\/|$)/, ['SEE', 'FRAME', 'KEEP']],
-  [/^\/japanese(\/|$)/, ['LEARN', 'TRY', 'GROW']],
   [/^\/now(\/|$)/, ['HERE', 'NOW', 'NEXT']],
+  [/^\/resume(\/|$)/, ['THINK', 'BUILD', 'SHARE']],
   [/^\/about(\/|$)/, ['LIVE', 'LEARN', 'MAKE']],
   [/^\/archive(\/|$)/, ['KEEP', 'TRACE', 'REVISIT']],
   [/^\/(ja|en)\/changelog(\/|$)/, ['CHANGE', 'REFINE', 'REPEAT']],
 ];
 const signoff = signoffThemes.find(([pattern]) => pattern.test(path))?.[1] ?? ['WRITE', 'BUILD', 'RECORD'];
 const canonical = new URL(Astro.url.pathname, SITE_CONFIG.brand.siteUrl);
-const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/projects' }, { label: '動画', href: '/videos' }, { label: '写真', href: '/photos' }, { label: '俳句', href: 'https://haiku.erzhiqian.cc/' }];
+const nav = [{ label: labels.articles, href: '/blog' }, { label: labels.projects, href: '/projects' }, { label: labels.videos, href: '/videos' }, { label: labels.photos, href: '/photos' }, { label: labels.haiku, href: 'https://haiku.erzhiqian.cc/' }];
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang === 'zh' ? 'zh-CN' : lang}>
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{title === SITE_CONFIG.brand.logo ? title : `${title} | ${SITE_CONFIG.brand.logo}`}</title>
@@ -40,21 +47,22 @@ const nav = [{ label: '記事', href: '/blog' }, { label: 'つくる', href: '/p
   <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
   {SITE_CONFIG.brand.googleAnalyticsId && <GoogleAnalytics id={SITE_CONFIG.brand.googleAnalyticsId} />}
+  <slot name="head" />
 </head>
 <body class:list={['editorial', { 'editorial-home': home, 'editorial-article': article }]}>
-  <a class="skip-link" href="#main-content">本文へ移動</a>
-  <nav class="edition-rail" aria-label="サイトナビゲーション">
-    {railGroups.map((group,i) => <div class:list={['rail-group', {'rail-secondary':i===1}]}>{group.map(item => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-label={item.label} aria-current={railActive(item.href) ? 'page' : undefined}><Icon name={'lucide:'+item.icon} /><span class="rail-tooltip" aria-hidden="true">{item.label}</span></a>)}{i === 1 && <button class="rail-social-toggle" type="button" popovertarget="rail-social-links" aria-label="ソーシャルリンク"><Icon name="lucide:contact-round" /><span class="rail-tooltip" aria-hidden="true">ソーシャルリンク</span></button>}</div>)}
+  <a class="skip-link" href="#main-content">{labels.skip}</a>
+  <nav class="edition-rail" aria-label={labels.navigation}>
+    {railGroups.map((group,i) => <div class:list={['rail-group', {'rail-secondary':i===1}]}>{group.map(item => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-label={item.label} aria-current={railActive(item.href) ? 'page' : undefined}><Icon name={'lucide:'+item.icon} /><span class="rail-tooltip" aria-hidden="true">{item.label}</span></a>)}{i === 1 && <button class="rail-social-toggle" type="button" popovertarget="rail-social-links" aria-label={labels.social}><Icon name="lucide:contact-round" /><span class="rail-tooltip" aria-hidden="true">{labels.social}</span></button>}</div>)}
   </nav>
   <div id="rail-social-links" popover="auto" class="rail-social-popover">
     <p>ELSEWHERE</p>
     {SITE_CONFIG.socials.map(s => <a href={s.href} target="_blank" rel="noreferrer">{s.label}<Icon name="lucide:arrow-up-right" /></a>)}
   </div>
   <div class="edition-shell">
-    {!home && <header class="edition-header"><a class="edition-wordmark" href="/" aria-label="Itsuki ホーム">ITSUKI.</a><nav aria-label="メインナビゲーション">{nav.map((item, i) => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
+    {!home && <header class="edition-header"><a class="edition-wordmark" href="/" aria-label={`Itsuki ${labels.home}`}>ITSUKI.</a><nav aria-label={labels.main}>{nav.map((item, i) => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
     <main id="main-content"><slot /></main>
     <footer class="edition-footer">
-      <nav aria-label="その他のページ"><a href="/japanese">日本語学習</a><a href="/now">現在</a><a href="/archive">アーカイブ</a><a href="/about">私について</a><a href="/ja/changelog">更新履歴</a></nav>
+      <nav aria-label={labels.other}><a href="/now">{labels.now}</a><a href="/archive">{labels.archive}</a><a href="/about">{labels.about}</a><a href={resumeHref}>{labels.resume}</a><a href={`/${changelogLang}/changelog`}>{labels.changes}</a></nav>
       <div class="edition-colophon"><div>{SITE_CONFIG.socials.map(s => <a href={s.href} target="_blank" rel="noreferrer">{s.label}<Icon name="lucide:arrow-up-right" /></a>)}</div><span>{SITE_CONFIG.brand.footer}</span></div>
       <div class="edition-signoff" lang="en">{signoff.map((word, index) => <>{index > 0 && <span class="signoff-divider" aria-hidden="true">/</span>}<span>{word}</span></>)}</div>
       <nav class="edition-webring" aria-label="Webring"><a href={SITE_CONFIG.brand.webring.prev} aria-label="Previous site"><Icon name="lucide:arrow-left" /></a><a href={SITE_CONFIG.brand.webring.home}>{SITE_CONFIG.brand.webring.label}</a><a href={SITE_CONFIG.brand.webring.next} aria-label="Next site"><Icon name="lucide:arrow-right" /></a></nav>

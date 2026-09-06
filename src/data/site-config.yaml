@@ -55,11 +55,6 @@ navigation:
     label: { ja: "私について", en: "About" }
     color: "hover:text-accent"
     icon: 'user' # 个人信息的标准符号
-  - id: "nav-jp"
-    href: "/japanese"
-    label: { ja: "日本語学習", en: "Japanese" }
-    color: "hover:text-pink"
-    icon: 'languages' # 双语切换或学习的直观表达
 
 # 3. 社交链接 (Socials)
 socials:
