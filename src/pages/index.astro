@@ -10,9 +10,11 @@ const [posts, videos, albums] = await Promise.all([getCollection('blog', japanes
 const newestFirst = (a, b) => Date.parse(b.data.date) - Date.parse(a.data.date);
 posts.sort(newestFirst); videos.sort(newestFirst); albums.sort(newestFirst);
 const words = posts.reduce((sum, p) => sum + (p.body?.match(/[\u4e00-\u9fa5]|[\u3040-\u309F]|[\u30A0-\u30FF]|\w+/g)?.length || 0), 0);
+const projects = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order).map(entry=>entry.data);
 const stats = [
   { value: posts.length, label: '記事', href: '/blog' },
   { value: words > 1000 ? (words / 1000).toFixed(1) + 'k' : words, label: '総文字数', href: '/blog' },
+  { value: projects.length, label: 'つくる', href: '/projects' },
   { value: albums.length, label: 'アルバム', href: '/photos' },
   { value: videos.length, label: '動画', href: '/videos' },
 ];
@@ -23,7 +25,6 @@ const localImage = (src) => typeof src === 'string' && src.startsWith('/') && ex
 const locale = (value) => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const visibleAlbums = albums.map(album => ({ album, cover: [album.data.cover, ...(album.data.images || []).map(i => i.url)].find(localImage) })).filter(a => a.cover).slice(0, 2);
 const visibleVideos = videos.filter(video => video.data.url).slice(0, 2);
-const projects = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order).map(entry=>entry.data);
 const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '02', label: 'つくる', href: '/projects' }, { number: '03', label: '動画', href: '/videos' }, { number: '04', label: '写真', href: '/photos' }, { number: '05', label: '俳句', href: 'https://haiku.erzhiqian.cc/' }];
 
 ---
@@ -49,7 +50,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
     <div class="masthead-intro"><h2>こんにちは、樹です。</h2><p>日々の記録と、つくっているもの。<br />考えたこと、学んだこと、<br />その断片を、未来の自分へ。</p><a href="/now" class="now-link"><span class="status-dot"></span>現在のこと<Icon name="lucide:arrow-up-right" /></a></div>
     <dl class="edition-stats">{stats.map(stat => <div><dt>{stat.label}</dt><dd><a href={stat.href}>{stat.value}</a></dd></div>)}</dl>
   </header>
-  <nav class="chapter-index" aria-label="メインナビゲーション">{chapters.map(chapter => <a href={chapter.href}><span class="chapter-number display-type">{chapter.number}</span><span>{chapter.label}</span><Icon name="lucide:arrow-up-right" /></a>)}</nav>
+  <nav class="chapter-index" aria-label="メインナビゲーション">{chapters.map(chapter => <a href={chapter.href} target={chapter.href.startsWith('https://') ? '_blank' : undefined} rel={chapter.href.startsWith('https://') ? 'noopener noreferrer' : undefined}><span class="chapter-number display-type">{chapter.number}</span><span>{chapter.label}</span><Icon name="lucide:arrow-up-right" /></a>)}</nav>
   <div class="front-grid">
     <section id="writing">
       <header class="section-heading"><span class="section-number display-type" aria-hidden="true">01</span><h2>最新の記事</h2><a href="/blog" aria-label="すべての記事を見る">すべて見る<Icon name="lucide:arrow-up-right" /></a></header>
@@ -78,9 +79,9 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   {latestDate && <p class="edition-updated">最終更新 <time datetime={latestDate}>{latestDate.slice(0, 10).replaceAll('-', '.')}</time></p>}
 </EditorialLayout>
 <style>
-  .edition-clock { display:flex; justify-content:flex-start; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:18px; color:var(--ink); font-size:12px; font-variant-numeric:tabular-nums; }
+  .edition-clock { display:flex; justify-content:flex-start; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:18px; color:var(--ink); font-size:16px; font-variant-numeric:tabular-nums; }
   .edition-clock[hidden] { display:none; }
-  .edition-clock span { font-size:10px; letter-spacing:.12em; }
+  .edition-clock span { font-size:12px; letter-spacing:.12em; }
 
   .project-kind { display:block; margin-bottom:5px; color:var(--muted); font-size:10px; letter-spacing:.04em; }
   .masthead { display:grid; grid-template-columns:1.6fr 1fr .8fr; align-items:center; gap:40px; padding-bottom:28px; }
@@ -149,7 +150,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   }
   @media(max-width:1000px) {
     .masthead { grid-template-columns:1.3fr 1fr; } .masthead-name { font-size:160px; }
-    .edition-stats { grid-column:1/-1; grid-template-columns:repeat(4,1fr); gap:16px; border-top:1px solid var(--rule); padding-top:18px; }
+    .edition-stats { grid-column:1/-1; grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; border-top:1px solid var(--rule); padding-top:18px; }
     .front-grid { column-gap:32px; row-gap:40px; }
     .album-list { grid-template-columns:1fr 1fr; align-items:start; }
     .chapter-index a { font-size:23px; gap:10px; } .chapter-number { font-size:36px; }
@@ -159,6 +160,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
     .brand-lockup { justify-content:space-between; gap:6px; } .masthead-name { font-size:112px; } .vertical-brand { font-size:11px; max-height:120px; }
     .masthead-intro { display:grid; grid-template-columns:1fr auto; } .masthead-intro h2 { font-size:17px; margin-bottom:8px; grid-column:1/-1; }
     .masthead-intro p { font-size:13px; } .masthead-intro p br { display:none; } .now-link { align-self:end; margin-left:14px; }
+    .edition-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
     .edition-stats dd { font-size:31px; } .edition-stats dt { font-size:11px; }
     .chapter-index { grid-template-columns:1fr 1fr; margin-bottom:26px; }
     .chapter-index a { font-size:22px; padding:12px 0; } .chapter-index a:nth-child(-n+4) { border-bottom:1px solid var(--rule); }
