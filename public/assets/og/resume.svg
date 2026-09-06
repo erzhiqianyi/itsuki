@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#fafbf9"/>
+  <path d="M0 0h12v630H0z" fill="#d52718"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="80" y="88" font-size="23" letter-spacing="4" fill="#d52718">ITSUKI / RÉSUMÉ</text>
+    <path d="M80 121h1040" stroke="#161616" stroke-width="2"/>
+    <text x="74" y="278" font-size="112" font-weight="700" letter-spacing="-4" fill="#161616">CAO FENG</text>
+    <text x="80" y="350" font-size="38" fill="#161616">Software Engineer</text>
+    <text x="80" y="415" font-size="27" fill="#62645e">Backend · Data Platforms · Product Development</text>
+    <path d="M80 503h1040" stroke="#d7d9d5"/>
+    <text x="80" y="556" font-size="22" fill="#62645e">TOKYO, JAPAN</text>
+    <text x="1120" y="556" text-anchor="end" font-size="22" fill="#d52718">erzhiqian.cc/resume</text>
+  </g>
+</svg>

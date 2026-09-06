@@ -13,6 +13,28 @@ export function getStaticPaths() {
 }
 const { locale } = Astro.props as { locale: ResumeLocale };
 const copy = resumeContent[locale];
+const pageUrl = new URL(Astro.url.pathname, SITE_CONFIG.brand.siteUrl).href;
+const shareImage = '/assets/og/resume.png';
+const shareImageAlt = 'CAO FENG / Itsuki — Software Engineer · Backend, Data Platforms & Product Development';
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  '@id': `${pageUrl}#profile`,
+  url: pageUrl,
+  name: `${careerProfile.name} — ${copy.title}`,
+  description: copy.summary,
+  inLanguage: copy.htmlLang,
+  mainEntity: {
+    '@type': 'Person',
+    '@id': new URL('/#person', SITE_CONFIG.brand.siteUrl).href,
+    name: careerProfile.name,
+    alternateName: careerProfile.alias,
+    jobTitle: 'Software Engineer',
+    description: copy.role,
+    url: new URL('/resume/', SITE_CONFIG.brand.siteUrl).href,
+    sameAs: [...new Set([careerProfile.github, ...SITE_CONFIG.socials.filter(social => social.id === 'x').map(social => social.href)])],
+  },
+};
 const projects = await getCollection('projects');
 const selectedProjects = copy.projects.map(project => {
   const entry = projects.find(entry => entry.data.id === project.id);
@@ -26,8 +48,15 @@ const sections = [
   { id: 'education', title: copy.ui.education },
 ];
 ---
-<EditorialLayout title={`${careerProfile.name} — ${copy.title}`} description={copy.summary} lang={locale}>
+<EditorialLayout title={`${careerProfile.name} — ${copy.title}`} description={copy.summary} lang={locale} image={shareImage}>
   <Fragment slot="head">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content={shareImageAlt} />
+    <meta name="twitter:image" content={new URL(shareImage, SITE_CONFIG.brand.siteUrl).href} />
+    <meta name="twitter:image:alt" content={shareImageAlt} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')} />
     {resumeLanguages.map(language => <link rel="alternate" hreflang={language.htmlLang} href={new URL(`${language.href}/`, SITE_CONFIG.brand.siteUrl)} />)}
     <link rel="alternate" hreflang="x-default" href={new URL('/resume/', SITE_CONFIG.brand.siteUrl)} />
   </Fragment>
