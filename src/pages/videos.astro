@@ -59,11 +59,16 @@ const ui = {
     <!-- 1. 精选视频 (Featured Hero Section) -->
 {featuredVideo && (
     <section class="featured-video">
+    <a href={featuredVideo.data.url} target="_blank" rel="noopener" class="featured-video-link" aria-label={ui.watch[lang]}>
     <img
         src={getImageUrl(featuredVideo.data.image)}
 class="featured-video-image"
 alt=""
 />
+<span class="featured-video-play">
+<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+</span>
+</a>
 
     <div class="py-6 space-y-4">
 <div class="flex flex-wrap gap-2">
@@ -74,13 +79,13 @@ alt=""
         ))}
     </div>
     <h1 class="text-3xl md:text-5xl font-black text-white leading-tight tracking-tighter italic">
-    {featuredVideo.data.title}
+    <a href={featuredVideo.data.url} target="_blank" rel="noopener" class="hover:text-red transition">{featuredVideo.data.title}</a>
     </h1>
     <p class="text-[var(--subtext)] text-sm md:text-base line-clamp-2 max-w-xl font-medium">
     {featuredVideo.data.desc}
     </p>
     <div class="flex flex-wrap items-center gap-6 pt-4">
-<a href={featuredVideo.data.url} class="bg-red text-[#1e1e2e] font-black px-8 py-3 rounded-full hover:scale-105 active:scale-95 transition shadow-[0_0_30px_rgba(243,139,168,0.4)] flex items-center gap-2">
+<a href={featuredVideo.data.url} target="_blank" rel="noopener" class="bg-red text-[#1e1e2e] font-black px-8 py-3 rounded-full hover:scale-105 active:scale-95 transition shadow-[0_0_30px_rgba(243,139,168,0.4)] flex items-center gap-2">
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
 {ui.watch[lang]}
 </a>
@@ -243,6 +248,10 @@ inputField?.addEventListener('keypress', (e) => e.key === 'Enter' && handleSend(
 <style>
 .featured-video { border-bottom:1px solid var(--rule); }
 .featured-video-image { width:100%; max-height:420px; object-fit:contain; display:block; }
+.featured-video-link { position:relative; display:block; }
+.featured-video-play { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .3s ease; }
+.featured-video-play svg { width:72px; height:72px; padding:22px; border-radius:9999px; background:rgba(0,0,0,.55); color:#fff; backdrop-filter:blur(6px); }
+.featured-video-link:hover .featured-video-play, .featured-video-link:focus-visible .featured-video-play { opacity:1; }
 .scroller::-webkit-scrollbar { width: 4px; }
 .scroller::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
 .video-card:hover { box-shadow: 0 20px 50px -15px rgba(243, 139, 168, 0.2); }

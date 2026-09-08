@@ -1,6 +1,6 @@
 ---
 lang: "ja"
-title: "レシートが、日本語の教材に。｜家計簿 × 日本語学習アプリ「ニャ識」nyashiki wide 15s"
+title: "レシートが、日本語の教材に。｜家計簿 × 日本語学習アプリ「ニャ識」"
 desc: "レシート、捨てる前に。 ニャ識は、毎日の買いものを「記録」と「学び」につなげるアプリです。"
 image: "/assets/videos/youtube/cZN8PLBN2Tc.jpg"
 tags: []
