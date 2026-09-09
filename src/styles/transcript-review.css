@@ -1,0 +1,72 @@
+/* Opt-in reading treatment for static Japanese transcript reviews. */
+.transcript-review .reading-sidebar { min-width:0; overflow-x:hidden; padding-right:10px; }
+.transcript-review .sidebar-pagination { display:none; }
+.transcript-review .reading-toc nav { min-width:0; }
+.transcript-review .reading-toc a { overflow-wrap:anywhere; }
+.transcript-review .article-cover { padding:9px 0; margin-bottom:20px; color:var(--muted); }
+.transcript-review .reading-heading { margin-bottom:20px; }
+.transcript-review .reading-article { container:review-copy / inline-size; }
+.transcript-review .article-content { font-size:17px; }
+.transcript-review .review-intro { margin-bottom:28px; }
+.transcript-review .review-intro p { margin-bottom:12px; font-size:16px; line-height:1.9; }
+.transcript-review .review-source { display:flex; flex-wrap:wrap; align-items:center; gap:8px 20px; }
+.transcript-review .review-source a { font-size:14px; }
+.transcript-review .review-source span { color:var(--muted); font-size:13px; }
+.transcript-review .review-context { color:var(--muted); font-size:14px; }
+.transcript-review .article-content h2 { font-size:23px; }
+.transcript-review .review-points { list-style:none; padding:0; margin:0 0 24px; border-top:1px solid var(--rule); }
+.transcript-review .review-points li { margin:0; padding:14px 0; border-bottom:1px solid var(--rule); font-size:15px; line-height:1.9; }
+.transcript-review .review-points strong { display:block; margin-bottom:3px; color:var(--ink); font-weight:600; }
+.transcript-review .review-key { margin:20px 0 28px; padding-left:14px; border-left:2px solid var(--rule); font-size:14px; line-height:1.9; color:var(--muted); }
+.transcript-review .review-key p { margin:0; }
+.transcript-review .review-kind { display:inline-block; margin-right:8px; font-size:12px; font-weight:500; letter-spacing:.02em; color:var(--vermillion); }
+.transcript-review [data-note-kind="wording"] .review-kind,
+.transcript-review [data-note-kind="transcript"] .review-kind,
+.transcript-review [data-note-kind="structure"] .review-kind { color:#606861; }
+.transcript-review .article-section { margin:0; border-top:1px solid var(--rule); }
+.transcript-review .article-section > summary { min-height:64px; padding:16px 0; }
+.transcript-review .article-section > summary h2 { margin:0; font-size:19px; line-height:1.7; }
+.transcript-review .article-section > summary::after,
+.transcript-review .article-section[open] > summary::after { transform:rotate(45deg); }
+.transcript-review .article-section[open] > summary::after { transform:rotate(-135deg); }
+.transcript-review .article-section[open] > summary { margin-bottom:14px; }
+.transcript-review .article-content .ct { gap:14px; margin-bottom:32px; padding-bottom:28px; }
+.transcript-review .article-section > .ct:last-child { border-bottom:0; margin-bottom:0; }
+.transcript-review .ct-head { align-items:center; flex-wrap:wrap; border:0; padding:0; }
+.transcript-review a.ct-time { display:inline-flex; align-items:center; min-height:32px; padding:3px 8px; border-color:var(--rule); font-family:inherit; font-size:13px; text-decoration:none; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.transcript-review a.ct-time:hover { border-color:var(--vermillion); }
+.transcript-review .ct-name { font-size:17px; }
+.transcript-review .ct-label { font-family:inherit; font-size:12px; letter-spacing:.04em; }
+.transcript-review .ct-col { padding:16px; }
+.transcript-review .article-content .ct-col p { font-size:16px; line-height:2; }
+.transcript-review .article-content .ct-after p { font-weight:400; }
+.transcript-review .article-content ol.ct-notes li { font-size:14px; line-height:1.9; }
+.transcript-review .ct-note-detail { border-top:1px dashed var(--rule); padding-top:8px; }
+.transcript-review .ct-note-detail > summary,
+.transcript-review .review-reference > summary { cursor:pointer; min-height:38px; padding:6px 0; color:var(--muted); font-size:14px; }
+.transcript-review .ct-note-detail .ct-why { margin:8px 0 0; border:0; padding:0; }
+.transcript-review .article-content .ct-why p { color:#535b54; font-size:14px; }
+.transcript-review .article-content .ct-why p.ct-zh { font-size:14px; line-height:1.9; }
+.transcript-review .review-reference { border-top:1px solid var(--rule); padding:5px 0; }
+.transcript-review .review-reference table { font-size:14px; margin:12px 0 20px; }
+.transcript-review .review-reference > p { font-size:15px; }
+.transcript-review .review-series { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-top:1px solid var(--rule); margin-top:32px; padding-top:20px; font-size:14px; }
+.transcript-review :is(a, summary, button):focus-visible { outline:2px solid var(--vermillion); outline-offset:4px; }
+.review-mobile-toc { display:none; }
+@container review-copy (max-width:560px) {
+  .transcript-review .ct-pair { grid-template-columns:minmax(0,1fr); }
+  .transcript-review .ct-after { border-left:0; border-top:2px solid var(--vermillion); }
+}
+@media(max-width:760px) {
+  .transcript-review .reading-sidebar { padding:0; }
+  .transcript-review .reading-heading h1 { font-size:25px; }
+  .transcript-review .reading-meta { gap:8px 14px; }
+  .transcript-review .review-mobile-toc { display:block; border-bottom:1px solid var(--rule); padding-bottom:12px; margin-bottom:22px; font-size:14px; }
+  .review-mobile-toc summary { cursor:pointer; padding:8px 0; }
+  .review-mobile-toc nav { display:grid; gap:12px; margin:12px 0; line-height:1.8; }
+  .transcript-review .review-intro p { font-size:15px; }
+  .transcript-review .article-section > summary h2 { font-size:17px; }
+  .transcript-review .ct-col { padding:14px; }
+  .transcript-review .ct-head { gap:10px; }
+  .transcript-review .ct-n { vertical-align:2px; }
+}

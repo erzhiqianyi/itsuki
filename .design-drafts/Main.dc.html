@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin:0; background:#fafbf9; color:#161616; font-family:'Noto Sans JP','Hiragino Sans',sans-serif; }
+    a { color:#d52718; } a:hover { color:#a71c10; }
+    .cond { font-family:'Barlow Condensed','Arial Narrow',sans-serif; }
+    .x { background:linear-gradient(transparent 60%, #f6c4bc 60%); }
+    .o { border-bottom:2px solid #f6c4bc; padding-bottom:1px; }
+    .n { display:inline-grid; place-items:center; width:16px; height:16px; border:1px solid #d52718; color:#d52718; font-size:11px; line-height:1; vertical-align:3px; margin-left:3px; font-family:'Barlow Condensed',sans-serif; }
+  </style>
+</helmet>
+
+<div style="padding:40px; display:flex; flex-direction:column; gap:30px">
+
+  <div style="border-top:2px solid #161616; padding-top:14px; display:flex; align-items:baseline; gap:14px">
+    <span class="cond" style="font-size:34px; font-weight:700; line-height:1; color:#d52718">01</span>
+    <span style="font-size:21px; font-weight:600">あいさつと天気</span>
+    <span class="cond" style="font-size:16px; color:#62645e; margin-left:auto">0:00 — 0:37</span>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:18px; border-bottom:1px solid #d7d9d5; padding-bottom:30px">
+
+    <div style="display:flex; align-items:flex-end; gap:12px; border-bottom:1px solid #d7d9d5; padding-bottom:9px">
+      <span class="cond" style="font-size:15px; font-weight:600; color:#d52718; border:1px solid #d52718; padding:2px 8px">0:00</span>
+      <span style="font-size:18px; font-weight:600">あいさつ</span>
+      <div style="margin-left:auto; display:flex; align-items:baseline; gap:3px">
+        <span class="cond" style="font-size:28px; font-weight:700; line-height:1; color:#d52718">4</span>
+        <span class="cond" style="font-size:14px; color:#62645e">/ 5</span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px; background:#d7d9d5">
+      <div style="background:#f1f2ef; padding:15px 18px; display:flex; flex-direction:column; gap:9px">
+        <span class="cond" style="font-size:12px; letter-spacing:.14em; color:#62645e">元の字幕</span>
+        <p style="margin:0; font-size:17px; line-height:2">皆さん、こんにちは。<span class="x">いつです</span><span class="n">1</span>。<span class="x">今日は9月6日。</span><span class="n">2</span></p>
+      </div>
+      <div style="background:#fafbf9; border-left:2px solid #d52718; padding:15px 18px; display:flex; flex-direction:column; gap:9px">
+        <span class="cond" style="font-size:12px; letter-spacing:.14em; color:#d52718">やさしい日本語 · 話しことば</span>
+        <p style="margin:0; font-size:17px; font-weight:500; line-height:2">はい、みなさん、こんにちは。<span class="o">イツキです</span>。今日は9月6日<span class="o">です</span>。</p>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:7px">
+      <div style="display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.8">
+        <span class="n" style="flex-shrink:0; margin:5px 0 0; vertical-align:0">1</span>
+        <span>「いつです」は「イツキです」の字幕のミス。名前は少し間を置いて、はっきり言う。</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.8">
+        <span class="n" style="flex-shrink:0; margin:5px 0 0; vertical-align:0">2</span>
+        <span>「今日は9月6日。」→ 文末の「です」がない。名詞で止めない。</span>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:7px; border-left:1px solid #d7d9d5; padding-left:16px">
+      <p style="margin:0; font-size:15px; line-height:1.8; color:#62645e"><span class="cond" style="letter-spacing:.1em; color:#161616">なぜ直したか　</span>最初の「はい、」は、話し始める前の息つぎの合図。動画ではとても自然です。そのあとは「名前」と「日付」を短く言い切るだけ。</p>
+      <p style="margin:0; font-size:13px; line-height:1.7; color:#62645e">中文：开口先来个「はい、」很自然；句子结尾要说完「です」，别停在名词上。</p>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-direction:column; gap:18px">
+    <div style="display:flex; align-items:flex-end; gap:12px; border-bottom:1px solid #d7d9d5; padding-bottom:9px">
+      <span class="cond" style="font-size:15px; font-weight:600; color:#d52718; border:1px solid #d52718; padding:2px 8px">0:06</span>
+      <span style="font-size:18px; font-weight:600">天気の話</span>
+      <div style="margin-left:auto; display:flex; align-items:baseline; gap:3px">
+        <span class="cond" style="font-size:28px; font-weight:700; line-height:1; color:#d52718">3</span>
+        <span class="cond" style="font-size:14px; color:#62645e">/ 5</span>
+      </div>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px; background:#d7d9d5">
+      <div style="background:#f1f2ef; padding:15px 18px; display:flex; flex-direction:column; gap:9px">
+        <span class="cond" style="font-size:12px; letter-spacing:.14em; color:#62645e">元の字幕</span>
+        <p style="margin:0; font-size:17px; line-height:2">今日も雨ですね。昨日<span class="x">天気予報に寄って</span><span class="n">1</span>、今日は<span class="x">大雨そうです</span><span class="n">2</span>。</p>
+      </div>
+      <div style="background:#fafbf9; border-left:2px solid #d52718; padding:15px 18px; display:flex; flex-direction:column; gap:9px">
+        <span class="cond" style="font-size:12px; letter-spacing:.14em; color:#d52718">やさしい日本語 · 話しことば</span>
+        <p style="margin:0; font-size:17px; font-weight:500; line-height:2">今日も雨ですね。昨日の<span class="o">天気予報だと</span>、今日は<span class="o">大雨だそうです</span>。</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:7px">
+      <div style="display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.8">
+        <span class="n" style="flex-shrink:0; margin:5px 0 0; vertical-align:0">1</span>
+        <span>「天気予報に寄って」→ 情報の出どころは「〜によると」。話しことばなら「〜だと」でOK。</span>
+      </div>
+      <div style="display:flex; gap:10px; align-items:flex-start; font-size:15px; line-height:1.8">
+        <span class="n" style="flex-shrink:0; margin:5px 0 0; vertical-align:0">2</span>
+        <span>「大雨そうです」→ 伝聞の「そうだ」は、名詞のあとに「だ」が必要。</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

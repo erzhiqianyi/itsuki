@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import EditorialLayout from '../../layouts/EditorialLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { SITE_CONFIG } from '../../data/site-config';
+import '../../styles/transcript-review.css';
 
 export async function getStaticPaths() {
     const blogEntries = await getCollection('blog');
@@ -37,6 +38,8 @@ const { entry, prevPost, nextPost } = Astro.props;
 
 if (!entry) return Astro.redirect('/404');
 const { Content, headings } = await render(entry);
+const isTranscriptReview = entry.data.transcriptReview === true;
+const reviewCount = (entry.body?.match(/class="ct"/g) || []).length;
 
 const {
     title,
@@ -59,6 +62,7 @@ const toc = (headings || []).filter((h) => h.depth === 2 || h.depth === 3);
 const postUI = {
     back: { ja: "一覧に戻る", en: "Back to List" },
     toc: { ja: "目次内容", en: "CONTENTS" },
+    panel: { ja: "サイドバーの開閉", en: "Toggle sidebar" },
     prev: { ja: "前の記事", en: "PREVIOUS" },
     next: { ja: "次の記事", en: "NEXT" },
     returnIdx: { ja: "記事一覧へ戻る", en: "Return to Index" },
@@ -72,24 +76,28 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
 ---
 
 <EditorialLayout title={title || date} description={postDescription} image={coverImage} article lang={lang as 'ja' | 'en'}>
-  <div class="reading-layout">
+  <div class:list={['reading-layout', { 'transcript-review': isTranscriptReview }]} id="reading-layout">
     <aside class="reading-sidebar">
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="true" aria-controls="sidebar-body" aria-label={postUI.panel[lang]} title={postUI.panel[lang]}></button>
+      <div class="sidebar-body" id="sidebar-body">
       <a href="/blog" class="back-link"><Icon name="lucide:arrow-left" />{postUI.back[lang]}</a>
       <nav class="sidebar-pagination" aria-label={lang === 'en' ? 'Adjacent articles' : '前後の記事'}>
         {prevPost && <a href={getPostUrl(prevPost.id)}><span><Icon name="lucide:arrow-left" />{postUI.prev[lang]}</span><strong>{prevPost.data.title || prevPost.data.date}</strong></a>}
         {nextPost && <a href={getPostUrl(nextPost.id)}><span>{postUI.next[lang]}<Icon name="lucide:arrow-right" /></span><strong>{nextPost.data.title || nextPost.data.date}</strong></a>}
       </nav>
-      {toc.length > 0 && <details class="reading-toc" open><summary>{postUI.toc[lang]}</summary><nav aria-label={postUI.toc[lang]}>{toc.map(h => <a href={'#' + h.slug} class:list={{ nested: h.depth === 3 }}>{h.text}</a>)}</nav></details>}
+      {toc.length > 0 && <details class="reading-toc" id="reading-toc" open><summary>{postUI.toc[lang]}<span class="toc-count">{toc.length}</span></summary><nav aria-label={postUI.toc[lang]}>{toc.map(h => <a href={'#' + h.slug} class:list={{ nested: h.depth === 3 }}>{h.text}</a>)}</nav></details>}
       {series && <details class="reading-toc"><summary>{series.title[lang]}</summary><nav>{series.items.map(item => <a href={item.href} aria-current={item.active ? 'page' : undefined}>{item.title[lang]}</a>)}</nav></details>}
+      </div>
     </aside>
     <article class="reading-article">
       <header class="reading-heading">
-        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category}</a><time datetime={date}>{date}</time><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></div>
+        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}</div>
         <h1>{title || date}</h1>
         {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <span>#{tag}</span>)}</p>}
       </header>
-      {coverImage && <details class="article-cover" open><summary>{lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
-      <div class="article-content" id="blog-content"><Content /></div>
+      {coverImage && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
+      {isTranscriptReview && <details class="review-mobile-toc"><summary>このページの目次</summary><nav aria-label="このページの目次">{toc.map(h => <a href={'#' + h.slug}>{h.text}</a>)}</nav></details>}
+      <div class="article-content" id="blog-content" data-transcript-review={isTranscriptReview ? '' : undefined}><Content /></div>
       <nav class="reading-pagination" aria-label="記事のナビゲーション">
         <a href={prevPost ? getPostUrl(prevPost.id) : '/blog'}><span><Icon name="lucide:arrow-left" />{prevPost ? postUI.prev[lang] : postUI.returnIdx[lang]}</span><strong>{prevPost?.data.title || prevPost?.data.date}</strong></a>
         <a href={nextPost ? getPostUrl(nextPost.id) : '/blog'}><span>{nextPost ? postUI.next[lang] : postUI.returnIdx[lang]}<Icon name="lucide:arrow-right" /></span><strong>{nextPost?.data.title || nextPost?.data.date}</strong></a>
@@ -129,9 +137,76 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   dialog?.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
   dialog?.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') step(-1); if (event.key === 'ArrowRight') step(1); });
   if (images.length < 2) dialog?.querySelectorAll<HTMLButtonElement>('.lightbox-prev, .lightbox-next').forEach(button => button.hidden = true);
+
+  // 章ごとに開閉できるようにする
+  const articleBody = document.querySelector<HTMLElement>('#blog-content');
+  if (articleBody) {
+    const isReview = articleBody.hasAttribute('data-transcript-review');
+    Array.from(articleBody.querySelectorAll<HTMLElement>(':scope > h2')).forEach(heading => {
+      const isChapter = /^\d+\./.test(heading.textContent?.trim() || '');
+      if (isReview && !isChapter) return;
+      const section = document.createElement('details');
+      section.className = 'article-section';
+      section.open = !isReview || /^1\./.test(heading.textContent?.trim() || '');
+      const summary = document.createElement('summary');
+      heading.replaceWith(section);
+      summary.appendChild(heading);
+      section.appendChild(summary);
+      let node = section.nextSibling;
+      while (node && !(node.nodeType === 1 && (node as HTMLElement).tagName === 'H2')) {
+        const next = node.nextSibling;
+        section.appendChild(node);
+        node = next;
+      }
+    });
+    // 閉じた章の中にあるアンカーへ飛べるようにする
+    const revealHash = () => {
+      let id: string;
+      try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+      if (!id) return;
+      const target = document.getElementById(id);
+      if (!target) return;
+      let box = target.closest('details');
+      while (box) { box.open = true; box = box.parentElement?.closest('details') ?? null; }
+      target.scrollIntoView();
+    };
+    window.addEventListener('hashchange', revealHash);
+    // 同じアンカーを再度押した場合も、閉じた章を開き直す。
+    if (isReview) document.addEventListener('click', event => {
+      const link = (event.target as Element).closest<HTMLAnchorElement>('a[href^="#"]');
+      if (link && link.hash === location.hash) revealHash();
+    });
+    revealHash();
+  }
+
+  // サイドバーを左右に開閉する（状態は記憶する）
+  const layout = document.querySelector<HTMLElement>('#reading-layout');
+  const sidebarToggle = document.querySelector<HTMLButtonElement>('#sidebar-toggle');
+  if (layout && sidebarToggle) {
+    const KEY = 'blog-sidebar-collapsed';
+    const apply = (collapsed: boolean) => {
+      layout.classList.toggle('sidebar-collapsed', collapsed);
+      sidebarToggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    };
+    let stored: string | null = null;
+    try { stored = localStorage.getItem(KEY); } catch {}
+    apply(stored === '1');
+    sidebarToggle.addEventListener('click', () => {
+      const collapsed = !layout.classList.contains('sidebar-collapsed');
+      apply(collapsed);
+      try { localStorage.setItem(KEY, collapsed ? '1' : '0'); } catch {}
+    });
+  }
 </script>
 <style is:global>
   .reading-layout { max-width:1100px; margin:auto; display:grid; grid-template-columns:210px minmax(0,720px); gap:64px; }
+  .sidebar-toggle { display:none; place-items:center; width:26px; height:26px; margin-bottom:20px; padding:0; border:1px solid var(--rule); background:var(--paper); color:var(--muted); cursor:pointer; transition:color .2s ease, border-color .2s ease; }
+  .sidebar-toggle::before { content:''; width:6px; height:6px; border-left:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateX(1px) rotate(45deg); transition:transform .25s ease; }
+  .sidebar-toggle:hover { color:var(--vermillion); border-color:var(--vermillion); }
+  @media(min-width:761px) { .sidebar-toggle { display:grid; } }
+  .reading-layout.sidebar-collapsed { grid-template-columns:26px minmax(0,900px); gap:28px; }
+  .reading-layout.sidebar-collapsed .sidebar-body { display:none; }
+  .reading-layout.sidebar-collapsed .sidebar-toggle::before { transform:translateX(-1px) rotate(-135deg); }
   .reading-sidebar { align-self:start; position:sticky; top:30px; max-height:calc(100dvh - 60px); overflow-y:auto; font-size:13px; }
   .back-link { display:flex; gap:8px; align-items:center; margin-bottom:30px; }
   .sidebar-pagination { display:grid; gap:20px; padding-bottom:24px; margin-bottom:24px; border-bottom:1px solid var(--rule); }
@@ -141,7 +216,13 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .sidebar-pagination a:hover strong { color:var(--vermillion); }
   @media(min-width:761px) { .reading-article > .reading-pagination { display:none; } }
   .reading-toc { margin-bottom:24px; }
-  .reading-toc summary { cursor:pointer; font-weight:600; margin-bottom:14px; }
+  .reading-toc > summary { position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:8px; cursor:pointer; font-weight:600; padding:6px 0 8px; margin-bottom:6px; background:var(--paper); list-style:none; user-select:none; }
+  .reading-toc > summary::-webkit-details-marker { display:none; }
+  .reading-toc > summary::after { content:''; margin-left:auto; width:6px; height:6px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:translateY(-2px) rotate(45deg); transition:transform .2s ease, border-color .2s ease; }
+  .reading-toc[open] > summary::after { transform:translateY(1px) rotate(-135deg); }
+  .reading-toc > summary:hover { color:var(--vermillion); }
+  .reading-toc > summary:hover::after { border-color:var(--vermillion); }
+  .toc-count { font-size:11px; font-weight:400; color:var(--muted); }
   .reading-toc nav { display:grid; gap:12px; border-left:1px solid var(--rule); padding-left:16px; line-height:1.7; }
   .reading-toc .nested { padding-left:12px; color:var(--muted); }
   .reading-article { min-width:0; }
@@ -158,12 +239,51 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .article-content p { margin:0 0 1.4em; }
   .article-content h2 { font-size:25px; font-weight:600; line-height:1.6; margin:2em 0 .9em; }
   .article-content > h2:first-child { margin-top:0; }
+  .article-content details.article-section > summary { display:flex; align-items:center; gap:14px; cursor:pointer; list-style:none; user-select:none; }
+  .article-content details.article-section > summary::-webkit-details-marker { display:none; }
+  .article-content details.article-section > summary h2 { margin-bottom:.5em; }
+  .article-content details.article-section > summary::after { content:''; flex-shrink:0; margin-left:auto; width:8px; height:8px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:translateY(4px) rotate(45deg); transition:transform .2s ease, border-color .2s ease; }
+  .article-content details.article-section[open] > summary::after { transform:translateY(8px) rotate(-135deg); }
+  .article-content details.article-section > summary:hover h2 { color:var(--vermillion); }
+  .article-content details.article-section > summary:hover::after { border-color:var(--vermillion); }
+  .article-content > details.article-section:first-child h2 { margin-top:0; }
   .article-content h3 { font-size:21px; font-weight:600; line-height:1.6; margin:1.8em 0 .8em; }
   .article-content a { color:var(--vermillion); text-decoration:underline; text-underline-offset:4px; }
   .article-content ul, .article-content ol { padding-left:1.5em; margin-bottom:1.4em; }
   .article-content ul { list-style:disc; } .article-content ol { list-style:decimal; }
   .article-content li { padding-left:.2em; margin-bottom:.5em; }
   .article-content blockquote { border-left:2px solid var(--vermillion); padding-left:22px; margin:28px 0; color:var(--muted); }
+
+  /* 日本語カテゴリ：字幕添削レイアウト（左右対比＋赤入れ） */
+  .article-content .ct { display:flex; flex-direction:column; gap:16px; margin:0 0 34px; padding-bottom:30px; border-bottom:1px solid var(--rule); scroll-margin-top:24px; }
+  .ct-head { display:flex; align-items:flex-end; gap:12px; border-bottom:1px solid var(--rule); padding-bottom:9px; }
+  .ct-time { font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:15px; font-weight:600; line-height:1.5; color:var(--vermillion); border:1px solid var(--vermillion); padding:2px 8px; }
+  .ct-name { font-size:18px; font-weight:600; }
+  .ct-score { display:flex; align-items:baseline; gap:3px; margin-left:auto; font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:14px; color:var(--muted); }
+  .ct-score em { font-style:normal; font-size:28px; font-weight:700; line-height:1; color:var(--vermillion); }
+  .ct-pair { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1px; background:var(--rule); }
+  .ct-col { display:flex; flex-direction:column; gap:9px; padding:15px 18px; }
+  .ct-before { background:#f1f2ef; }
+  .ct-after { background:var(--paper); border-left:2px solid var(--vermillion); }
+  .ct-label { font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:12px; letter-spacing:.14em; color:var(--muted); }
+  .ct-after .ct-label { color:var(--vermillion); }
+  .article-content .ct-col p { margin:0; font-size:17px; line-height:2; }
+  .article-content .ct-after p { font-weight:500; }
+  .article-content mark.ct-x { background:linear-gradient(transparent 60%, #f6c4bc 60%); color:inherit; }
+  .article-content mark.ct-o { background:none; color:inherit; border-bottom:2px solid #f6c4bc; }
+  .ct-n { display:inline-grid; place-items:center; width:16px; height:16px; margin-left:3px; border:1px solid var(--vermillion); color:var(--vermillion); font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:11px; font-style:normal; line-height:1; vertical-align:3px; }
+  .article-content ol.ct-notes { display:flex; flex-direction:column; gap:6px; list-style:none; margin:0; padding:0; counter-reset:ctn; }
+  .article-content ol.ct-notes li { position:relative; counter-increment:ctn; margin:0; padding-left:26px; font-size:15px; line-height:1.8; }
+  .article-content ol.ct-notes li::before { content:counter(ctn); position:absolute; left:0; top:5px; display:grid; place-items:center; width:16px; height:16px; border:1px solid var(--vermillion); color:var(--vermillion); font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:11px; line-height:1; }
+  .ct-why { display:flex; flex-direction:column; gap:6px; border-left:1px solid var(--rule); padding-left:16px; }
+  .article-content .ct-why p { margin:0; font-size:15px; line-height:1.8; color:var(--muted); }
+  .ct-why-label { margin-right:12px; font-family:'Barlow Condensed','Arial Narrow',sans-serif; letter-spacing:.1em; color:var(--ink); }
+  .article-content .ct-why p.ct-zh { font-size:13px; line-height:1.7; }
+  @media(max-width:760px) {
+    .ct-pair { grid-template-columns:minmax(0,1fr); }
+    .ct-after { border-left:0; border-top:2px solid var(--vermillion); }
+    .article-content .ct-col p { font-size:16px; }
+  }
   .article-content img { display:block; width:auto; max-width:100%; height:auto; margin:28px auto; cursor:zoom-in; }
   .article-content .x-photo-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:24px 0; }
   .article-content .x-photo-grid img { width:100%; height:100%; aspect-ratio:1; object-fit:cover; margin:0; border-radius:4px; }
