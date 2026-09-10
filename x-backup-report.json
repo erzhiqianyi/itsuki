@@ -1,11 +1,11 @@
 {
-  "profile": "itsuki_maer",
-  "capturedAt": "2026-09-10",
-  "ownPosts": 392,
-  "days": 66,
+  "profile": "https://x.com/itsuki_maer",
+  "capturedAt": "2026-09-10T22:10:46.612Z",
+  "ownPosts": 397,
+  "days": 67,
   "dateFrom": "2026-07-04",
-  "dateTo": "2026-09-09",
-  "profileCount": 393,
+  "dateTo": "2026-09-10",
+  "profileCount": 398,
   "reposts": [
     {
       "url": "https://x.com/kamakura_kyokai/status/2075476670237077593",
@@ -38,8 +38,9 @@
           "text": "944K"
         }
       ],
+      "quoteTexts": [],
       "context": "You reposted",
-      "note": "Repost timestamp is not exposed by X; the date shown is the original post's publication time, not when it was reposted."
+      "note": "Repost by itsuki_maer; repost timestamp not available. date is original publication time, NOT repost time."
     }
   ],
   "imagesSaved": 535,
