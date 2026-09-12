@@ -4,6 +4,7 @@ import { Icon } from 'astro-icon/components';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import EditorialLayout from '../layouts/EditorialLayout.astro';
+import { photoPreview } from '../components/photo-preview';
 import { SITE_CONFIG } from '../data/site-config';
 const japanese = ({ data }) => !data.lang || data.lang === 'ja';
 const [posts, videos, albums] = await Promise.all([getCollection('blog', japanese), getCollection('videos', japanese), getCollection('photos', japanese)]);
@@ -23,7 +24,10 @@ const latestPosts = await Promise.all(posts.slice(0, 3).map(async post => ({ ...
 const postUrl = (post) => '/blog/' + post.id.replace(/\.(md|mdx)$/, '');
 const localImage = (src) => typeof src === 'string' && src.startsWith('/') && existsSync(join(process.cwd(), 'public', src));
 const locale = (value) => typeof value === 'string' ? value : value?.ja || value?.en || '';
-const visibleAlbums = albums.map(album => ({ album, cover: [album.data.cover, ...(album.data.images || []).map(i => i.url)].find(localImage) })).filter(a => a.cover).slice(0, 2);
+// Covers served from R2 are resized on the edge; local ones must exist under public/.
+const remoteImage = (src) => typeof src === 'string' && /^https?:\/\//.test(src);
+const albumCover = (album) => { const candidates = [album.data.cover, ...(album.data.images || []).map(i => i.url)]; const url = candidates.find(src => localImage(src) || remoteImage(src)); return url ? (album.data.images?.find(i => i.url === url) || { url }) : undefined; };
+const visibleAlbums = (await Promise.all(albums.map(async album => { const photo = albumCover(album); return { album, cover: photo ? (await photoPreview(photo, 960)).src : undefined }; }))).filter(a => a.cover).slice(0, 2);
 const visibleVideos = videos.filter(video => video.data.url).slice(0, 2);
 const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '02', label: 'つくる', href: '/projects' }, { number: '03', label: '動画', href: '/videos' }, { number: '04', label: '写真', href: '/photos' }, { number: '05', label: '俳句', href: 'https://haiku.erzhiqian.cc/' }];
 
@@ -73,7 +77,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
       </section>
     <section id="photography">
       <header class="section-heading"><span class="section-number display-type" aria-hidden="true">04</span><h2>写真<span class="album-label">（アルバム）</span></h2><a href="/photos" aria-label="すべてのアルバムを見る">すべて見る<Icon name="lucide:arrow-up-right" /></a></header>
-      <div class="album-list">{visibleAlbums.map(({ album, cover }) => <a class="album-entry" href={'/photos/' + album.slug}><figure><img src={cover} alt={locale(album.data.title)} loading="lazy" /><figcaption><span>{locale(album.data.title)}</span><time datetime={album.data.date}>{album.data.date?.slice(0, 7).replace('-', '.')}</time></figcaption></figure></a>)}</div>
+      <div class="album-list">{visibleAlbums.map(({ album, cover }) => <a class="album-entry" href={'/photos/' + album.slug}><figure><img src={cover} alt={locale(album.data.title)} loading="lazy" /><figcaption><span>{locale(album.data.title)}</span><span class="album-meta"><time datetime={album.data.date}>{album.data.date?.slice(0, 7).replace('-', '.')}</time><small>{String(album.data.images?.length || 1).padStart(2,'0')} PHOTOS</small></span></figcaption></figure></a>)}</div>
     </section>
   </div>
   {latestDate && <p class="edition-updated">最終更新 <time datetime={latestDate}>{latestDate.slice(0, 10).replaceAll('-', '.')}</time></p>}
@@ -142,7 +146,8 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   .album-list { display:grid; grid-template-columns:1fr 1fr; align-items:start; gap:24px; }
   .album-entry img { display:block; width:auto; max-width:100%; height:auto; max-height:250px; }
   .album-entry figcaption { display:flex; justify-content:space-between; gap:12px; font-size:12px; margin-top:8px; line-height:1.6; }
-  .album-entry time { flex-shrink:0; color:var(--muted); }
+  .album-entry .album-meta { flex-shrink:0; display:flex; flex-direction:column; align-items:flex-end; color:var(--muted); }
+  .album-entry .album-meta small { font-size:10px; letter-spacing:.04em; }
   .edition-updated { text-align:right; color:var(--muted); font-size:11px; margin-top:28px; }
   @media(max-width:1380px) {
     .masthead { gap:26px; grid-template-columns:1.4fr 1fr .8fr; } .masthead-name { font-size:132px; }

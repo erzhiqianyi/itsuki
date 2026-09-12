@@ -5,7 +5,7 @@ import { mkdtemp, readdir, rm, stat } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
-  ROOT, SOURCES, slugify, processImage, objectKey, publicUrl, uploadObject, frontMatter, writeAlbum, preflight,
+  ROOT, SOURCES, slugify, processImage, objectKey, publicUrl, uploadObject, frontMatter, writeAlbum, preflight, recordUpload,
 } from './photo-lib.mjs';
 
 const fail = message => { console.error(`\n✗ ${message}`); process.exit(1); };
@@ -74,7 +74,7 @@ async function main() {
     };
     album.locationTag = slugify(await ask('location-tag', '場所タグ', slugify(album.locationEn)));
     album.collectionTag = slugify(await ask('collection-tag', 'コレクションタグ', album.locationTag));
-    album.featured = options.featured ?? /^y/i.test(await ask('featured-answer', 'トップに出す？ y/N', 'n'));
+    album.featured = options.featured ?? (process.stdin.isTTY ? /^y/i.test(await ask('featured-answer', 'トップに出す？ y/N', 'n')) : false);
     album.slug = slugify(await ask('slug', 'スラッグ', slugify(album.titleEn) || album.locationTag));
     rl.close();
 
@@ -96,6 +96,7 @@ async function main() {
 
     for (const [index, photo] of photos.entries()) {
       await uploadObject(photo.key, photo.local);
+      await recordUpload(photo);
       process.stdout.write(`\r  アップロード ${index + 1}/${photos.length}  ${photo.key}          `);
     }
     console.log('\n');

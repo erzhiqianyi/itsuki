@@ -9,7 +9,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import {
   ROOT, BUCKET, HOST, PREFIX, SOURCES, slugify, processImage, thumbnail,
-  objectKey, publicUrl, uploadObject, albumPath, writeAlbum, preflight,
+  objectKey, publicUrl, uploadObject, albumPath, writeAlbum, albumSlug, preflight,
+  loadLibrary, recordUpload,
 } from './photo-lib.mjs';
 
 const PORT = Number(process.env.PORT) || 4477;
@@ -52,6 +53,15 @@ const routes = {
     }
   },
 
+  // Large preview for a staged photo; library photos are previewed straight from the CDN.
+  'GET /api/preview': async (_request, response, url) => {
+    const photo = staged.get(url.searchParams.get('id'));
+    if (!photo) return json(response, 404, { error: 'not staged' });
+    photo.preview ??= await thumbnail(photo.local, 1800);
+    response.writeHead(200, { 'content-type': 'image/webp', 'cache-control': 'no-store' });
+    response.end(photo.preview);
+  },
+
   'GET /api/thumb': async (_request, response, url) => {
     const photo = staged.get(url.searchParams.get('id'));
     if (!photo) return json(response, 404, { error: 'not staged' });
@@ -68,29 +78,37 @@ const routes = {
     json(response, 200, { exists, path: path.relative(ROOT, target) });
   },
 
+  // Upload one staged photo. Without an album date the key uses the EXIF date, so
+  // photos can go up first and be sorted into albums later from the library.
   'POST /api/upload': async (request, response) => {
     const { id, date } = JSON.parse(await body(request));
     const photo = staged.get(id);
     if (!photo) return json(response, 404, { error: 'not staged' });
-    const key = objectKey(date, photo.name);
+    const day = /^\d{4}-\d{2}-\d{2}$/.test(date || '') ? date : photo.exif.taken || new Date().toISOString().slice(0, 10);
+    const key = objectKey(day, photo.name);
     try {
       await uploadObject(key, photo.local);
       Object.assign(photo, { key, url: publicUrl(key) });
-      json(response, 200, { key, url: photo.url });
+      const entry = await recordUpload(photo);
+      json(response, 200, entry);
     } catch (error) {
       json(response, 502, { error: (error.stderr || error.message || '').trim().split('\n').slice(-3).join(' ') });
     }
   },
 
+  'GET /api/library': async (_request, response) => json(response, 200, { photos: await loadLibrary() }),
+
+  // `order` mixes staged ids and library keys; both resolve to an uploaded photo.
   'POST /api/publish': async (request, response) => {
     const { album, order, cover } = JSON.parse(await body(request));
-    const photos = order.map(id => staged.get(id)).filter(Boolean);
+    const library = new Map((await loadLibrary()).map(photo => [photo.key, photo]));
+    const photos = order.map(id => staged.get(id) || library.get(id)).filter(Boolean);
     if (!photos.length) return json(response, 400, { error: '写真がありません。' });
     if (photos.some(photo => !photo.url)) return json(response, 409, { error: 'アップロードが完了していない写真があります。' });
-    photos.forEach(photo => { photo.cover = photo.id === cover; });
+    photos.forEach(photo => { photo.cover = (photo.id || photo.key) === cover || photo.key === cover; });
     try {
       const target = await writeAlbum(album, photos);
-      json(response, 200, { path: path.relative(ROOT, target), slug: `${album.date.slice(0, 4)}/${album.date.slice(5, 7)}/${album.date.slice(8, 10)}_${album.slug}` });
+      json(response, 200, { path: path.relative(ROOT, target), slug: albumSlug(album.date, album.slug) });
     } catch (error) {
       json(response, error.code === 'EEXIST' ? 409 : 500, { error: error.code === 'EEXIST' ? '同じ日付とスラッグのアルバムが既にあります。' : error.message });
     }

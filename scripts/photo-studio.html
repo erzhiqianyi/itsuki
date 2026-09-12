@@ -8,11 +8,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Noto+Sans+JP:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root { --ink:#161616; --paper:#fafbf9; --vermillion:#d52718; --rule:#d7d9d5; --muted:#62645e; --card:#f1f2ef; }
+:root { --ink:#161616; --paper:#fafbf9; --vermillion:#d52718; --rule:#d7d9d5; --muted:#62645e; --card:#f1f2ef; --ok:#2e7d32; }
 * { box-sizing:border-box; }
 body { margin:0; background:var(--paper); color:var(--ink); font:400 14px/1.7 'Noto Sans JP',sans-serif; border-left:8px solid var(--vermillion); }
-h1,h2 { margin:0; font-weight:600; }
-.wrap { max-width:1240px; margin:0 auto; padding:36px 40px 140px; }
+h1,h2,h3 { margin:0; font-weight:600; }
+.wrap { max-width:1240px; margin:0 auto; padding:36px 40px 150px; }
 
 header { display:flex; align-items:flex-end; justify-content:space-between; gap:32px; border-bottom:2px solid var(--ink); padding-bottom:20px; }
 h1 { font:700 52px/.95 'Barlow Condensed',sans-serif; letter-spacing:.01em; }
@@ -21,15 +21,16 @@ h1 span { display:inline-block; margin-left:20px; font:600 17px/1.5 'Noto Sans J
 .target b { display:block; font:600 15px/1.4 'Barlow Condensed',sans-serif; letter-spacing:.06em; color:var(--ink); }
 .probe { display:block; margin-top:5px; padding-left:14px; position:relative; max-width:340px; }
 .probe::before { content:''; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%; background:var(--muted); }
-.probe[data-ok=yes]::before { background:#2e7d32; }
+.probe[data-ok=yes]::before { background:var(--ok); }
 .probe[data-ok=no] { color:var(--vermillion); }
 .probe[data-ok=no]::before { background:var(--vermillion); }
 
-.kicker { font-size:11px; letter-spacing:.14em; color:var(--vermillion); margin:0 0 14px; }
+.kicker { font-size:11px; letter-spacing:.14em; color:var(--vermillion); margin:0 0 14px; display:flex; align-items:baseline; gap:14px; }
+.kicker small { color:var(--muted); letter-spacing:0; margin-left:auto; }
 .columns { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:56px; margin-top:36px; align-items:start; }
 @media (max-width:960px) { .columns { grid-template-columns:1fr; gap:40px; } }
 
-#drop { border:1px dashed var(--rule); background:var(--card); padding:44px 24px; text-align:center; cursor:pointer; transition:.15s; }
+#drop { border:1px dashed var(--rule); background:var(--card); padding:36px 24px; text-align:center; cursor:pointer; transition:.15s; }
 #drop:hover, #drop.over { border-color:var(--vermillion); color:var(--vermillion); background:#d527180a; }
 #drop strong { display:block; font:600 20px/1.5 'Noto Sans JP',sans-serif; }
 #drop small { display:block; margin-top:8px; font-size:12px; color:var(--muted); }
@@ -47,12 +48,29 @@ h1 span { display:inline-block; margin-left:20px; font:600 17px/1.5 'Noto Sans J
 .frame .file { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .frame .dim { margin-left:auto; flex-shrink:0; font-size:10px; }
 .acts { display:flex; gap:14px; padding-top:7px; font-size:11px; }
-.acts button { background:none; border:0; padding:0; font:inherit; color:var(--muted); cursor:pointer; }
+.acts button { background:none; border:0; padding:0; font:inherit; color:var(--muted); cursor:pointer; white-space:nowrap; }
 .acts button:hover { color:var(--vermillion); }
+.acts .state { margin-left:auto; color:var(--muted); white-space:nowrap; }
+.frame[data-state=done] .state { color:var(--ok); }
+.frame[data-state=failed] .state { color:var(--vermillion); }
 .frame[data-cover] .acts .setcover { color:var(--vermillion); font-weight:600; }
 .frame[data-cover] .plate { outline:2px solid var(--vermillion); outline-offset:3px; }
-.frame[data-state=done] .serial::after { content:' ✓'; }
-.frame[data-state=failed] .plate { outline:2px solid var(--vermillion); }
+
+.library { margin-top:52px; border-top:2px solid var(--ink); padding-top:24px; }
+.library:empty { display:none; }
+.day { margin-top:22px; }
+.day h3 { display:flex; align-items:baseline; gap:14px; font:600 22px/1 'Barlow Condensed',sans-serif; letter-spacing:.04em; padding-bottom:10px; border-bottom:1px solid var(--rule); }
+.day h3 small { font:400 11px/1 'Noto Sans JP',sans-serif; color:var(--muted); }
+.day h3 button { background:none; border:1px solid var(--rule); padding:5px 12px; font:500 11px/1.4 'Noto Sans JP',sans-serif; color:var(--ink); cursor:pointer; }
+.day h3 button:hover { color:var(--vermillion); border-color:var(--vermillion); }
+.strip { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:16px 14px; margin-top:16px; }
+.tile { cursor:pointer; min-width:0; }
+.tile .plate { height:96px; display:flex; align-items:center; justify-content:center; background:var(--card); }
+.tile img { max-width:100%; max-height:100%; display:block; }
+.tile figcaption { font-size:10px; color:var(--muted); padding-top:6px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tile:hover .plate { outline:2px solid var(--vermillion); outline-offset:2px; }
+.tile:hover figcaption { color:var(--vermillion); }
+.library-note { font-size:11px; color:var(--muted); margin:14px 0 0; }
 
 .panel { position:sticky; top:36px; display:grid; gap:18px; }
 label { display:block; font-size:11px; letter-spacing:.1em; color:var(--muted); margin-bottom:6px; }
@@ -66,15 +84,56 @@ input:focus { outline:2px solid var(--vermillion); outline-offset:1px; border-co
 .readout b { color:var(--ink); font-weight:500; }
 
 footer { position:fixed; left:8px; right:0; bottom:0; background:var(--paper); border-top:2px solid var(--ink); padding:14px 40px; }
-.bar { max-width:1240px; margin:0 auto; display:flex; align-items:center; gap:24px; }
+.bar { max-width:1240px; margin:0 auto; display:flex; align-items:center; gap:18px; }
 #status { flex:1; min-width:0; font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 #status.bad { color:var(--vermillion); }
 #status a { color:var(--vermillion); }
-.meter { flex:0 0 200px; height:3px; background:var(--rule); }
+.meter { flex:0 0 160px; height:3px; background:var(--rule); }
 .meter i { display:block; height:100%; width:0; background:var(--vermillion); transition:width .2s; }
-#publish { padding:12px 30px; font:600 13px/1 'Noto Sans JP',sans-serif; letter-spacing:.06em; color:var(--paper); background:var(--ink); border:0; cursor:pointer; }
-#publish:hover:not(:disabled) { background:var(--vermillion); }
-#publish:disabled { opacity:.35; cursor:not-allowed; }
+.bar button { padding:12px 24px; font:600 13px/1 'Noto Sans JP',sans-serif; letter-spacing:.06em; cursor:pointer; border:1px solid var(--ink); }
+#upload { background:var(--paper); color:var(--ink); }
+#upload:hover:not(:disabled) { color:var(--vermillion); border-color:var(--vermillion); }
+#publish { background:var(--ink); color:var(--paper); }
+#publish:hover:not(:disabled) { background:var(--vermillion); border-color:var(--vermillion); }
+.bar button:disabled { opacity:.35; cursor:not-allowed; }
+
+.frame .plate, .tile .plate { cursor:zoom-in; }
+.tile { position:relative; }
+.tile .plate { cursor:pointer; user-select:none; }
+.tile .zoom { position:absolute; top:6px; left:6px; width:26px; height:26px; display:grid; place-items:center; background:var(--paper); border:1px solid var(--rule); font:600 13px/1 'Barlow Condensed',sans-serif; color:var(--ink); cursor:zoom-in; opacity:0; transition:.12s; }
+.tile:hover .zoom { opacity:1; }
+.tile .zoom:hover { color:var(--vermillion); border-color:var(--vermillion); }
+.tile .mark { position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:50%; border:1.5px solid var(--paper); background:#0004; display:grid; place-items:center; color:var(--paper); font:700 13px/1 'Barlow Condensed',sans-serif; pointer-events:none; opacity:0; transition:.12s; }
+.tile:hover .mark, .tile.selected .mark { opacity:1; }
+.tile.selected .plate { outline:2px solid var(--vermillion); outline-offset:2px; }
+.tile.selected .mark { background:var(--vermillion); border-color:var(--vermillion); }
+.tile.selected figcaption { color:var(--vermillion); }
+.select-bar { display:flex; align-items:center; gap:10px; margin-top:14px; padding:10px 14px; background:var(--card); font-size:12px; }
+.select-bar[hidden] { display:none; }
+.select-bar b { font:600 20px/1 'Barlow Condensed',sans-serif; margin-right:4px; }
+.select-bar button { background:none; border:1px solid var(--rule); padding:6px 14px; font:500 12px/1.4 'Noto Sans JP',sans-serif; color:var(--ink); cursor:pointer; }
+.select-bar button:hover { color:var(--vermillion); border-color:var(--vermillion); }
+.select-bar button.primary { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+.select-bar button.primary:hover { background:var(--vermillion); border-color:var(--vermillion); color:var(--paper); }
+.select-bar small { margin-left:auto; color:var(--muted); }
+.day h3 .select-day { margin-left:auto; }
+.day h3 .add-day { margin-left:8px; }
+
+body:has(.viewer[open]) { overflow:hidden; }
+.viewer { position:fixed; inset:0; width:100%; max-width:none; height:100%; max-height:none; margin:0; padding:24px 40px; border:0; background:var(--paper); color:var(--ink); }
+.viewer[open] { display:grid; grid-template-rows:44px minmax(0,1fr) 48px; gap:16px; }
+.viewer::backdrop { background:#111d; }
+.viewer-bar { display:flex; align-items:center; gap:12px; }
+.viewer-bar .count { margin-right:auto; font:500 24px/1 'Barlow Condensed',sans-serif; }
+.viewer-bar .meta { font-size:12px; color:var(--muted); margin-right:16px; }
+.viewer button { height:40px; padding:0 16px; display:grid; place-items:center; background:none; border:1px solid var(--rule); font:500 12px/1 'Noto Sans JP',sans-serif; color:var(--ink); cursor:pointer; white-space:nowrap; }
+.viewer button:hover { color:var(--vermillion); border-color:var(--vermillion); }
+.viewer button[hidden] { display:none; }
+.viewer button.icon { width:44px; height:44px; padding:0; font:400 22px/1 'Barlow Condensed',sans-serif; }
+.viewer-stage { min-height:0; display:grid; grid-template-rows:minmax(0,1fr) auto; gap:12px; margin:0; }
+.viewer-stage img { width:100%; height:100%; object-fit:contain; min-height:0; background:var(--card); }
+.viewer-stage figcaption { text-align:center; font-size:13px; color:var(--muted); }
+.viewer-nav { display:flex; gap:16px; justify-content:center; }
 </style>
 </head>
 <body>
@@ -93,6 +152,8 @@ footer { position:fixed; left:8px; right:0; bottom:0; background:var(--paper); b
       </div>
       <input id="picker" type="file" accept="image/*" multiple hidden>
       <div class="sheet" id="sheet"></div>
+
+      <div class="library" id="library"></div>
     </section>
 
     <section class="panel">
@@ -119,16 +180,37 @@ footer { position:fixed; left:8px; right:0; bottom:0; background:var(--paper); b
   </div>
 </div>
 
+<dialog class="viewer" id="viewer" aria-label="写真ビューアー">
+  <div class="viewer-bar">
+    <span class="count" id="vCount"></span>
+    <span class="meta" id="vMeta"></span>
+    <button type="button" id="vCover">表紙にする</button>
+    <button type="button" id="vRemove">外す</button>
+    <button type="button" id="vAdd">アルバムに追加</button>
+    <button type="button" class="icon" id="vClose" aria-label="閉じる">×</button>
+  </div>
+  <figure class="viewer-stage"><img id="vImage" alt=""><figcaption id="vCaption"></figcaption></figure>
+  <div class="viewer-nav">
+    <button type="button" class="icon" id="vPrev" aria-label="前の写真">←</button>
+    <button type="button" class="icon" id="vNext" aria-label="次の写真">→</button>
+  </div>
+</dialog>
+
 <footer><div class="bar">
-  <span id="status">写真を追加してください。</span>
+  <span id="status">写真を追加するか、下のライブラリから選んでください。</span>
   <span class="meter"><i id="meter"></i></span>
-  <button id="publish" disabled>アップロードして公開</button>
+  <button id="upload" disabled>アップロードのみ</button>
+  <button id="publish" disabled>アルバムを作成</button>
 </div></footer>
 
 <script type="module">
 const $ = id => document.getElementById(id);
-const photos = [];
+const photos = [];   // the sheet: new uploads and library picks, in album order
+let library = [];    // everything ever uploaded, from src/data/photo-library.json
 let cover = null;
+let busy = false;
+const selected = new Set();  // library keys picked for a multi-add
+let lastClicked = null;     // anchor for shift-click ranges
 
 const api = async (path, options) => {
   const response = await fetch(path, options);
@@ -145,6 +227,13 @@ const mode = values => {
   for (const value of values.filter(Boolean)) tally.set(value, (tally.get(value) || 0) + 1);
   return [...tally.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
 };
+const thumbOf = photo => photo.url
+  ? `${new URL(photo.url).origin}/cdn-cgi/image/width=480,format=auto,quality=70${new URL(photo.url).pathname}`
+  : `/api/thumb?id=${photo.id}`;
+const largeOf = photo => photo.url
+  ? `${new URL(photo.url).origin}/cdn-cgi/image/width=1800,format=auto,quality=80${new URL(photo.url).pathname}`
+  : `/api/preview?id=${photo.id}`;
+const dayOf = photo => photo.key?.match(/(\d{4})\/(\d{2})\/(\d{2})\//)?.slice(1).join('-') || photo.exif?.taken || '';
 
 api('/api/config').then(config => {
   $('bucket').textContent = config.bucket;
@@ -171,7 +260,7 @@ async function add(files) {
     try {
       const staged = await api(`/api/stage?name=${encodeURIComponent(file.name)}`, { method: 'POST', body: file });
       photos.push({ ...staged, state: 'ready' });
-    } catch (error) { say(`${error.message}`, true); }
+    } catch (error) { say(error.message, true); }
   }
   photos.sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true }));
   cover ??= photos[0]?.id;
@@ -180,7 +269,105 @@ async function add(files) {
   say(`${photos.length} 枚を読み込みました。位置情報などのメタデータは削除済みです。`);
 }
 
+// --- library ---------------------------------------------------------------
+async function loadLibrary() {
+  library = (await api('/api/library')).photos;
+  renderLibrary();
+}
+
+function pick(entry) {
+  if (photos.some(photo => photo.id === entry.key)) return;
+  photos.push({ id: entry.key, key: entry.key, url: entry.url, name: entry.name, width: entry.width, height: entry.height, exif: entry.exif, state: 'done' });
+  cover ??= entry.key;
+  selected.delete(entry.key);
+}
+
+function pickMany(entries) {
+  entries.forEach(pick);
+  render();
+}
+
+function toggle(entry, free, shift) {
+  // Shift extends from the last clicked tile across the flat library order.
+  if (shift && lastClicked) {
+    const a = free.findIndex(item => item.key === lastClicked), b = free.findIndex(item => item.key === entry.key);
+    if (a >= 0 && b >= 0) {
+      const on = !selected.has(entry.key);
+      for (const item of free.slice(Math.min(a, b), Math.max(a, b) + 1)) on ? selected.add(item.key) : selected.delete(item.key);
+      renderLibrary();
+      return;
+    }
+  }
+  selected.has(entry.key) ? selected.delete(entry.key) : selected.add(entry.key);
+  lastClicked = entry.key;
+  renderLibrary();
+}
+
+function renderLibrary() {
+  const inSheet = new Set(photos.map(photo => photo.id));
+  const free = library.filter(entry => !entry.album && !inSheet.has(entry.key));
+  const used = library.filter(entry => entry.album).length;
+  for (const key of selected) if (!free.some(entry => entry.key === key)) selected.delete(key);
+  const days = new Map();
+  for (const entry of free) {
+    const day = dayOf(entry);
+    if (!days.has(day)) days.set(day, []);
+    days.get(day).push(entry);
+  }
+  const root = $('library');
+  root.replaceChildren();
+  if (!free.length && !used) return;
+
+  const kicker = document.createElement('p');
+  kicker.className = 'kicker';
+  kicker.innerHTML = `03 / ライブラリ <small>アップロード済みでまだアルバムに入っていない写真 ${free.length} 枚</small>`;
+  root.append(kicker);
+
+  const bar = document.createElement('div');
+  bar.className = 'select-bar';
+  bar.hidden = !selected.size;
+  bar.innerHTML = `<b>${selected.size}</b> 枚を選択中
+    <button type="button" class="primary">選択した写真を追加</button>
+    <button type="button" class="clear">選択解除</button>
+    <small>クリックで選択、Shift+クリックで範囲選択</small>`;
+  bar.querySelector('.primary').onclick = () => pickMany(free.filter(entry => selected.has(entry.key)));
+  bar.querySelector('.clear').onclick = () => { selected.clear(); renderLibrary(); };
+  root.append(bar);
+
+  for (const [day, entries] of [...days.entries()].sort((a, b) => b[0].localeCompare(a[0]))) {
+    const block = document.createElement('div');
+    block.className = 'day';
+    const allSelected = entries.every(entry => selected.has(entry.key));
+    block.innerHTML = `<h3>${day || '日付不明'} <small>${entries.length} 枚</small>
+      <button type="button" class="select-day">${allSelected ? 'この日の選択を外す' : 'この日をすべて選択'}</button>
+      <button type="button" class="add-day">この日をすべて追加</button></h3><div class="strip"></div>`;
+    block.querySelector('.select-day').onclick = () => { entries.forEach(entry => allSelected ? selected.delete(entry.key) : selected.add(entry.key)); renderLibrary(); };
+    block.querySelector('.add-day').onclick = () => pickMany(entries);
+    const strip = block.querySelector('.strip');
+    for (const entry of entries) {
+      const tile = document.createElement('figure');
+      tile.className = 'tile' + (selected.has(entry.key) ? ' selected' : '');
+      tile.innerHTML = `<div class="plate"><img src="${thumbOf(entry)}" alt="" loading="lazy"></div>
+        <span class="mark">${selected.has(entry.key) ? '✓' : ''}</span>
+        <button type="button" class="zoom" title="大きく表示">⤢</button>
+        <figcaption>${entry.name}</figcaption>`;
+      tile.querySelector('.plate').onclick = event => toggle(entry, free, event.shiftKey);
+      tile.querySelector('.zoom').onclick = event => { event.stopPropagation(); openViewer('library', free.indexOf(entry)); };
+      strip.append(tile);
+    }
+    root.append(block);
+  }
+  if (used) {
+    const note = document.createElement('p');
+    note.className = 'library-note';
+    note.textContent = `アルバムに入っている ${used} 枚は表示していません。`;
+    root.append(note);
+  }
+}
+
 // --- rendering -------------------------------------------------------------
+const STATE = { ready: '未送信', done: '送信済み', failed: '失敗' };
+
 function render() {
   $('sheet').replaceChildren(...photos.map((photo, index) => {
     const frame = document.createElement('figure');
@@ -190,7 +377,7 @@ function render() {
     frame.dataset.state = photo.state;
     if (photo.id === cover) frame.dataset.cover = '';
     frame.innerHTML = `
-      <div class="plate"><img src="/api/thumb?id=${photo.id}" alt=""></div>
+      <div class="plate"><img src="${thumbOf(photo)}" alt=""></div>
       <figcaption>
         <span class="serial">${String(index + 1).padStart(2, '0')}</span>
         <span class="file">${photo.name}</span>
@@ -199,15 +386,18 @@ function render() {
       <div class="acts">
         <button type="button" class="setcover">${photo.id === cover ? '表紙' : '表紙にする'}</button>
         <button type="button" class="remove">外す</button>
+        <span class="state">${STATE[photo.state] || ''}</span>
       </div>`;
+    frame.querySelector('.plate').onclick = () => openViewer('sheet', index);
     frame.querySelector('.setcover').onclick = () => { cover = photo.id; render(); };
     frame.querySelector('.remove').onclick = () => {
       photos.splice(photos.indexOf(photo), 1);
       if (cover === photo.id) cover = photos[0]?.id ?? null;
-      render(); refresh();
+      render();
     };
     return frame;
   }));
+  renderLibrary();
   refresh();
 }
 
@@ -218,11 +408,15 @@ function refresh() {
     シャッター: mode(photos.map(p => p.exif?.shutter)),
     ISO: mode(photos.map(p => p.exif?.iso)),
   };
-  $('readout').innerHTML = [`<div><span>枚数</span><b>${photos.length}</b></div>`]
-    .concat(Object.entries(exif).filter(([, v]) => v).map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`)).join('');
-  const taken = photos.map(p => p.exif?.taken).filter(Boolean).sort()[0];
+  const pending = photos.filter(photo => photo.state !== 'done').length;
+  $('readout').innerHTML = [
+    `<div><span>枚数</span><b>${photos.length}</b></div>`,
+    pending ? `<div><span>未アップロード</span><b>${pending}</b></div>` : '',
+  ].concat(Object.entries(exif).filter(([, v]) => v).map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`)).join('');
+  const taken = photos.map(p => p.exif?.taken || dayOf(p)).filter(Boolean).sort()[0];
   if (taken && !$('date').value) $('date').value = taken;
-  $('publish').disabled = !(photos.length && $('titleJa').value.trim() && $('date').value && $('slug').value.trim());
+  $('upload').disabled = busy || !pending;
+  $('publish').disabled = busy || !(photos.length && $('titleJa').value.trim() && $('date').value && $('slug').value.trim());
 }
 
 // --- drag & drop -----------------------------------------------------------
@@ -236,10 +430,7 @@ document.addEventListener('dragover', event => event.preventDefault());
 document.addEventListener('drop', event => event.preventDefault());
 
 let dragging = null;
-$('sheet').addEventListener('dragstart', event => {
-  dragging = event.target.closest('.frame');
-  dragging?.classList.add('dragging');
-});
+$('sheet').addEventListener('dragstart', event => { dragging = event.target.closest('.frame'); dragging?.classList.add('dragging'); });
 $('sheet').addEventListener('dragend', () => { dragging?.classList.remove('dragging'); dragging = null; });
 $('sheet').addEventListener('dragover', event => {
   const over = event.target.closest('.frame');
@@ -260,9 +451,7 @@ $('sheet').addEventListener('drop', event => {
 });
 
 // --- form ------------------------------------------------------------------
-for (const id of ['titleJa', 'titleEn', 'locationJa', 'locationEn', 'date', 'slug', 'locationTag', 'collectionTag']) {
-  $(id).addEventListener('input', refresh);
-}
+for (const id of ['titleJa', 'titleEn', 'locationJa', 'locationEn', 'date', 'slug', 'locationTag', 'collectionTag']) $(id).addEventListener('input', refresh);
 $('titleEn').addEventListener('input', () => { if (!$('slug').dataset.touched) $('slug').value = slugify($('titleEn').value); refresh(); });
 $('locationEn').addEventListener('input', () => {
   if (!$('locationTag').dataset.touched) $('locationTag').value = slugify($('locationEn').value);
@@ -271,8 +460,35 @@ $('locationEn').addEventListener('input', () => {
 });
 for (const id of ['slug', 'locationTag', 'collectionTag']) $(id).addEventListener('input', event => { event.target.dataset.touched = '1'; });
 
-// --- publish ---------------------------------------------------------------
-$('publish').onclick = async () => {
+// --- upload & publish ------------------------------------------------------
+async function uploadPending(date) {
+  const pending = photos.filter(photo => photo.state !== 'done');
+  for (const [index, photo] of pending.entries()) {
+    say(`アップロード中 ${index + 1}/${pending.length} — ${photo.name}`);
+    progress(index / pending.length);
+    try {
+      const entry = await api('/api/upload', { method: 'POST', body: JSON.stringify({ id: photo.id, date }) });
+      Object.assign(photo, { key: entry.key, url: entry.url, state: 'done' });
+    } catch (error) { photo.state = 'failed'; render(); throw new Error(`${photo.name}: ${error.message}`); }
+    render();
+  }
+  progress(1);
+  return pending.length;
+}
+
+const guard = async work => {
+  busy = true; refresh();
+  try { await work(); } catch (error) { say(error.message, true); progress(0); }
+  finally { busy = false; refresh(); }
+};
+
+$('upload').onclick = () => guard(async () => {
+  const count = await uploadPending($('date').value || null);
+  await loadLibrary();
+  say(`${count} 枚をアップロードしました。ライブラリに記録したので、あとからアルバムにまとめられます。`);
+});
+
+$('publish').onclick = () => guard(async () => {
   const album = {
     titleJa: $('titleJa').value.trim(), titleEn: $('titleEn').value.trim(),
     locationJa: $('locationJa').value.trim(), locationEn: $('locationEn').value.trim(),
@@ -280,36 +496,75 @@ $('publish').onclick = async () => {
     locationTag: slugify($('locationTag').value), collectionTag: slugify($('collectionTag').value) || slugify($('locationTag').value),
     featured: $('featured').checked,
   };
-  $('publish').disabled = true;
-  try {
-    const { exists, path } = await api('/api/check', { method: 'POST', body: JSON.stringify({ date: album.date, slug: album.slug }) });
-    if (exists && !confirm(`${path} は既にあります。中止しますか？\n\nOK＝中止 / キャンセル＝続行（書き込みは失敗します）`)) throw new Error('中止しました。');
-    if (exists) throw new Error(`既に存在します: ${path}`);
+  const { exists, path } = await api('/api/check', { method: 'POST', body: JSON.stringify({ date: album.date, slug: album.slug }) });
+  if (exists) throw new Error(`既に存在します: ${path} — スラッグを変えてください。`);
 
-    const pending = photos.filter(photo => photo.state !== 'done');
-    for (const [index, photo] of pending.entries()) {
-      say(`アップロード中 ${index + 1}/${pending.length} — ${photo.name}`);
-      progress(index / pending.length);
-      try {
-        await api('/api/upload', { method: 'POST', body: JSON.stringify({ id: photo.id, date: album.date }) });
-        photo.state = 'done';
-      } catch (error) { photo.state = 'failed'; render(); throw new Error(`${photo.name}: ${error.message}`); }
-      render();
-    }
-    progress(1);
+  await uploadPending(album.date);
+  const result = await api('/api/publish', { method: 'POST', body: JSON.stringify({ album, order: photos.map(photo => photo.id), cover }) });
+  photos.length = 0; cover = null;
+  for (const id of ['titleJa', 'titleEn', 'locationJa', 'locationEn', 'date', 'slug', 'locationTag', 'collectionTag']) { $(id).value = ''; delete $(id).dataset.touched; }
+  $('featured').checked = false;
+  await loadLibrary();
+  render();
+  say(`公開しました → ${result.path} ／ <a href="http://localhost:3000/photos/${result.slug}" target="_blank" rel="noreferrer">プレビュー</a>（npm run dev）`);
+});
 
-    const result = await api('/api/publish', {
-      method: 'POST',
-      body: JSON.stringify({ album, order: photos.map(photo => photo.id), cover }),
-    });
-    say(`公開しました → ${result.path} ／ <a href="http://localhost:3000/photos/${result.slug}" target="_blank" rel="noreferrer">プレビュー</a>（npm run dev）`);
-  } catch (error) {
-    say(error.message, true);
-    progress(0);
-  } finally {
-    refresh();
-  }
+// --- viewer ----------------------------------------------------------------
+// Browses either the sheet (album order) or the free library photos.
+const viewer = { source: 'sheet', index: 0 };
+const viewerList = () => viewer.source === 'sheet'
+  ? photos
+  : library.filter(entry => !entry.album && !photos.some(photo => photo.id === entry.key));
+
+function showViewer(index) {
+  const list = viewerList();
+  if (!list.length) return $('viewer').close();
+  viewer.index = (index + list.length) % list.length;
+  const photo = list[viewer.index];
+  $('vImage').src = largeOf(photo);
+  $('vImage').alt = photo.name;
+  $('vCaption').textContent = photo.name;
+  $('vCount').textContent = `${String(viewer.index + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}`;
+  const exif = photo.exif || {};
+  $('vMeta').textContent = [`${photo.width}×${photo.height}`, exif.camera, exif.aperture, exif.shutter, exif.iso && `ISO ${exif.iso}`, exif.taken].filter(Boolean).join('  ·  ');
+  const inSheet = viewer.source === 'sheet';
+  $('vCover').hidden = !inSheet;
+  $('vRemove').hidden = !inSheet;
+  $('vAdd').hidden = inSheet;
+  $('vCover').textContent = inSheet && (photo.id === cover) ? '表紙' : '表紙にする';
+  $('vPrev').hidden = $('vNext').hidden = list.length < 2;
+}
+
+function openViewer(source, index) {
+  viewer.source = source;
+  showViewer(index);
+  if (!$('viewer').open) $('viewer').showModal();
+}
+
+$('vClose').onclick = () => $('viewer').close();
+$('vPrev').onclick = () => showViewer(viewer.index - 1);
+$('vNext').onclick = () => showViewer(viewer.index + 1);
+$('vCover').onclick = () => { cover = photos[viewer.index]?.id ?? cover; render(); showViewer(viewer.index); };
+$('vRemove').onclick = () => {
+  const photo = photos[viewer.index];
+  if (!photo) return;
+  photos.splice(viewer.index, 1);
+  if (cover === photo.id) cover = photos[0]?.id ?? null;
+  render();
+  showViewer(viewer.index);
 };
+$('vAdd').onclick = () => {
+  const entry = viewerList()[viewer.index];
+  if (entry) { pick(entry); render(); }
+  showViewer(viewer.index);  // the list shrank; stay in place to keep browsing
+};
+$('viewer').addEventListener('click', event => { if (event.target === $('viewer')) $('viewer').close(); });
+$('viewer').addEventListener('keydown', event => {
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); showViewer(viewer.index + (event.key === 'ArrowLeft' ? -1 : 1)); }
+});
+$('viewer').addEventListener('close', () => { $('vImage').src = ''; });
+
+loadLibrary();
 </script>
 </body>
 </html>

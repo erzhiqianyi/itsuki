@@ -2,7 +2,7 @@
 // and render the album front matter. Used by photo-import.mjs and photo-studio.mjs.
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile, readFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -15,8 +15,8 @@ export const ROOT = path.resolve(import.meta.dirname, '..');
 export const ENV_FILE = path.join(ROOT, '.env');
 if (existsSync(ENV_FILE)) process.loadEnvFile(ENV_FILE);
 
-export const BUCKET = process.env.R2_BUCKET || 'itsuki-photos';
-export const HOST = process.env.PHOTO_CDN_HOST || 'img.erzhiqian.cc';
+export const BUCKET = process.env.R2_BUCKET || 'blog-image';
+export const HOST = process.env.PHOTO_CDN_HOST || 'blog.image.erzhiqian.cc';
 export const PREFIX = process.env.R2_PREFIX || 'photos';
 export const SOURCES = new Set(['.jpg', '.jpeg', '.png', '.webp', '.tif', '.tiff', '.heic', '.heif']);
 
@@ -117,6 +117,46 @@ export async function preflight() {
   }
 }
 
+// --- library ---------------------------------------------------------------
+// Every upload is recorded here with the width/height/EXIF that the bucket no longer
+// carries (metadata is stripped before upload), so albums can be assembled later.
+export const LIBRARY_FILE = path.join(ROOT, 'src/data/photo-library.json');
+
+export async function loadLibrary() {
+  try { return JSON.parse(await readFile(LIBRARY_FILE, 'utf8')).photos || []; }
+  catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+}
+
+async function saveLibrary(photos) {
+  photos.sort((a, b) => (a.key < b.key ? -1 : a.key > b.key ? 1 : 0));
+  const temp = `${LIBRARY_FILE}.tmp`;
+  await mkdir(path.dirname(LIBRARY_FILE), { recursive: true });
+  await writeFile(temp, JSON.stringify({ photos }, null, 2) + '\n');
+  await rename(temp, LIBRARY_FILE);
+}
+
+export async function recordUpload(photo) {
+  const photos = await loadLibrary();
+  const entry = {
+    key: photo.key, url: photo.url, name: photo.name,
+    width: photo.width, height: photo.height,
+    exif: Object.fromEntries(Object.entries(photo.exif || {}).filter(([, v]) => v)),
+    uploadedAt: new Date().toISOString(),
+    album: null,
+  };
+  const index = photos.findIndex(item => item.key === photo.key);
+  if (index >= 0) entry.album = photos[index].album, photos[index] = entry; else photos.push(entry);
+  await saveLibrary(photos);
+  return entry;
+}
+
+export async function assignAlbum(keys, album) {
+  const photos = await loadLibrary();
+  const wanted = new Set(keys);
+  for (const photo of photos) if (wanted.has(photo.key)) photo.album = album;
+  await saveLibrary(photos);
+}
+
 // --- front matter ----------------------------------------------------------
 const quote = value => `"${String(value ?? '').replace(/(["\\])/g, '\\$1')}"`;
 
@@ -159,9 +199,12 @@ export function frontMatter(album, photos) {
 export const albumPath = (date, slug) =>
   path.join(ROOT, 'src/content/photos', date.slice(0, 4), date.slice(5, 7), `${date.slice(8, 10)}_${slug}.md`);
 
+export const albumSlug = (date, slug) => `${date.slice(0, 4)}/${date.slice(5, 7)}/${date.slice(8, 10)}_${slug}`;
+
 export async function writeAlbum(album, photos) {
   const target = albumPath(album.date, album.slug);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, frontMatter(album, photos), { flag: 'wx' });
+  await assignAlbum(photos.map(photo => photo.key), albumSlug(album.date, album.slug));
   return target;
 }

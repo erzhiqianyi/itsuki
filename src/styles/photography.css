@@ -39,7 +39,17 @@
 .contact-print img[hidden], .photo-unavailable[hidden] { display:none; }
 .contact-print figcaption { display:flex; gap:12px; align-items:center; font-size:11px; color:var(--muted); padding:10px 0; border-bottom:1px solid var(--rule); }
 .contact-print figcaption > span:first-child { color:var(--vermillion); font-variant-numeric:tabular-nums; }
-.contact-print figcaption svg { margin-left:auto; width:14px; height:14px; }
+.contact-print figcaption svg { margin-left:auto; width:14px; height:14px; flex-shrink:0; }
+.contact-print[hidden] { display:none; }
+.contact-print-title { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.contact-print-title small { font-size:10px; color:var(--vermillion); letter-spacing:.04em; }
+.contact-print-tags { display:flex; flex-wrap:wrap; gap:4px; margin-left:auto; }
+.contact-print-tags em { font-style:normal; font-size:10px; padding:1px 6px; border:1px solid var(--rule); border-radius:999px; white-space:nowrap; }
+.contact-print-tags + svg { margin-left:0; }
+.contact-filters { margin-bottom:28px; }
+.contact-filters button { font:inherit; font-size:13px; color:inherit; background:none; border:0; border-bottom:2px solid transparent; padding:5px 0; cursor:pointer; }
+.contact-filters button[aria-pressed="true"] { color:var(--vermillion); border-bottom-color:var(--vermillion); }
+.contact-filters-count { margin:0; font-size:11px; color:var(--muted); min-height:1em; }
 .photo-unavailable { display:grid; place-items:center; min-height:180px; background:#edefeb; font-size:13px; }
 .album-adjacent { display:grid; grid-template-columns:1fr 1fr; gap:28px; border-block:1px solid var(--rule); margin-top:32px; padding:24px 0; }
 .album-adjacent a { display:flex; gap:16px; align-items:center; font-size:16px; }

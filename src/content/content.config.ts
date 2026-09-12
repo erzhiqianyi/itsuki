@@ -42,7 +42,9 @@ const photos = defineCollection({
             url: z.string(),
             width: z.number().optional(),  // 可选，但在代码中最好有回退值
             height: z.number().optional(), // 可选
-            title: z.string().optional()
+            title: z.string().optional(),
+            location: z.string().optional(),          // 写真ごとの場所（例: 男木島）
+            tags: z.array(z.string()).default([])     // 写真ごとの被写体タグ（例: 猫, 花火, 富士山）
         })).optional()
     }),
 });

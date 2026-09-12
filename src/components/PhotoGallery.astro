@@ -5,12 +5,41 @@ const { images, albumTitle } = Astro.props;
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const previews = await Promise.all(images.map(photo => photoPreview(photo)));
 const viewerImages = await Promise.all(images.map(photo => photoPreview(photo,1920)));
+// Per-photo place and subject tags (optional in front matter) drive the filter bar and the captions.
+const unique = values => [...new Set(values.filter(Boolean))];
+const places = unique(images.map(photo => photo.location));
+const tags = unique(images.flatMap(photo => photo.tags || []));
+const caption = photo => [locale(photo.title), photo.location].filter(Boolean).join(' — ') || albumTitle;
 ---
-<div class="photo-contact-sheet" style={`--photo-columns:${Math.min(images.length,3) || 1}`}>{images.map((photo,index) => <figure class="contact-print"><a href={photo.url} data-photo-open data-viewer-src={viewerImages[index].src} data-caption={locale(photo.title) || albumTitle} aria-label={`写真 ${index + 1} を拡大`}><img {...previews[index]} alt={locale(photo.title) || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" /><span class="photo-unavailable" hidden>画像を読み込めません</span></a><figcaption><span>{String(index + 1).padStart(2,'0')}</span><span>{locale(photo.title)}</span><Icon name="lucide:plus" /></figcaption></figure>)}</div>
+{(places.length > 1 || tags.length > 0) && <nav class="photo-filters contact-filters" aria-label="写真の絞り込み">{places.length > 1 && <div><span>PLACE</span><button type="button" data-filter="place" data-value="" aria-pressed="true">すべて</button>{places.map(place => <button type="button" data-filter="place" data-value={place} aria-pressed="false">{place}</button>)}</div>}{tags.length > 0 && <div><span>TAG</span><button type="button" data-filter="tag" data-value="" aria-pressed="true">すべて</button>{tags.map(tag => <button type="button" data-filter="tag" data-value={tag} aria-pressed="false">{tag}</button>)}</div>}<p class="contact-filters-count" data-filter-count aria-live="polite"></p></nav>}
+<div class="photo-contact-sheet" style={`--photo-columns:${Math.min(images.length,3) || 1}`}>{images.map((photo,index) => <figure class="contact-print" data-place={photo.location || ''} data-tags={(photo.tags || []).join('|')}><a href={photo.url} data-photo-open data-viewer-src={viewerImages[index].src} data-caption={caption(photo)} aria-label={`写真 ${index + 1} を拡大`}><img {...previews[index]} alt={locale(photo.title) || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" /><span class="photo-unavailable" hidden>画像を読み込めません</span></a><figcaption><span>{String(index + 1).padStart(2,'0')}</span><span class="contact-print-title">{locale(photo.title)}{photo.location && <small>{photo.location}</small>}</span>{photo.tags?.length > 0 && <span class="contact-print-tags">{photo.tags.map(tag => <em>{tag}</em>)}</span>}<Icon name="lucide:plus" /></figcaption></figure>)}</div>
 <dialog class="photo-viewer" aria-label="写真ビューアー"><div class="viewer-bar"><span data-viewer-count aria-live="polite"></span><a data-viewer-original target="_blank" rel="noreferrer" aria-label="原寸画像を開く" title="原寸画像を開く"><Icon name="lucide:external-link" /></a><button type="button" data-viewer-close aria-label="閉じる" title="閉じる"><Icon name="lucide:x" /></button></div><figure class="viewer-stage"><img data-viewer-image alt="" /><figcaption data-viewer-caption></figcaption></figure><div class="viewer-navigation"><button type="button" data-viewer-prev aria-label="前の写真" title="前の写真"><Icon name="lucide:arrow-left" /></button><button type="button" data-viewer-next aria-label="次の写真" title="次の写真"><Icon name="lucide:arrow-right" /></button></div></dialog>
 <script>
-  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-photo-open]'));
+  const allLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-photo-open]'));
+  let links = allLinks;
   const dialog = document.querySelector<HTMLDialogElement>('.photo-viewer');
+  const filters = document.querySelector<HTMLElement>('.contact-filters');
+  if (filters) {
+    const prints = Array.from(document.querySelectorAll<HTMLElement>('.contact-print'));
+    const count = filters.querySelector<HTMLElement>('[data-filter-count]')!;
+    const active = { place: '', tag: '' };
+    const apply = () => {
+      let shown = 0;
+      prints.forEach(print => {
+        const match = (!active.place || print.dataset.place === active.place) && (!active.tag || (print.dataset.tags || '').split('|').includes(active.tag));
+        print.hidden = !match;
+        if (match) shown++;
+      });
+      links = allLinks.filter(link => !link.closest<HTMLElement>('.contact-print')!.hidden);
+      count.textContent = active.place || active.tag ? `${shown} / ${prints.length} PHOTOS` : '';
+    };
+    filters.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button => button.addEventListener('click', () => {
+      const kind = button.dataset.filter as 'place' | 'tag';
+      active[kind] = button.dataset.value || '';
+      filters.querySelectorAll<HTMLButtonElement>(`[data-filter="${kind}"]`).forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+      apply();
+    }));
+  }
   if (dialog) {
     const image = dialog.querySelector<HTMLImageElement>('[data-viewer-image]')!;
     const caption = dialog.querySelector<HTMLElement>('[data-viewer-caption]')!;
@@ -28,8 +57,8 @@ const viewerImages = await Promise.all(images.map(photo => photoPreview(photo,19
       original.href = links[index].href;
       previous.hidden = next.hidden = links.length < 2;
     };
-    links.forEach((link,i) => {
-      link.addEventListener('click', event => { event.preventDefault(); show(i); dialog.showModal(); });
+    allLinks.forEach(link => {
+      link.addEventListener('click', event => { event.preventDefault(); show(links.indexOf(link)); dialog.showModal(); });
       const thumbnail = link.querySelector('img')!;
       const failed = () => { thumbnail.hidden = true; link.querySelector<HTMLElement>('.photo-unavailable')!.hidden = false; };
       thumbnail.addEventListener('error',failed);
