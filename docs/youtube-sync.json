@@ -1,8 +1,20 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-09-08",
+  "checkedAt": "2026-09-13",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "QF6k-zsOyA4",
+      "date": "2026-09-12T19:52:01+09:00",
+      "title": "生活費が下ろせない…異国で突然カードを止められた週末",
+      "duration": "16:50"
+    },
+    {
+      "id": "giK2L_yQO5k",
+      "date": "2026-09-09T19:27:51+09:00",
+      "title": "雨の東京を歩きながら話す、無料日本語教室とこれからの就活",
+      "duration": "16:13"
+    },
     {
       "id": "Mh3s-v7WfR0",
       "date": "2026-09-07T22:54:16+09:00",
