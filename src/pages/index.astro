@@ -163,9 +163,10 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   }
   @media(max-width:760px) {
     .masthead { grid-template-columns:1fr; gap:24px; padding-bottom:24px; }
-    .brand-lockup { justify-content:space-between; gap:6px; } .masthead-name { font-size:112px; } .vertical-brand { font-size:11px; max-height:120px; }
-    .masthead-intro { display:grid; grid-template-columns:1fr auto; } .masthead-intro h2 { font-size:17px; margin-bottom:8px; grid-column:1/-1; }
-    .masthead-intro p { font-size:13px; } .masthead-intro p br { display:none; } .now-link { align-self:end; margin-left:14px; }
+    .brand-lockup { justify-content:space-between; gap:6px; } .masthead-name { font-size:clamp(112px,32vw,136px); } .vertical-brand { display:none; }
+    .masthead-intro h2 { font-size:17px; margin-bottom:8px; }
+    .masthead-intro p { font-size:13px; line-height:1.9; } .masthead-intro p br { display:none; }
+    .intro-links { gap:0 22px; } .now-link { margin-top:12px; }
     .edition-stats { grid-template-columns:repeat(3,minmax(0,1fr)); }
     .edition-stats dd { font-size:31px; } .edition-stats dt { font-size:11px; }
     .chapter-index { grid-template-columns:1fr 1fr; margin-bottom:26px; }
