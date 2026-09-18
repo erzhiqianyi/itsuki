@@ -5,7 +5,7 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/EuFJzBWUWlY.jpg"
-"title": "#5 期末試験が終わった日、荒川を歩きながら"
+"title": "#5 来日して半年。語学学校の期末テストが終わった日の荒川散歩"
 "tags":
  - "やさしい日本語"
  - "話しことば"
