@@ -100,8 +100,16 @@
       "body": "离线优先的 iPhone 铁路旅行 App，提供行程时间线、离线路线图、GPS 到站提醒和本地旅行日记。支持中日英三语，无账号、无广告，数据默认留在设备上。"
     },
     {
+      "id": "career",
+      "body": "把在日求职的公司记录、应聘材料准备和面试练习整合在一起的 Web 应用。前端使用 React + Vite，API 基于 Cloudflare Workers 与 D1，通过 Firebase 实现 Google 登录，并借助 MCP 让 AI Agent 协助公司调研和材料修改。"
+    },
+    {
       "id": "jlpt",
       "body": "通过 MCP 与 Codex、Claude Code 等 AI Agent 交互，将学习对话中的词汇、语法和疑问整理、保存为结构化的个人学习知识库。让知识在对话之外持续积累，并用于生成 JLPT 复习卡组和练习，支持多语言界面与学习记录。"
+    },
+    {
+      "id": "mcp-app-server",
+      "body": "把现有 Web 应用变成受 OAuth 2.1 保护的 MCP 服务器的 TypeScript 库。通过一个身份函数接入 Firebase、Supabase、Auth0 等既有认证，提供 PKCE、动态客户端注册、刷新令牌轮换与撤销、带权限范围的工具和用户同意界面。支持 Node.js、Cloudflare Workers、Deno、Bun，已发布到 npm。"
     },
     {
       "id": "haiku",

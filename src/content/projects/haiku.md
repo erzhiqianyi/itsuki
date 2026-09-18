@@ -5,7 +5,7 @@ description: "街角の光、風、日々の気配を、一句ずつ。静かに
 kind: "Web · 俳句を読む"
 href: "https://haiku.erzhiqian.cc/"
 icon: "feather"
-order: 3
+order: 4
 action: "句帖を開く"
 ---
 

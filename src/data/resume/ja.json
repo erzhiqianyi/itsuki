@@ -100,8 +100,16 @@
       "body": "オフライン優先の iPhone 鉄道旅行アプリ。行程タイムライン、オフライン路線図、GPS 到着リマインダー、ローカル旅行日記。中・日・英の3言語に対応し、アカウント不要・広告なし・データは端末内に置く設計。"
     },
     {
+      "id": "career",
+      "body": "日本での就職活動を、企業ごとの記録・応募書類の準備・面接の練習としてひとつにまとめる Web アプリ。React + Vite のフロントエンドに Cloudflare Workers と D1 の API、Firebase による Google ログインを組み合わせ、MCP 経由で AI エージェントから企業調査や書類の推敲を行える設計。"
+    },
+    {
       "id": "jlpt",
       "body": "MCP を通じて Codex・Claude Code などの AI エージェントと連携し、学習中の会話に出てきた語彙・文法・疑問を整理して個人の学習ナレッジベースに保存。会話を越えて知識を蓄積し、JLPT の復習カードや練習問題に活用する Web アプリ。多言語表示と学習記録に対応。"
+    },
+    {
+      "id": "mcp-app-server",
+      "body": "既存の Web アプリを OAuth 2.1 で保護された MCP サーバーにするための TypeScript ライブラリ。Firebase・Supabase・Auth0 などの既存認証を一つの関数でつなぎ、PKCE・動的クライアント登録・トークンの更新と失効、スコープ付きツールと同意画面までを提供。Node.js に加え Cloudflare Workers・Deno・Bun で動作し、npm で公開。"
     },
     {
       "id": "haiku",

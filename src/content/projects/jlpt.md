@@ -5,7 +5,7 @@ description: "わからなかった言葉や文法を記録して、自分のた
 kind: "Web App · GitHub"
 href: "https://github.com/erzhiqianyi/jlpt-master-deck"
 icon: "book-open"
-order: 4
+order: 5
 action: "GitHub で見る"
 ---
 

@@ -100,8 +100,16 @@
       "body": "An offline-first iPhone railway-travel app with itinerary timelines, offline route maps, GPS arrival reminders, and local travel journals. Trilingual, no account, no ads, data stays on the device."
     },
     {
+      "id": "career",
+      "body": "A web app that brings a Japanese job search into one place: notes per company, application documents, and interview practice. React + Vite on the front end, a Cloudflare Workers + D1 API, Google sign-in via Firebase, and MCP so AI agents can help with company research and document review."
+    },
+    {
       "id": "jlpt",
       "body": "A web app that connects with AI agents such as Codex and Claude Code through MCP, organising vocabulary, grammar and questions from study conversations into a structured personal learning knowledge base. Preserves knowledge beyond individual chats and uses it to generate JLPT review cards and exercises, with multilingual support and study records."
+    },
+    {
+      "id": "mcp-app-server",
+      "body": "A TypeScript library that turns an existing web app into an OAuth 2.1-protected MCP server. Plugs in existing auth (Firebase, Supabase, Auth0, …) through a single identity function and provides PKCE, dynamic client registration, refresh-token rotation and revocation, scoped tools and a consent UI. Runs on Node.js, Cloudflare Workers, Deno and Bun, published on npm."
     },
     {
       "id": "haiku",
