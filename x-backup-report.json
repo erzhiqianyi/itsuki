@@ -1,49 +1,21 @@
 {
   "profile": "itsuki_maer",
-  "capturedAt": "2026-09-17T23:26:06.711Z",
-  "ownPosts": 415,
-  "days": 73,
+  "capturedAt": "2026-09-18T21:28:12.364Z",
+  "ownPosts": 420,
+  "days": 74,
   "dateFrom": "2026-07-04",
-  "dateTo": "2026-09-17",
-  "profileCount": 416,
+  "dateTo": "2026-09-18",
+  "profileCount": 420,
   "reposts": [
     {
-      "url": "https://x.com/kamakura_kyokai/status/2075476670237077593",
-      "date": "2026-07-10T07:06:13.000Z",
-      "text": "第78回鎌倉花火大会 実施内容変更のお知らせ\n\n本日開催を予定しておりました第78回鎌倉花火大会は、高波の影響により花火打ち上げ台船の出港を断念したため、予定していた通常プログラムの実施を取りやめることとしました。",
-      "images": [],
-      "links": [
-        {
-          "href": "/itsuki_maer",
-          "text": "You reposted"
-        },
-        {
-          "href": "/kamakura_kyokai",
-          "text": ""
-        },
-        {
-          "href": "/kamakura_kyokai",
-          "text": "鎌倉市観光協会"
-        },
-        {
-          "href": "/kamakura_kyokai",
-          "text": "@kamakura_kyokai"
-        },
-        {
-          "href": "/kamakura_kyokai/status/2075476670237077593",
-          "text": "Jul 10"
-        },
-        {
-          "href": "/kamakura_kyokai/status/2075476670237077593/analytics",
-          "text": "945K"
-        }
-      ],
-      "quoteTexts": [],
-      "context": "You reposted",
-      "note": "Repost timestamp not exposed by X; original post publish time shown, not repost time."
+      "note": "Observed in profile Reposts tab; repost time not exposed.",
+      "originalPublishedAt": "2026-07-10T07:06:13.000Z",
+      "repostedAt": null,
+      "sourceUrl": "https://x.com/kamakura_kyokai/status/2075476670237077593",
+      "type": "repost"
     }
   ],
-  "imagesSaved": 548,
+  "imagesSaved": 550,
   "imageFailures": [],
   "officialArchive": false,
   "videoFilesSaved": 0,
