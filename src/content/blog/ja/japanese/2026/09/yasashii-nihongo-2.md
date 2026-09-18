@@ -652,4 +652,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo">前回 · #2 GPT-6で焦った週末</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo">前回 · #2 GPT-6で焦った週末</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-4">次回 · #4 生活費が下ろせない…カードを止められた週末</a></nav>
