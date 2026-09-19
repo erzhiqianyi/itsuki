@@ -542,4 +542,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-4">前回 · #4 生活費が下ろせない…カードを止められた週末</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-6">次回 · #6 寮の人と、日本語で話せた日</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-4">前回 · #4 生活費が下ろせない…カードを止められた週末</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-6">次回 · #6 来日して半年。偶然の雑談で日本語の上達を実感した連休前の散歩</a></nav>

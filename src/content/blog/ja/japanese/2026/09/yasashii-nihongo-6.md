@@ -5,7 +5,7 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/Hj5gj8_wfZs.jpg"
-"title": "#6 寮の人と、日本語で話せた日"
+"title": "#6 来日して半年。偶然の雑談で日本語の上達を実感した連休前の散歩"
 "tags":
  - "やさしい日本語"
  - "話しことば"
