@@ -1,8 +1,14 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-09-13",
+  "checkedAt": "2026-09-20",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "EuFJzBWUWlY",
+      "date": "2026-09-18T09:37:01+09:00",
+      "title": "来日して半年。語学学校の期末テストが終わった日の荒川散歩",
+      "duration": "21:38"
+    },
     {
       "id": "QF6k-zsOyA4",
       "date": "2026-09-12T19:52:01+09:00",
