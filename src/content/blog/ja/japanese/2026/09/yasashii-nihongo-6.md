@@ -488,4 +488,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-5">前回 · #5 来日して半年。期末テストが終わった日の荒川散歩</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-5">前回 · #5 来日して半年。期末テストが終わった日の荒川散歩</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-7">次回 · #7 連休初日、巾着田の彼岸花と日和田山</a></nav>
