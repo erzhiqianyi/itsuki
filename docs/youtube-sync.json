@@ -1,8 +1,20 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-09-20",
+  "checkedAt": "2026-09-21",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "ILakNfrur5k",
+      "date": "2026-09-20T15:03:58+09:00",
+      "title": "来日して半年。一面の曼珠沙華と日和田山を歩いた秋の休日",
+      "duration": "5:25"
+    },
+    {
+      "id": "Hj5gj8_wfZs",
+      "date": "2026-09-20T06:33:41+09:00",
+      "title": "来日して半年。偶然の雑談で日本語の上達を実感した連休前の散歩",
+      "duration": "14:34"
+    },
     {
       "id": "EuFJzBWUWlY",
       "date": "2026-09-18T09:37:01+09:00",
