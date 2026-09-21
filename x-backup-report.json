@@ -1,11 +1,11 @@
 {
-  "profile": "https://x.com/itsuki_maer",
-  "capturedAt": "2026-09-21T00:00:00.000Z",
-  "ownPosts": 432,
-  "days": 76,
+  "profile": "itsuki_maer",
+  "capturedAt": "2026-09-21T22:32:14.315Z",
+  "ownPosts": 434,
+  "days": 77,
   "dateFrom": "2026-07-04",
-  "dateTo": "2026-09-20",
-  "profileCount": 432,
+  "dateTo": "2026-09-21",
+  "profileCount": 434,
   "reposts": [
     {
       "type": "repost",
@@ -15,7 +15,7 @@
       "note": "Observed in profile Reposts tab; repost time not exposed."
     }
   ],
-  "imagesSaved": 577,
+  "imagesSaved": 527,
   "imageFailures": [],
   "officialArchive": false,
   "videoFilesSaved": 0,
