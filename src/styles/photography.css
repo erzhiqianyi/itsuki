@@ -17,9 +17,10 @@
 .photo-filters-more:hover { color:var(--vermillion); }
 .photo-filters-more svg { width:12px; height:12px; transition:transform .2s; }
 .photo-filters-more[aria-expanded="true"] svg { transform:rotate(180deg); }
-.photo-filters-sort { margin-left:auto; display:flex; gap:16px; }
-.photo-filters-sort button { font:inherit; background:none; border-top:0; border-left:0; border-right:0; color:var(--muted); cursor:pointer; }
+.photo-filters-sort { margin-left:auto; display:flex; gap:8px; }
+.photo-filters-sort button { display:flex; font:inherit; background:none; border-top:0; border-left:0; border-right:0; color:var(--muted); cursor:pointer; }
 .photo-filters-sort button:hover { color:var(--ink); }
+.photo-filters-sort svg { width:16px; height:16px; }
 .album-index { display:grid; grid-template-columns:repeat(3,1fr); gap:28px 24px; margin-top:20px; }
 .tag-grid-caption { font-size:11px; color:var(--muted); margin:20px 0 16px; }
 .album-sheet { min-width:0; }

@@ -6,6 +6,9 @@ title:
 location:
   ja: "足立区"
   en: "Adachi"
+country:
+  ja: 日本
+  en: Japan
 cover: "https://blog.image.erzhiqian.cc/photos/2026/05/30/DSC05807.jpg"
 images:
   - url: "https://blog.image.erzhiqian.cc/photos/2026/05/30/DSC05807.jpg"
@@ -109,7 +112,7 @@ images:
     height: 2583
     tags: ["花火", "人物"]
 date: "2026-05-30"
-location_tag: "adachi"
+country_tag: japan
 year_tag: "2026"
 collection_tag: "firework"
 featured: false
@@ -120,3 +123,5 @@ exif:
   shutter: "5s"
   iso: "50"
 ---
+
+夜空いっぱいに打ち上がる大輪の花火を、ただ眺めた一夜ーー足立区花火大会の記録。

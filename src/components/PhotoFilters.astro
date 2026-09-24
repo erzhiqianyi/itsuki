@@ -1,21 +1,31 @@
 ---
-// Shared masthead + YEAR/PLACE/TAG filter bar for the album index and the
-// cross-album TAG photo view, so both stay visually and behaviorally in sync.
+// Shared masthead + YEAR/COUNTRY/PLACE/TAG filter bar for the album index and
+// the cross-album TAG photo view, so both stay visually and behaviorally in sync.
 import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 const { tag, sortable = true } = Astro.props;
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
-const all = await getCollection('photos'); // locked albums still count toward YEAR/PLACE/totals — only their photos are hidden from TAG
+const all = await getCollection('photos'); // locked albums still count toward YEAR/COUNTRY/totals — only their photos are hidden from PLACE/TAG
 const visible = all.filter(p => !p.data.locked);
 const years = [...new Set(all.map(p => p.data.year_tag).filter(Boolean))].sort().reverse();
-const places = [...new Map(all.filter(p => p.data.location_tag).map(p => [p.data.location_tag, locale(p.data.location)])).entries()];
-// Locked albums' photo tags are excluded — otherwise a TAG link could lead to an empty page
-// while quietly confirming a locked album contains that subject.
-const contentTags = [...new Set(visible.flatMap(p => p.data.images?.flatMap(photo => photo.tags || []) || []))].sort((a,b) => a.localeCompare(b,'ja'));
+const countries = [...new Map(all.filter(p => p.data.country_tag).map(p => [p.data.country_tag, locale(p.data.country)])).entries()];
+// Once a COUNTRY is active, PLACE and TAG below it scope down to that country's
+// own photos instead of listing every place/subject site-wide — "すべて" on
+// either row then clears back to the country, not all the way out to /photos.
+const activeCountry = countries.find(([key]) => key === tag)?.[0] ?? null;
+const scopeHref = activeCountry ? `/photos/tags/${activeCountry}/1` : '/photos';
+const scoped = activeCountry ? visible.filter(p => p.data.country_tag === activeCountry) : visible;
+// Locked albums' photo tags/places are excluded — otherwise a link could lead to an
+// empty page while quietly confirming a locked album contains that subject/place.
+// PLACE is keyed by each photo's own location (falling back to the album's location
+// when a photo doesn't set one), so a multi-city trip splits into its real stops
+// instead of being filed under one collective location.
+const places = [...new Set(scoped.flatMap(p => (p.data.images || []).map(photo => photo.location || locale(p.data.location))).filter(Boolean))].sort((a,b) => a.localeCompare(b,'ja'));
+const contentTags = [...new Set(scoped.flatMap(p => p.data.images?.flatMap(photo => photo.tags || []) || []))].sort((a,b) => a.localeCompare(b,'ja'));
 const totalPhotos = all.reduce((n,p) => n + (p.data.images?.length || (p.data.cover ? 1 : 0)),0);
 ---
 <header class="photo-masthead"><h1 class="photo-wordmark">PHOTOGRAPHS<span>写真</span></h1><dl class="photo-totals"><div><dt>アルバム</dt><dd>{all.length.toString().padStart(2,'0')}</dd></div><div><dt>写真</dt><dd>{totalPhotos}</dd></div></dl></header>
-<nav class="photo-filters" aria-label="写真の絞り込み"><div><span>YEAR</span><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{years.map(year => <a href={`/photos/tags/${year}/1`} aria-current={tag === year ? 'page' : undefined}>{year}</a>)}{sortable && <div class="photo-filters-sort" role="group" aria-label="並び順"><button type="button" data-sort="desc" aria-current="page">NEWEST FIRST</button><button type="button" data-sort="asc">OLDEST FIRST</button></div>}</div><div><span>PLACE</span><div class="photo-filters-clamp" data-clamp-list><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{places.map(([key,label]) => <a href={`/photos/tags/${key}/1`} aria-current={tag === key ? 'page' : undefined}>{label}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div><div><span>TAG</span><div class="photo-filters-clamp" data-clamp-list><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{contentTags.map(t => <a href={`/photos/tags/${t}/1`} aria-current={tag === t ? 'page' : undefined}>{t}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div></nav>
+<nav class="photo-filters" aria-label="写真の絞り込み"><div><span>YEAR</span><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{years.map(year => <a href={`/photos/tags/${year}/1`} aria-current={tag === year ? 'page' : undefined}>{year}</a>)}{sortable && <div class="photo-filters-sort" role="group" aria-label="並び順"><button type="button" data-sort="desc" aria-current="page" aria-label="新しい順" title="新しい順"><Icon name="lucide:arrow-down-wide-narrow" /></button><button type="button" data-sort="asc" aria-label="古い順" title="古い順"><Icon name="lucide:arrow-up-narrow-wide" /></button></div>}</div><div><span>COUNTRY</span><div class="photo-filters-clamp" data-clamp-list><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{countries.map(([key,label]) => <a href={`/photos/tags/${key}/1`} aria-current={tag === key ? 'page' : undefined}>{label}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div><div><span>PLACE</span><div class="photo-filters-clamp" data-clamp-list><a href={scopeHref} aria-current={(!tag || tag === activeCountry) ? 'page' : undefined}>すべて</a>{places.map(place => <a href={`/photos/tags/${place}/1`} aria-current={tag === place ? 'page' : undefined}>{place}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div><div><span>TAG</span><div class="photo-filters-clamp" data-clamp-list><a href={scopeHref} aria-current={(!tag || tag === activeCountry) ? 'page' : undefined}>すべて</a>{contentTags.map(t => <a href={`/photos/tags/${t}/1`} aria-current={tag === t ? 'page' : undefined}>{t}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div></nav>
 <script>
   document.querySelectorAll<HTMLElement>('[data-clamp-list]').forEach(list => {
     const toggle = list.parentElement?.querySelector<HTMLButtonElement>('[data-clamp-toggle]');

@@ -6,6 +6,9 @@ title:
 location:
   ja: "葛西臨海公園"
   en: "Kasai Rinkai Park"
+country:
+  ja: 日本
+  en: Japan
 cover: "https://blog.image.erzhiqian.cc/photos/2026/05/10/DSC05377.jpg"
 images:
   - url: "https://blog.image.erzhiqian.cc/photos/2026/05/10/DSC05377.jpg"
@@ -41,7 +44,7 @@ images:
     height: 3609
     tags: ["観覧車", "夕焼け"]
 date: "2026-05-10"
-location_tag: "kasai"
+country_tag: japan
 year_tag: "2026"
 collection_tag: "kasai"
 featured: false
@@ -52,3 +55,5 @@ exif:
   shutter: "1/125s"
   iso: "200"
 ---
+
+鳥と犬が行き交う渚を歩き、観覧車が夕焼けに染まるまで過ごしたーー葛西臨海公園の記録。

@@ -50,7 +50,7 @@
 .transcript-review .review-reference { border-top:1px solid var(--rule); padding:5px 0; }
 .transcript-review .review-reference table { font-size:14px; margin:12px 0 20px; }
 .transcript-review .review-reference > p { font-size:15px; }
-.transcript-review .review-series { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-top:1px solid var(--rule); margin-top:32px; padding-top:20px; font-size:14px; }
+.review-series { display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; border-top:1px solid var(--rule); margin-top:32px; padding-top:20px; font-size:14px; }
 .transcript-review :is(a, summary, button):focus-visible { outline:2px solid var(--vermillion); outline-offset:4px; }
 .review-mobile-toc { display:none; }
 @container review-copy (max-width:560px) {

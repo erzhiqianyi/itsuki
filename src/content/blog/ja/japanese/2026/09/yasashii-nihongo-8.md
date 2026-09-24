@@ -348,4 +348,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-7">前回 · #7 連休初日、巾着田の彼岸花と日和田山</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-7">前回 · #7 連休初日、巾着田の彼岸花と日和田山</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-9">次回 · #9 目的地を決めずに、水元公園で2時間半のひとり散歩</a></nav>

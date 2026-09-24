@@ -11,6 +11,11 @@ const { page, tag } = Astro.props;
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const images = page.data.map(({ photo, album }) => ({
   ...photo,
+  // Most albums never set a per-photo location (only the multi-city summer-holiday
+  // album does) — fall back to the album's own location so the PLACE facet on a
+  // tag page reflects every album that tag appears in, not just the one album
+  // that happens to annotate individual photos.
+  location: photo.location || locale(album.data.location),
   sourceAlbum: { title: locale(album.data.title), slug: album.slug },
 }));
 ---

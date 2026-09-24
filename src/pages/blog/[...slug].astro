@@ -40,6 +40,7 @@ if (!entry) return Astro.redirect('/404');
 const { Content, headings } = await render(entry);
 const isTranscriptReview = entry.data.transcriptReview === true;
 const reviewCount = (entry.body?.match(/class="ct"/g) || []).length;
+const hasFurigana = /<ruby[\s>]/i.test(entry.body || '');
 
 const {
     title,
@@ -91,7 +92,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
     </aside>
     <article class="reading-article">
       <header class="reading-heading">
-        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}</div>
+        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}{hasFurigana && <button type="button" id="furigana-toggle" class="furigana-toggle" aria-pressed="true">読み方</button>}</div>
         <h1>{title || date}</h1>
         {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <span>#{tag}</span>)}</p>}
       </header>
@@ -179,6 +180,25 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
     revealHash();
   }
 
+  // 読み方（ふりがな）の表示・非表示を切り替える（状態は記憶する）
+  const furiganaToggle = document.querySelector<HTMLButtonElement>('#furigana-toggle');
+  const furiganaTarget = document.querySelector<HTMLElement>('#blog-content');
+  if (furiganaToggle && furiganaTarget) {
+    const KEY = 'article-furigana-hidden';
+    const apply = (hidden: boolean) => {
+      furiganaTarget.classList.toggle('furigana-hidden', hidden);
+      furiganaToggle.setAttribute('aria-pressed', hidden ? 'false' : 'true');
+    };
+    let stored: string | null = null;
+    try { stored = localStorage.getItem(KEY); } catch {}
+    apply(stored === '1');
+    furiganaToggle.addEventListener('click', () => {
+      const hidden = !furiganaTarget.classList.contains('furigana-hidden');
+      apply(hidden);
+      try { localStorage.setItem(KEY, hidden ? '1' : '0'); } catch {}
+    });
+  }
+
   // サイドバーを左右に開閉する（状態は記憶する）
   const layout = document.querySelector<HTMLElement>('#reading-layout');
   const sidebarToggle = document.querySelector<HTMLButtonElement>('#sidebar-toggle');
@@ -231,6 +251,12 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .reading-meta a { color:var(--vermillion); }
   .reading-heading h1 { font-size:34px; font-weight:700; line-height:1.55; margin:20px 0; overflow-wrap:anywhere; }
   .reading-tags { display:flex; flex-wrap:wrap; gap:16px; color:var(--muted); font-size:12px; }
+  .furigana-toggle { margin-left:auto; padding:3px 12px; border:1px solid var(--rule); border-radius:999px; background:var(--paper); color:var(--muted); font-size:12px; line-height:1.8; cursor:pointer; transition:color .2s ease, border-color .2s ease; }
+  .furigana-toggle:hover { color:var(--vermillion); border-color:var(--vermillion); }
+  .furigana-toggle[aria-pressed="true"] { color:var(--vermillion); border-color:var(--vermillion); }
+  .article-content ruby { ruby-position:over; }
+  .article-content rt { font-size:.55em; font-weight:400; color:var(--muted); user-select:none; }
+  .article-content.furigana-hidden rt { display:none; }
   .article-cover { margin-bottom:28px; border-block:1px solid var(--rule); padding:12px 0; }
   .article-cover summary { cursor:pointer; font-size:13px; }
   .article-cover summary svg { display:inline; margin-left:8px; vertical-align:middle; }
@@ -257,6 +283,13 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   /* 日本語カテゴリ：字幕添削レイアウト（左右対比＋赤入れ） */
   .article-content .ct { display:flex; flex-direction:column; gap:16px; margin:0 0 34px; padding-bottom:30px; border-bottom:1px solid var(--rule); scroll-margin-top:24px; }
   .ct-head { display:flex; align-items:flex-end; gap:12px; border-bottom:1px solid var(--rule); padding-bottom:9px; }
+  details.ct > summary.ct-head { cursor:pointer; list-style:none; align-items:center; }
+  details.ct > summary.ct-head::-webkit-details-marker { display:none; }
+  details.ct > summary.ct-head::after { content:''; flex-shrink:0; margin-left:auto; width:8px; height:8px; border-right:1.5px solid var(--muted); border-bottom:1.5px solid var(--muted); transform:rotate(-135deg); transition:transform .2s ease, border-color .2s ease; }
+  details.ct[open] > summary.ct-head::after { transform:rotate(45deg); }
+  details.ct > summary.ct-head:hover::after { border-color:var(--vermillion); }
+  details.ct:not([open]) { padding-bottom:9px; }
+  details.ct:not([open]) > summary.ct-head { border-bottom:0; }
   .ct-time { font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:15px; font-weight:600; line-height:1.5; color:var(--vermillion); border:1px solid var(--vermillion); padding:2px 8px; }
   .ct-name { font-size:18px; font-weight:600; }
   .ct-score { display:flex; align-items:baseline; gap:3px; margin-left:auto; font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:14px; color:var(--muted); }

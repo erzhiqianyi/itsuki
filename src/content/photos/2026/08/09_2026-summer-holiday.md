@@ -4,11 +4,14 @@ title:
   ja: "2026夏休み"
   en: "Summer Holiday 2026"
 location:
-  ja: "日本、東海道・瀬戸内・関西"
-  en: "Japan — Tokaido, Setouchi and Kansai"
+  ja: "東海道・瀬戸内・関西"
+  en: "Tokaido, Setouchi and Kansai"
+country:
+  ja: 日本
+  en: Japan
 cover: "https://blog.image.erzhiqian.cc/photos/2026/08/09/DSC07786.jpg"
 date: "2026-08-09"
-location_tag: "tokaido-kansai"
+country_tag: japan
 year_tag: "2026"
 collection_tag: "2026-summer-holiday"
 featured: true

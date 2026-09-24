@@ -6,6 +6,9 @@ title:
 location:
   ja: "筑波山"
   en: "Mt. Tsukuba"
+country:
+  ja: 日本
+  en: Japan
 cover: "https://blog.image.erzhiqian.cc/photos/2026/05/05/DSC05223.jpg"
 images:
   - url: "https://blog.image.erzhiqian.cc/photos/2026/05/05/DSC05186.jpg"
@@ -25,7 +28,7 @@ images:
     height: 2216
     tags: ["緑"]
 date: "2026-05-05"
-location_tag: "tsukuba"
+country_tag: japan
 year_tag: "2026"
 collection_tag: "tsukuba"
 featured: false
@@ -36,3 +39,5 @@ exif:
   shutter: "1/320s"
   iso: "200"
 ---
+
+満開の花と新緑を車窓に眺めながら、筑波山を訪ねた記録。
