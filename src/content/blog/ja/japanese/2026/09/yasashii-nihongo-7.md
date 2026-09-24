@@ -266,4 +266,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-6">前回 · #6 来日して半年。偶然の雑談で日本語の上達を実感した連休前の散歩</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-6">前回 · #6 来日して半年。偶然の雑談で日本語の上達を実感した連休前の散歩</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-8">次回 · #8 来日して半年、初めての散髪。混んだ店とAIに聞いた髪型説明</a></nav>
