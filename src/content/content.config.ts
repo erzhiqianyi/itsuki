@@ -45,7 +45,16 @@ const photos = defineCollection({
             title: z.string().optional(),
             location: z.string().optional(),          // 写真ごとの場所（例: 男木島）
             tags: z.array(z.string()).default([])     // 写真ごとの被写体タグ（例: 猫, 花火, 富士山）
-        })).optional()
+        })).optional(),
+        // パスワード保護アルバム：locked な場合、images/cover は前面に置かず、
+        // 代わりに cipher（AES-GCM 暗号文）だけをコミットする。復号は閲覧者のブラウザで行う。
+        locked: z.boolean().default(false),
+        imageCount: z.number().optional(), // locked 時、images なしで枚数表示に使う
+        cipher: z.object({
+            salt: z.string(),  // base64, PBKDF2 salt
+            iv: z.string(),    // base64, AES-GCM iv
+            data: z.string(),  // base64, 暗号化された { images, cover } の JSON
+        }).optional(),
     }),
 });
 

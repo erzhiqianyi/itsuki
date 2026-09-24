@@ -3,8 +3,8 @@ import { Icon } from 'astro-icon/components';
 import { SITE_CONFIG } from '../data/site-config';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import '../styles/editorial.css';
-interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en' | 'zh'; home?: boolean; }
-const { title = SITE_CONFIG.brand.logo, description = SITE_CONFIG.brand.description.ja, image, article = false, lang = 'ja', home = false } = Astro.props;
+interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en' | 'zh'; home?: boolean; hideHeader?: boolean; }
+const { title = SITE_CONFIG.brand.logo, description = SITE_CONFIG.brand.description.ja, image, article = false, lang = 'ja', home = false, hideHeader = false } = Astro.props;
 const changelogLang = lang === 'en' ? 'en' : 'ja';
 const resumeHref = lang === 'ja' ? '/resume' : `/resume/${lang}`;
 const labels = {
@@ -59,7 +59,7 @@ const nav = [{ label: labels.articles, href: '/blog' }, { label: labels.projects
     {SITE_CONFIG.socials.map(s => <a href={s.href} target="_blank" rel="noreferrer">{s.label}<Icon name="lucide:arrow-up-right" /></a>)}
   </div>
   <div class="edition-shell">
-    {!home && <header class="edition-header"><a class="edition-wordmark" href="/" aria-label={`Itsuki ${labels.home}`}>ITSUKI.</a><nav aria-label={labels.main}>{nav.map((item, i) => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
+    {!home && <header class="edition-header" class:list={{ 'edition-header-rail-fallback': hideHeader }}><a class="edition-wordmark" href="/" aria-label={`Itsuki ${labels.home}`}>ITSUKI.</a><nav aria-label={labels.main}>{nav.map((item, i) => <a href={item.href} target={item.href.startsWith('https://') ? '_blank' : undefined} rel={item.href.startsWith('https://') ? 'noopener noreferrer' : undefined} aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}><span class="display-type">0{i + 1}</span>{item.label}<Icon name="lucide:arrow-up-right" /></a>)}</nav></header>}
     <main id="main-content"><slot /></main>
     <footer class="edition-footer">
       <nav aria-label={labels.other}><a href="/now">{labels.now}</a><a href="/archive">{labels.archive}</a><a href="/about">{labels.about}</a><a href={resumeHref}>{labels.resume}</a><a href={`/${changelogLang}/changelog`}>{labels.changes}</a></nav>

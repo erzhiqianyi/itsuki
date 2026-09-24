@@ -58,6 +58,9 @@ npm run dev -- --host 127.0.0.1 --port 4322
 | `npm run build` | Build the static site into `dist/` |
 | `npm run preview` | Preview the built site locally; run the build first |
 | `npm run astro -- check` | Run Astro / TypeScript diagnostics |
+| `npm run photos:studio` | Launch the photo studio — upload photos to R2 from a browser UI and create albums |
+| `npm run photos:add` | Run the same workflow from the command line |
+| `npm run photos:lock` | Password-protect an existing album (Japanese; see [Photo import](docs/photo-import.md#6-非公開アルバムパスワード保護)) |
 
 There are currently no dedicated `test` or `lint` scripts. Building and type checking are separate checks.
 
@@ -112,8 +115,9 @@ featured: false
 
 Replace the sample cover with a real image and verify that its path exists. After saving, check the article listing and detail page, then run a build.
 
-Further maintenance documentation is currently written in Chinese:
+Further maintenance documentation: the photo import guide is written in Japanese, and the rest are currently written in Chinese.
 
+- [Photo import](docs/photo-import.md): R2 setup, using the photo studio, and creating albums. (Japanese)
 - [Content maintenance](docs/content-maintenance.md): Where each content type lives and how to edit it.
 - [X diary backup](docs/x-backup.md): Capture scope, external source data, import commands, and backup limitations.
 - [YouTube video sync](docs/youtube-sync.md): Sync scope and update steps. Scheduled automatic syncing is not currently configured.

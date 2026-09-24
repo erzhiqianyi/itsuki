@@ -18,6 +18,7 @@ const stats = [
   { value: projects.length, label: 'つくる', href: '/projects' },
   { value: albums.length, label: 'アルバム', href: '/photos' },
   { value: videos.length, label: '動画', href: '/videos' },
+  { value: 67, label: '俳句', href: 'https://haiku.erzhiqian.cc/' }, // 手動更新（リアルタイム連携なし）
 ];
 const latestDate = [...posts, ...videos, ...albums].map(p => p.data.date).filter(Boolean).sort().at(-1);
 const latestPosts = await Promise.all(posts.slice(0, 3).map(async post => ({ ...post, excerpt: post.data.summary || (await render(post)).headings.filter(h => h.depth <= 3).slice(0, 5).map(h => h.text).join(' / ') })));
@@ -52,7 +53,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   <header class="masthead">
     <div class="brand-lockup"><h1 class="masthead-name">ITSUKI.</h1><span class="vertical-brand">{SITE_CONFIG.brand.logo}</span></div>
     <div class="masthead-intro"><h2>こんにちは、樹です。</h2><p>日々の記録と、つくっているもの。<br />考えたこと、学んだこと、<br />その断片を、未来の自分へ。</p><div class="intro-links"><a href="/about" class="now-link">私について・経歴<Icon name="lucide:arrow-up-right" /></a><a href="/now" class="now-link"><span class="status-dot"></span>現在のこと<Icon name="lucide:arrow-up-right" /></a></div></div>
-    <dl class="edition-stats">{stats.map(stat => <div><dt>{stat.label}</dt><dd><a href={stat.href}>{stat.value}</a></dd></div>)}</dl>
+    <dl class="edition-stats">{stats.map(stat => <div><dt>{stat.label}</dt><dd><a href={stat.href} target={stat.href.startsWith('https://') ? '_blank' : undefined} rel={stat.href.startsWith('https://') ? 'noopener noreferrer' : undefined}>{stat.value}</a></dd></div>)}</dl>
   </header>
   <nav class="chapter-index" aria-label="メインナビゲーション">{chapters.map(chapter => <a href={chapter.href} target={chapter.href.startsWith('https://') ? '_blank' : undefined} rel={chapter.href.startsWith('https://') ? 'noopener noreferrer' : undefined}><span class="chapter-number display-type">{chapter.number}</span><span>{chapter.label}</span><Icon name="lucide:arrow-up-right" /></a>)}</nav>
   <div class="front-grid">
@@ -156,7 +157,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
   }
   @media(max-width:1000px) {
     .masthead { grid-template-columns:1.3fr 1fr; } .masthead-name { font-size:160px; }
-    .edition-stats { grid-column:1/-1; grid-template-columns:repeat(5,minmax(0,1fr)); gap:16px; border-top:1px solid var(--rule); padding-top:18px; }
+    .edition-stats { grid-column:1/-1; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; border-top:1px solid var(--rule); padding-top:18px; }
     .front-grid { column-gap:32px; row-gap:40px; }
     .album-list { grid-template-columns:1fr 1fr; align-items:start; }
     .chapter-index a { font-size:23px; gap:10px; } .chapter-number { font-size:36px; }

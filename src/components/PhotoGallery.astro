@@ -1,7 +1,7 @@
 ---
 import { Icon } from 'astro-icon/components';
 import { photoPreview } from './photo-preview';
-const { images, albumTitle } = Astro.props;
+const { images, albumTitle, locked = false, cipher } = Astro.props;
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const previews = await Promise.all(images.map(photo => photoPreview(photo)));
 const viewerImages = await Promise.all(images.map(photo => photoPreview(photo,1920)));
@@ -9,68 +9,200 @@ const viewerImages = await Promise.all(images.map(photo => photoPreview(photo,19
 const unique = values => [...new Set(values.filter(Boolean))];
 const places = unique(images.map(photo => photo.location));
 const tags = unique(images.flatMap(photo => photo.tags || []));
-const caption = photo => [locale(photo.title), photo.location].filter(Boolean).join(' — ') || albumTitle;
+const caption = photo => [locale(photo.title), photo.location, photo.sourceAlbum?.title].filter(Boolean).join(' — ') || albumTitle;
 ---
-{(places.length > 1 || tags.length > 0) && <nav class="photo-filters contact-filters" aria-label="写真の絞り込み">{places.length > 1 && <div><span>PLACE</span><button type="button" data-filter="place" data-value="" aria-pressed="true">すべて</button>{places.map(place => <button type="button" data-filter="place" data-value={place} aria-pressed="false">{place}</button>)}</div>}{tags.length > 0 && <div><span>TAG</span><button type="button" data-filter="tag" data-value="" aria-pressed="true">すべて</button>{tags.map(tag => <button type="button" data-filter="tag" data-value={tag} aria-pressed="false">{tag}</button>)}</div>}<p class="contact-filters-count" data-filter-count aria-live="polite"></p></nav>}
-<div class="photo-contact-sheet" style={`--photo-columns:${Math.min(images.length,3) || 1}`}>{images.map((photo,index) => <figure class="contact-print" data-place={photo.location || ''} data-tags={(photo.tags || []).join('|')}><a href={photo.url} data-photo-open data-viewer-src={viewerImages[index].src} data-caption={caption(photo)} aria-label={`写真 ${index + 1} を拡大`}><img {...previews[index]} alt={locale(photo.title) || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" /><span class="photo-unavailable" hidden>画像を読み込めません</span></a><figcaption><span>{String(index + 1).padStart(2,'0')}</span><span class="contact-print-title">{locale(photo.title)}{photo.location && <small>{photo.location}</small>}</span>{photo.tags?.length > 0 && <span class="contact-print-tags">{photo.tags.map(tag => <em>{tag}</em>)}</span>}<Icon name="lucide:plus" /></figcaption></figure>)}</div>
-<dialog class="photo-viewer" aria-label="写真ビューアー"><div class="viewer-bar"><span data-viewer-count aria-live="polite"></span><a data-viewer-original target="_blank" rel="noreferrer" aria-label="原寸画像を開く" title="原寸画像を開く"><Icon name="lucide:external-link" /></a><button type="button" data-viewer-close aria-label="閉じる" title="閉じる"><Icon name="lucide:x" /></button></div><figure class="viewer-stage"><img data-viewer-image alt="" /><figcaption data-viewer-caption></figcaption></figure><div class="viewer-navigation"><button type="button" data-viewer-prev aria-label="前の写真" title="前の写真"><Icon name="lucide:arrow-left" /></button><button type="button" data-viewer-next aria-label="次の写真" title="次の写真"><Icon name="lucide:arrow-right" /></button></div></dialog>
+<template data-icon-plus><Icon name="lucide:plus" /></template>
+{locked && <form class="photo-lock" data-photo-lock data-salt={cipher.salt} data-iv={cipher.iv} data-cipher={cipher.data} data-album-title={albumTitle}><Icon name="lucide:lock" /><p class="photo-lock-title">このアルバムはパスワードで保護されています</p><p class="photo-lock-hint">閲覧を許可された方はパスワードを入力してください。</p><div class="photo-lock-row"><input type="password" data-lock-input name="password" placeholder="パスワード" autocomplete="off" required /><button type="submit" aria-label="開く"><Icon name="lucide:arrow-right" /></button></div><p class="photo-lock-error" data-lock-error hidden>パスワードが違います。もう一度お試しください。</p></form>}
+{!locked && (places.length > 1 || tags.length > 0) && <nav class="photo-filters contact-filters" aria-label="写真の絞り込み">{places.length > 1 && <div><span>PLACE</span><button type="button" data-filter="place" data-value="" aria-pressed="true">すべて</button>{places.map(place => <button type="button" data-filter="place" data-value={place} aria-pressed="false">{place}</button>)}</div>}{tags.length > 0 && <div><span>TAG</span><button type="button" data-filter="tag" data-value="" aria-pressed="true">すべて</button>{tags.map(tag => <button type="button" data-filter="tag" data-value={tag} aria-pressed="false">{tag}</button>)}</div>}<p class="contact-filters-count" data-filter-count aria-live="polite"></p></nav>}
+<div class="photo-contact-sheet" data-gallery-sheet hidden={locked} style={`--photo-columns:${Math.min(images.length,3) || 1}`}>{images.map((photo,index) => <figure class="contact-print" data-place={photo.location || ''} data-tags={(photo.tags || []).join('|')}><a href={photo.url} data-photo-open data-viewer-src={viewerImages[index].src} data-caption={caption(photo)} aria-label={`写真 ${index + 1} を拡大`}><img {...previews[index]} alt={locale(photo.title) || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`} loading={index < 3 ? 'eager' : 'lazy'} decoding="async" /><span class="photo-unavailable" hidden>画像を読み込めません</span></a><figcaption><span>{String(index + 1).padStart(2,'0')}</span><span class="contact-print-title">{locale(photo.title)}{photo.location && <small>{photo.location}</small>}{photo.sourceAlbum && <a class="contact-print-album" href={`/photos/${photo.sourceAlbum.slug}`}>{photo.sourceAlbum.title}</a>}</span>{photo.tags?.length > 0 && <span class="contact-print-tags">{photo.tags.map(tag => <em>{tag}</em>)}</span>}<Icon name="lucide:plus" /></figcaption></figure>)}</div>
+<dialog class="photo-viewer" aria-label="写真ビューアー"><div class="viewer-bar"><span data-viewer-count aria-live="polite"></span><button type="button" data-viewer-fullscreen aria-label="全画面表示" title="全画面表示"><Icon name="lucide:maximize" data-fs-enter /><Icon name="lucide:minimize" data-fs-exit hidden /></button><a data-viewer-original target="_blank" rel="noreferrer" aria-label="原寸画像を開く" title="原寸画像を開く"><Icon name="lucide:external-link" /></a><button type="button" data-viewer-close aria-label="閉じる" title="閉じる"><Icon name="lucide:x" /></button></div><figure class="viewer-stage"><img data-viewer-image alt="" /><figcaption data-viewer-caption></figcaption></figure><div class="viewer-navigation"><button type="button" data-viewer-prev aria-label="前の写真" title="前の写真"><Icon name="lucide:chevron-left" /></button><button type="button" data-viewer-next aria-label="次の写真" title="次の写真"><Icon name="lucide:chevron-right" /></button></div></dialog>
 <script>
-  const allLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-photo-open]'));
-  let links = allLinks;
-  const dialog = document.querySelector<HTMLDialogElement>('.photo-viewer');
-  const filters = document.querySelector<HTMLElement>('.contact-filters');
-  if (filters) {
-    const prints = Array.from(document.querySelectorAll<HTMLElement>('.contact-print'));
-    const count = filters.querySelector<HTMLElement>('[data-filter-count]')!;
-    const active = { place: '', tag: '' };
-    const apply = () => {
-      let shown = 0;
-      prints.forEach(print => {
-        const match = (!active.place || print.dataset.place === active.place) && (!active.tag || (print.dataset.tags || '').split('|').includes(active.tag));
-        print.hidden = !match;
-        if (match) shown++;
+  // Wires up the filter bar and the lightbox viewer against whatever
+  // `.contact-print` items currently sit in the DOM. Runs once: immediately
+  // for a public album, or after a locked album's password form decrypts
+  // its photos and injects them (see the lock handling below).
+  function init() {
+    const allLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-photo-open]'));
+    let links = allLinks;
+    const dialog = document.querySelector<HTMLDialogElement>('.photo-viewer');
+    const filters = document.querySelector<HTMLElement>('.contact-filters');
+    if (filters) {
+      const prints = Array.from(document.querySelectorAll<HTMLElement>('.contact-print'));
+      const count = filters.querySelector<HTMLElement>('[data-filter-count]')!;
+      const active = { place: '', tag: '' };
+      const apply = () => {
+        let shown = 0;
+        prints.forEach(print => {
+          const match = (!active.place || print.dataset.place === active.place) && (!active.tag || (print.dataset.tags || '').split('|').includes(active.tag));
+          print.hidden = !match;
+          if (match) shown++;
+        });
+        links = allLinks.filter(link => !link.closest<HTMLElement>('.contact-print')!.hidden);
+        count.textContent = active.place || active.tag ? `${shown} / ${prints.length} PHOTOS` : '';
+      };
+      filters.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button => button.addEventListener('click', () => {
+        const kind = button.dataset.filter as 'place' | 'tag';
+        active[kind] = button.dataset.value || '';
+        filters.querySelectorAll<HTMLButtonElement>(`[data-filter="${kind}"]`).forEach(other => other.setAttribute('aria-pressed', String(other === button)));
+        apply();
+      }));
+    }
+    if (dialog) {
+      const image = dialog.querySelector<HTMLImageElement>('[data-viewer-image]')!;
+      const caption = dialog.querySelector<HTMLElement>('[data-viewer-caption]')!;
+      const count = dialog.querySelector<HTMLElement>('[data-viewer-count]')!;
+      const original = dialog.querySelector<HTMLAnchorElement>('[data-viewer-original]')!;
+      const previous = dialog.querySelector<HTMLButtonElement>('[data-viewer-prev]')!;
+      const next = dialog.querySelector<HTMLButtonElement>('[data-viewer-next]')!;
+      let index = 0;
+      const show = (value: number) => {
+        index = (value + links.length) % links.length;
+        image.src = links[index].dataset.viewerSrc || links[index].href;
+        image.alt = links[index].querySelector('img')?.alt || '';
+        caption.textContent = links[index].dataset.caption || '';
+        count.textContent = `${String(index + 1).padStart(2,'0')} / ${String(links.length).padStart(2,'0')}`;
+        original.href = links[index].href;
+        previous.hidden = next.hidden = links.length < 2;
+      };
+      allLinks.forEach(link => {
+        link.addEventListener('click', event => { event.preventDefault(); show(links.indexOf(link)); dialog.showModal(); });
+        const thumbnail = link.querySelector('img')!;
+        const failed = () => { thumbnail.hidden = true; link.querySelector<HTMLElement>('.photo-unavailable')!.hidden = false; };
+        thumbnail.addEventListener('error',failed);
+        if (thumbnail.complete && !thumbnail.naturalWidth) failed();
       });
-      links = allLinks.filter(link => !link.closest<HTMLElement>('.contact-print')!.hidden);
-      count.textContent = active.place || active.tag ? `${shown} / ${prints.length} PHOTOS` : '';
-    };
-    filters.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach(button => button.addEventListener('click', () => {
-      const kind = button.dataset.filter as 'place' | 'tag';
-      active[kind] = button.dataset.value || '';
-      filters.querySelectorAll<HTMLButtonElement>(`[data-filter="${kind}"]`).forEach(other => other.setAttribute('aria-pressed', String(other === button)));
-      apply();
-    }));
+      dialog.querySelector('[data-viewer-close]')!.addEventListener('click',() => dialog.close());
+      previous.addEventListener('click',() => show(index - 1));
+      next.addEventListener('click',() => show(index + 1));
+      dialog.addEventListener('keydown',event => { if(event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); show(index + (event.key === 'ArrowLeft' ? -1 : 1)); } });
+      dialog.addEventListener('click',event => { if(event.target === dialog) dialog.close(); });
+      dialog.addEventListener('close',() => { if (document.fullscreenElement) document.exitFullscreen(); });
+      const fullscreenButton = dialog.querySelector<HTMLButtonElement>('[data-viewer-fullscreen]');
+      if (fullscreenButton && document.fullscreenEnabled) {
+        // <dialog> itself can't be the fullscreen element (browsers reject it), so the
+        // whole page goes fullscreen instead — the modal already fills the viewport,
+        // this just hides the browser chrome around it.
+        const enterIcon = fullscreenButton.querySelector<HTMLElement>('[data-fs-enter]')!;
+        const exitIcon = fullscreenButton.querySelector<HTMLElement>('[data-fs-exit]')!;
+        const syncFullscreenIcon = () => {
+          const active = !!document.fullscreenElement;
+          enterIcon.hidden = active;
+          exitIcon.hidden = !active;
+        };
+        fullscreenButton.addEventListener('click',() => {
+          if (document.fullscreenElement) document.exitFullscreen();
+          else document.documentElement.requestFullscreen().catch(() => {});
+        });
+        document.addEventListener('fullscreenchange',syncFullscreenIcon);
+      } else {
+        fullscreenButton?.setAttribute('hidden','');
+      }
+      let touchX = 0;
+      image.addEventListener('touchstart',event => { if(event.touches.length === 1) touchX = event.touches[0].clientX; },{passive:true});
+      image.addEventListener('touchend',event => { if(event.changedTouches.length === 1 && Math.abs(event.changedTouches[0].clientX - touchX) > 60) show(index + (event.changedTouches[0].clientX < touchX ? 1 : -1)); },{passive:true});
+    }
   }
-  if (dialog) {
-    const image = dialog.querySelector<HTMLImageElement>('[data-viewer-image]')!;
-    const caption = dialog.querySelector<HTMLElement>('[data-viewer-caption]')!;
-    const count = dialog.querySelector<HTMLElement>('[data-viewer-count]')!;
-    const original = dialog.querySelector<HTMLAnchorElement>('[data-viewer-original]')!;
-    const previous = dialog.querySelector<HTMLButtonElement>('[data-viewer-prev]')!;
-    const next = dialog.querySelector<HTMLButtonElement>('[data-viewer-next]')!;
-    let index = 0;
-    const show = (value: number) => {
-      index = (value + links.length) % links.length;
-      image.src = links[index].dataset.viewerSrc || links[index].href;
-      image.alt = links[index].querySelector('img')?.alt || '';
-      caption.textContent = links[index].dataset.caption || '';
-      count.textContent = `${String(index + 1).padStart(2,'0')} / ${String(links.length).padStart(2,'0')}`;
-      original.href = links[index].href;
-      previous.hidden = next.hidden = links.length < 2;
-    };
-    allLinks.forEach(link => {
-      link.addEventListener('click', event => { event.preventDefault(); show(links.indexOf(link)); dialog.showModal(); });
-      const thumbnail = link.querySelector('img')!;
-      const failed = () => { thumbnail.hidden = true; link.querySelector<HTMLElement>('.photo-unavailable')!.hidden = false; };
-      thumbnail.addEventListener('error',failed);
-      if (thumbnail.complete && !thumbnail.naturalWidth) failed();
+
+  // Locked albums ship no plaintext images at all — just an AES-GCM blob.
+  // The form below derives a key from the typed password (PBKDF2) and only
+  // on a successful decrypt builds the same `.contact-print` markup the
+  // server would have rendered, then hands off to init() above.
+  const lockForm = document.querySelector<HTMLFormElement>('[data-photo-lock]');
+  if (!lockForm) {
+    init();
+  } else {
+    const sheet = document.querySelector<HTMLElement>('[data-gallery-sheet]')!;
+    const input = lockForm.querySelector<HTMLInputElement>('[data-lock-input]')!;
+    const error = lockForm.querySelector<HTMLElement>('[data-lock-error]')!;
+    const submitButton = lockForm.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const plusTemplate = document.querySelector<HTMLTemplateElement>('[data-icon-plus]');
+    const ITERATIONS = 250_000;
+
+    type LockedPhoto = { url: string; title?: string; location?: string; tags?: string[] };
+    const base64ToBytes = (value: string) => Uint8Array.from(atob(value), c => c.charCodeAt(0));
+    const cdnUrl = (url: string, width: number) => { try { const u = new URL(url); return `${u.origin}/cdn-cgi/image/width=${width},format=auto,quality=80${u.pathname}`; } catch { return url; } };
+    const unique = (values: (string | undefined)[]) => [...new Set(values.filter(Boolean) as string[])];
+
+    async function decrypt(password: string): Promise<{ images?: LockedPhoto[] }> {
+      const salt = base64ToBytes(lockForm.dataset.salt || '');
+      const iv = base64ToBytes(lockForm.dataset.iv || '');
+      const data = base64ToBytes(lockForm.dataset.cipher || '');
+      const keyMaterial = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveKey']);
+      const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: ITERATIONS, hash: 'SHA-256' }, keyMaterial, { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+      const plain = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+      return JSON.parse(new TextDecoder().decode(plain));
+    }
+
+    function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string | boolean | undefined> = {}, ...children: (Node | string | null | undefined)[]) {
+      const node = document.createElement(tag);
+      for (const [key, value] of Object.entries(attrs)) {
+        if (value === undefined || value === false) continue;
+        if (key === 'text') node.textContent = String(value);
+        else node.setAttribute(key, value === true ? '' : String(value));
+      }
+      for (const child of children) if (child) node.append(child);
+      return node;
+    }
+
+    function buildSheet(images: LockedPhoto[], albumTitle: string) {
+      images.forEach((photo, index) => {
+        const location = photo.location || '';
+        const tags = photo.tags || [];
+        const caption = [photo.title, location].filter(Boolean).join(' — ') || albumTitle;
+        const link = el('a', { href: photo.url, 'data-photo-open': 'true', 'data-viewer-src': cdnUrl(photo.url, 1920), 'data-caption': caption, 'aria-label': `写真 ${index + 1} を拡大` });
+        const img = el('img', { src: cdnUrl(photo.url, 960), alt: photo.title || `${albumTitle} / ${String(index + 1).padStart(2,'0')}`, loading: index < 3 ? 'eager' : 'lazy', decoding: 'async' });
+        link.append(img, el('span', { class: 'photo-unavailable', hidden: true, text: '画像を読み込めません' }));
+        const titleSpan = el('span', { class: 'contact-print-title' }, document.createTextNode(photo.title || ''));
+        if (location) titleSpan.append(el('small', { text: location }));
+        const figcaption = el('figcaption', {}, el('span', { text: String(index + 1).padStart(2,'0') }), titleSpan);
+        if (tags.length) figcaption.append(el('span', { class: 'contact-print-tags' }, ...tags.map(tag => el('em', { text: tag }))));
+        const plusIcon = plusTemplate?.content.firstElementChild?.cloneNode(true) as Node | undefined;
+        if (plusIcon) figcaption.append(plusIcon);
+        sheet.append(el('figure', { class: 'contact-print', 'data-place': location, 'data-tags': tags.join('|') }, link, figcaption));
+      });
+      sheet.style.setProperty('--photo-columns', String(Math.min(images.length,3) || 1));
+    }
+
+    function buildFilters(images: LockedPhoto[]) {
+      const placesList = unique(images.map(p => p.location));
+      const tagsList = unique(images.flatMap(p => p.tags || []));
+      if (placesList.length <= 1 && tagsList.length === 0) return null;
+      const nav = el('nav', { class: 'photo-filters contact-filters', 'aria-label': '写真の絞り込み' });
+      if (placesList.length > 1) {
+        const group = el('div', {}, el('span', { text: 'PLACE' }), el('button', { type: 'button', 'data-filter': 'place', 'data-value': '', 'aria-pressed': 'true', text: 'すべて' }));
+        placesList.forEach(place => group.append(el('button', { type: 'button', 'data-filter': 'place', 'data-value': place, 'aria-pressed': 'false', text: place })));
+        nav.append(group);
+      }
+      if (tagsList.length > 0) {
+        const group = el('div', {}, el('span', { text: 'TAG' }), el('button', { type: 'button', 'data-filter': 'tag', 'data-value': '', 'aria-pressed': 'true', text: 'すべて' }));
+        tagsList.forEach(tag => group.append(el('button', { type: 'button', 'data-filter': 'tag', 'data-value': tag, 'aria-pressed': 'false', text: tag })));
+        nav.append(group);
+      }
+      nav.append(el('p', { class: 'contact-filters-count', 'data-filter-count': 'true', 'aria-live': 'polite' }));
+      return nav;
+    }
+
+    lockForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      error.hidden = true;
+      const password = input.value;
+      if (!password) return;
+      submitButton.disabled = true;
+      try {
+        const payload = await decrypt(password);
+        const images = payload.images || [];
+        const filters = buildFilters(images);
+        if (filters) sheet.parentNode?.insertBefore(filters, sheet);
+        buildSheet(images, lockForm.dataset.albumTitle || '');
+        sheet.hidden = false;
+        lockForm.remove();
+        init();
+      } catch {
+        error.hidden = false;
+        input.select();
+      } finally {
+        submitButton.disabled = false;
+      }
     });
-    dialog.querySelector('[data-viewer-close]')!.addEventListener('click',() => dialog.close());
-    previous.addEventListener('click',() => show(index - 1));
-    next.addEventListener('click',() => show(index + 1));
-    dialog.addEventListener('keydown',event => { if(event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); show(index + (event.key === 'ArrowLeft' ? -1 : 1)); } });
-    dialog.addEventListener('click',event => { if(event.target === dialog) dialog.close(); });
-    let touchX = 0;
-    image.addEventListener('touchstart',event => { if(event.touches.length === 1) touchX = event.touches[0].clientX; },{passive:true});
-    image.addEventListener('touchend',event => { if(event.changedTouches.length === 1 && Math.abs(event.changedTouches[0].clientX - touchX) > 60) show(index + (event.changedTouches[0].clientX < touchX ? 1 : -1)); },{passive:true});
   }
 </script>

@@ -1,11 +1,45 @@
 ---
 import { getCollection } from 'astro:content';
 import PhotoIndex from '../../../../components/PhotoIndex.astro';
+import TagPhotoGrid from '../../../../components/TagPhotoGrid.astro';
+
 export async function getStaticPaths({ paginate }) {
   const albums = await getCollection('photos');
-  const keys = ['location_tag', 'year_tag', 'collection_tag'];
-  const tags = [...new Set(albums.flatMap(p => keys.map(key => p.data[key])).filter(Boolean))];
-  return tags.flatMap(tag => paginate(albums.filter(p => keys.some(key => p.data[key] === tag)).sort((a,b) => Date.parse(b.data.date) - Date.parse(a.data.date)), { params: { tag }, pageSize: 3 }));
+  const structuralKeys = ['location_tag', 'year_tag', 'collection_tag'] as const;
+  const structuralTags = new Set(albums.flatMap(a => structuralKeys.map(key => a.data[key])).filter(Boolean));
+  const byDateDesc = (a: typeof albums[number], b: typeof albums[number]) => Date.parse(b.data.date) - Date.parse(a.data.date);
+
+  const albumPaths = [...structuralTags].flatMap(tag =>
+    paginate(
+      albums.filter(a => structuralKeys.some(key => a.data[key] === tag)).sort(byDateDesc),
+      { params: { tag }, pageSize: 12, props: { kind: 'album' } },
+    ),
+  );
+
+  // Subject tags carried by individual photos (猫, 花火, …) list matching PHOTOS
+  // across every album, not the albums themselves. Locked albums are excluded
+  // entirely — their photos stay behind the password, never in a public grid.
+  const contentTagMap = new Map<string, { photo: any; album: typeof albums[number] }[]>();
+  for (const album of albums) {
+    if (album.data.locked) continue;
+    for (const photo of album.data.images || []) {
+      for (const t of photo.tags || []) {
+        if (structuralTags.has(t)) continue; // structural tag wins on any collision
+        if (!contentTagMap.has(t)) contentTagMap.set(t, []);
+        contentTagMap.get(t)!.push({ photo, album });
+      }
+    }
+  }
+  const contentPaths = [...contentTagMap.entries()].flatMap(([tag, entries]) =>
+    paginate(
+      entries.sort((a, b) => byDateDesc(a.album, b.album)),
+      { params: { tag }, pageSize: 24, props: { kind: 'content' } },
+    ),
+  );
+
+  return [...albumPaths, ...contentPaths];
 }
 ---
-<PhotoIndex page={Astro.props.page} tag={Astro.params.tag} />
+{Astro.props.kind === 'content'
+  ? <TagPhotoGrid page={Astro.props.page} tag={Astro.params.tag} />
+  : <PhotoIndex page={Astro.props.page} tag={Astro.params.tag} />}

@@ -12,12 +12,14 @@ const { entry, next, previous, number } = Astro.props;
 const { Content } = await render(entry);
 const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
 const title = locale(entry.data.title);
-const images = entry.data.images?.length ? entry.data.images : entry.data.cover ? [{url:entry.data.cover,title}] : [];
+const locked = entry.data.locked;
+const images = locked ? [] : entry.data.images?.length ? entry.data.images : entry.data.cover ? [{url:entry.data.cover,title}] : [];
+const photoCount = locked ? entry.data.imageCount || 0 : images.length;
 ---
-<EditorialLayout title={title} description={locale(entry.data.description) || title} image={entry.data.cover}>
+<EditorialLayout title={title} description={locale(entry.data.description) || title} image={locked ? undefined : entry.data.cover} hideHeader>
   <a class="photo-back" href="/photos"><Icon name="lucide:arrow-left" />写真一覧</a>
-  <header class="album-heading"><span class="album-heading-number">{String(number).padStart(2,'0')}</span><div><p class="photo-kicker">PHOTOGRAPHIC RECORD / {entry.data.year_tag}</p><h1>{title}</h1><div class="album-metadata"><time datetime={entry.data.date}>{entry.data.date?.replaceAll('-','.')}</time><span>{locale(entry.data.location)}</span><span>{images.length} PHOTOS</span></div></div></header>
+  <header class="album-heading"><span class="album-heading-number">{String(number).padStart(2,'0')}</span><div><p class="photo-kicker">PHOTOGRAPHIC RECORD / {entry.data.year_tag}</p><h1>{title}</h1><div class="album-metadata"><time datetime={entry.data.date}>{entry.data.date?.replaceAll('-','.')}</time><span>{locale(entry.data.location)}</span><span>{locked && <Icon name="lucide:lock" />}{photoCount} PHOTOS</span></div></div></header>
   {entry.body?.trim() && <div class="album-prose"><Content /></div>}
-  <PhotoGallery images={images} albumTitle={title} />
+  <PhotoGallery images={images} albumTitle={title} locked={locked} cipher={entry.data.cipher} />
   <nav class="album-adjacent" aria-label="アルバムのナビゲーション"><div>{previous && <a href={'/photos/' + previous.slug}><Icon name="lucide:arrow-left" /><span><small>NEWER ALBUM</small>{locale(previous.data.title)}</span></a>}</div><div>{next && <a href={'/photos/' + next.slug}><span><small>OLDER ALBUM</small>{locale(next.data.title)}</span><Icon name="lucide:arrow-right" /></a>}</div></nav>
 </EditorialLayout>

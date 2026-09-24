@@ -6,7 +6,7 @@ const copy = (await getEntry('page-copy', 'projects')).data;
 const entries = (await getCollection('projects')).sort((a,b)=>a.data.order-b.data.order);
 const projects = await Promise.all(entries.map(async entry=>({...entry.data, Content:(await render(entry)).Content})));
 ---
-<EditorialLayout title={copy.title} description={copy.description}>
+<EditorialLayout title={copy.title} description={copy.description} hideHeader>
 <div class="projects-page">
   <header class="projects-heading"><p class="kicker">{copy.kicker}</p><h1>{copy.title}</h1><p class="intro">{copy.intro}</p><a class="creator-link" href="/resume">開発者の経歴を見る<Icon name="lucide:arrow-up-right" /></a></header>
   <nav class="project-index" aria-label="プロジェクト一覧">{projects.map(p=><a href={'#'+p.id}>{p.name}<span>↓</span></a>)}</nav>

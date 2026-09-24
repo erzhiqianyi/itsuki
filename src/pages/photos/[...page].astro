@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import PhotoIndex from '../../components/PhotoIndex.astro';
 export async function getStaticPaths({ paginate }) {
-  return paginate((await getCollection('photos')).sort((a,b) => Date.parse(b.data.date) - Date.parse(a.data.date)), { pageSize: 9 });
+  return paginate((await getCollection('photos')).sort((a,b) => Date.parse(b.data.date) - Date.parse(a.data.date)), { pageSize: 12 });
 }
 ---
 <PhotoIndex page={Astro.props.page} />

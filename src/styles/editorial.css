@@ -43,6 +43,10 @@
 @media(min-width:761px) {
   .editorial { padding-left:64px; }
   .edition-rail { display:flex; position:fixed; left:8px; top:0; bottom:0; width:64px; padding:26px 0; flex-direction:column; justify-content:space-between; gap:24px; background:var(--paper); border-right:1px solid var(--rule); z-index:100; }
+  /* The rail already covers these same links once it's visible, so pages that opt out
+     of the top header (hideHeader) only actually drop it here — on narrower screens,
+     where the rail hides itself, this header comes back as the only way to navigate. */
+  .edition-header-rail-fallback { display:none; }
   .rail-group { display:flex; flex-direction:column; align-items:center; gap:6px; }
   .edition-rail a { display:flex; position:relative; justify-content:center; align-items:center; width:42px; height:42px; border-radius:4px; }
   .edition-rail a[aria-current=page] { color:var(--vermillion); background:#d527180a; }

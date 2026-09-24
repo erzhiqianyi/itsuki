@@ -1,0 +1,22 @@
+---
+// Content tags (subject words carried by individual photos, e.g. 猫, 花火) browse
+// as a flat cross-album photo grid instead of the album grid PhotoIndex renders —
+// that's what "find the same content" across trips actually means for a TAG filter.
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../layouts/EditorialLayout.astro';
+import PhotoFilters from './PhotoFilters.astro';
+import PhotoGallery from './PhotoGallery.astro';
+import '../styles/photography.css';
+const { page, tag } = Astro.props;
+const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
+const images = page.data.map(({ photo, album }) => ({
+  ...photo,
+  sourceAlbum: { title: locale(album.data.title), slug: album.slug },
+}));
+---
+<EditorialLayout title={`写真 / ${tag}`} hideHeader>
+  <PhotoFilters tag={tag} sortable={false} />
+  <p class="tag-grid-caption">{tag} / {page.total} PHOTOS</p>
+  <PhotoGallery images={images} albumTitle={tag} />
+  {page.lastPage > 1 && <nav class="photo-pagination" aria-label="タグのページ">{page.url.prev && <a href={page.url.prev} aria-label="前のページ"><Icon name="lucide:arrow-left" /></a>}<span>{page.currentPage} / {page.lastPage}</span>{page.url.next && <a href={page.url.next} aria-label="次のページ"><Icon name="lucide:arrow-right" /></a>}</nav>}
+</EditorialLayout>

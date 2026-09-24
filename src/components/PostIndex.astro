@@ -11,7 +11,7 @@ const pageHref = (n) => n === 1 ? base : base + '/' + n;
 const numbers = Array.from({ length: page.lastPage }, (_, i) => i + 1).filter(n => n === 1 || n === page.lastPage || Math.abs(n - page.currentPage) <= 1);
 const entries = await Promise.all(page.data.map(async post => ({ post, excerpt: post.data.summary || (await render(post)).headings.filter(h => h.depth <= 3).slice(0, 5).map(h => h.text).join(' / ') })));
 ---
-<EditorialLayout title={category ? label(category) : '記事'}>
+<EditorialLayout title={category ? label(category) : '記事'} hideHeader>
   <div class="post-index">
     <header class="index-title"><span class="display-type">01</span><h1>{category ? label(category) : '記事'}</h1><p>{category ? allPosts.filter(p => p.data.category.toLowerCase() === category).length : allPosts.length} 記事</p></header>
     <nav class="index-categories" aria-label="カテゴリー"><a href="/blog" aria-current={!category ? 'page' : undefined}>すべて</a>{categories.map(c => <a href={'/category/' + c} aria-current={category === c ? 'page' : undefined}>{label(c)}</a>)}<a href="/blog/featured">おすすめ</a></nav>

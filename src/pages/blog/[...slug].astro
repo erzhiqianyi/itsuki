@@ -75,7 +75,7 @@ const postUI = {
 const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
 ---
 
-<EditorialLayout title={title || date} description={postDescription} image={coverImage} article lang={lang as 'ja' | 'en'}>
+<EditorialLayout title={title || date} description={postDescription} image={coverImage} article lang={lang as 'ja' | 'en'} hideHeader>
   <div class:list={['reading-layout', { 'transcript-review': isTranscriptReview }]} id="reading-layout">
     <aside class="reading-sidebar">
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="true" aria-controls="sidebar-body" aria-label={postUI.panel[lang]} title={postUI.panel[lang]}></button>

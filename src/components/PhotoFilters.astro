@@ -1,0 +1,48 @@
+---
+// Shared masthead + YEAR/PLACE/TAG filter bar for the album index and the
+// cross-album TAG photo view, so both stay visually and behaviorally in sync.
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+const { tag, sortable = true } = Astro.props;
+const locale = value => typeof value === 'string' ? value : value?.ja || value?.en || '';
+const all = await getCollection('photos'); // locked albums still count toward YEAR/PLACE/totals — only their photos are hidden from TAG
+const visible = all.filter(p => !p.data.locked);
+const years = [...new Set(all.map(p => p.data.year_tag).filter(Boolean))].sort().reverse();
+const places = [...new Map(all.filter(p => p.data.location_tag).map(p => [p.data.location_tag, locale(p.data.location)])).entries()];
+// Locked albums' photo tags are excluded — otherwise a TAG link could lead to an empty page
+// while quietly confirming a locked album contains that subject.
+const contentTags = [...new Set(visible.flatMap(p => p.data.images?.flatMap(photo => photo.tags || []) || []))].sort((a,b) => a.localeCompare(b,'ja'));
+const totalPhotos = all.reduce((n,p) => n + (p.data.images?.length || (p.data.cover ? 1 : 0)),0);
+---
+<header class="photo-masthead"><h1 class="photo-wordmark">PHOTOGRAPHS<span>写真</span></h1><dl class="photo-totals"><div><dt>アルバム</dt><dd>{all.length.toString().padStart(2,'0')}</dd></div><div><dt>写真</dt><dd>{totalPhotos}</dd></div></dl></header>
+<nav class="photo-filters" aria-label="写真の絞り込み"><div><span>YEAR</span><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{years.map(year => <a href={`/photos/tags/${year}/1`} aria-current={tag === year ? 'page' : undefined}>{year}</a>)}{sortable && <div class="photo-filters-sort" role="group" aria-label="並び順"><button type="button" data-sort="desc" aria-current="page">NEWEST FIRST</button><button type="button" data-sort="asc">OLDEST FIRST</button></div>}</div><div><span>PLACE</span><div class="photo-filters-clamp" data-clamp-list><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{places.map(([key,label]) => <a href={`/photos/tags/${key}/1`} aria-current={tag === key ? 'page' : undefined}>{label}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div><div><span>TAG</span><div class="photo-filters-clamp" data-clamp-list><a href="/photos" aria-current={!tag ? 'page' : undefined}>すべて</a>{contentTags.map(t => <a href={`/photos/tags/${t}/1`} aria-current={tag === t ? 'page' : undefined}>{t}</a>)}</div><button type="button" class="photo-filters-more" data-clamp-toggle aria-expanded="false" hidden><span data-label>もっと見る</span><Icon name="lucide:chevron-down" /></button></div></nav>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-clamp-list]').forEach(list => {
+    const toggle = list.parentElement?.querySelector<HTMLButtonElement>('[data-clamp-toggle]');
+    if (!toggle) return;
+    const sync = () => { if (!list.classList.contains('expanded')) toggle.hidden = list.scrollHeight <= list.clientHeight + 1; };
+    requestAnimationFrame(sync);
+    document.fonts?.ready?.then(sync);
+    window.addEventListener('resize', sync);
+    toggle.addEventListener('click', () => {
+      const expanded = list.classList.toggle('expanded');
+      toggle.setAttribute('aria-expanded', String(expanded));
+      toggle.querySelector('[data-label]')!.textContent = expanded ? '閉じる' : 'もっと見る';
+    });
+  });
+  const grid = document.querySelector<HTMLElement>('[data-sortable-grid]');
+  const sortButtons = document.querySelectorAll<HTMLButtonElement>('[data-sort]');
+  if (grid && sortButtons.length) {
+    const cards = Array.from(grid.children) as HTMLElement[];
+    sortButtons.forEach(button => button.addEventListener('click', () => {
+      const order = button.dataset.sort;
+      sortButtons.forEach(other => other.removeAttribute('aria-current'));
+      button.setAttribute('aria-current', 'page');
+      const sorted = [...cards].sort((a,b) => {
+        const dateOf = (el: HTMLElement) => el.dataset.date || '';
+        return order === 'asc' ? dateOf(a).localeCompare(dateOf(b)) : dateOf(b).localeCompare(dateOf(a));
+      });
+      sorted.forEach(card => grid.appendChild(card));
+    }));
+  }
+</script>

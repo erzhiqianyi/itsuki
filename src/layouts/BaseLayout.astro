@@ -1,7 +1,7 @@
 ---
 import EditorialLayout from './EditorialLayout.astro';
 import '../styles/legacy-editorial.css';
-interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en'; }
+interface Props { title?: string; description?: string; image?: string; article?: boolean; lang?: 'ja' | 'en'; hideHeader?: boolean; }
 ---
 <EditorialLayout {...Astro.props}>
   <div class="legacy-editorial"><slot /></div>

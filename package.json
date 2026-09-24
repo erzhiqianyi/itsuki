@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "photos:add": "node scripts/photo-import.mjs",
-    "photos:studio": "node scripts/photo-studio.mjs"
+    "photos:studio": "node scripts/photo-studio.mjs",
+    "photos:lock": "node scripts/photo-lock.mjs"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.82",
