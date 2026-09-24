@@ -99,8 +99,8 @@ export const publicUrl = key => `https://${HOST}/${key}`;
 
 const wrangler = args => run('npx', ['--yes', 'wrangler', ...args], { cwd: ROOT });
 
-export const uploadObject = (key, file) =>
-  wrangler(['r2', 'object', 'put', `${BUCKET}/${key}`, '--file', file, '--content-type', 'image/jpeg', '--remote']);
+export const uploadObject = (key, file, contentType = 'image/jpeg') =>
+  wrangler(['r2', 'object', 'put', `${BUCKET}/${key}`, '--file', file, '--content-type', contentType, '--remote']);
 
 // Is wrangler authenticated and does the bucket exist? Reported before any upload starts.
 export async function preflight() {
