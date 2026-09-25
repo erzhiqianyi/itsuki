@@ -1,8 +1,14 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-09-21",
+  "checkedAt": "2026-09-25",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "TzHkL8tam7A",
+      "date": "2026-09-24T21:27:29+09:00",
+      "title": "初めて日本の1400円カットに行った休日の記録",
+      "duration": "15:04"
+    },
     {
       "id": "ILakNfrur5k",
       "date": "2026-09-20T15:03:58+09:00",
