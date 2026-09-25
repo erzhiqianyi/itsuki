@@ -14,6 +14,8 @@ const blog = defineCollection({
         coverImage: z.string(),
         featured: z.boolean().default(false),
         transcriptReview: z.boolean().default(false),
+        codexReadingDay: z.number().int().min(1).max(30).optional(),
+        pinnedInCategory: z.boolean().default(false),
     }),
 });
 

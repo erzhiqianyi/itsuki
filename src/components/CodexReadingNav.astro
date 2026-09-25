@@ -1,0 +1,7 @@
+---
+const { day } = Astro.props;
+---
+<nav class="codex-series-nav" aria-label="Codex 連載">
+  <a href="/blog/ja/codex-reading/overview">図解で読む Codex · はじめに・全30章</a>
+  <span>DAY {String(day).padStart(2, '0')} / 30</span>
+</nav>

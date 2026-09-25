@@ -136,4 +136,4 @@
 
 ---
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-8">前回 · #8 来日して半年、初めての散髪。混んだ店とAIに聞いた髪型説明</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-8">前回 · #8 来日して半年、初めての散髪。混んだ店とAIに聞いた髪型説明</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-10">次回 · #10 期末テストの結果は思ったより悪かった。ポケモン30周年イベントを覗きながら振り返る</a></nav>

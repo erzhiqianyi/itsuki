@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+const chapters = (await getCollection('blog', ({ data }) => !!data.codexReadingDay))
+  .sort((a, b) => a.data.codexReadingDay! - b.data.codexReadingDay!);
+const groups = [
+  { start:1, end:5, title:'動かす。地図をつくる。', text:'手元で起動し、入口・メッセージ・状態の単位を知る。' },
+  { start:6, end:9, title:'判断と記憶をつなぐ。', text:'Agent Loop、モデルとの通信、履歴と Compaction。' },
+  { start:10, end:16, title:'道具と画面をつなぐ。', text:'ツールの実行、承認、Sandbox、MCP、App Server。' },
+  { start:17, end:23, title:'試す。調べる。確かめる。', text:'小さな改造から Issue 分析、履歴調査、回帰テストへ。' },
+  { start:24, end:30, title:'状態と境界を読み解く。', text:'修正の前提、到達可能性、失敗の回復、API の契約を全体地図へ。' },
+];
+---
+<EditorialLayout title="図解で読む Codex — ソースコードを30日で読む" description="全30章を図解と3つの要点で整理。Codex の起動から Agent Loop、ツール、状態、テストまでを読む。" hideHeader>
+  <div class="codex-index">
+    <a class="back" href="/blog/ja/codex-reading/overview">← 連載の紹介と読み方</a>
+    <header>
+      <div><p class="eyebrow">CODEX SOURCE READING / 30 CHAPTERS</p><h1>図解で読む<br/><em>Codex</em> のしくみ。</h1><p class="intro">一つの図から、コードの奥へ。<br/>動かす・読む・確かめるを、30の小さな章で。</p><a class="start" href="/blog/ja/codex-reading/day-01">Day 01 から読む <span>→</span></a></div>
+      <img src="/assets/codex-reading/day-30.svg" alt="入力、Session、Model・Tools、History を結ぶ Codex の全体地図" width="660" height="760" />
+    </header>
+    <div class="reading-guide"><strong>この連載の読み方</strong><p>各章は「図でつかむ → 3つのポイント → ソースで確かめる → 30秒で復習」の順。初めてなら Day 01 から、知りたいテーマがあれば途中の章から読めます。</p></div>
+    <nav class="chapter-jumps" aria-label="連載の区分">{groups.map((group, i) => <a href={`#part-${i + 1}`}>0{i + 1}<span>Day {String(group.start).padStart(2, '0')}–{String(group.end).padStart(2, '0')}</span></a>)}</nav>
+    {groups.map((group, i) => <section id={`part-${i + 1}`}>
+      <div class="part-heading"><span>0{i + 1}</span><div><h2>{group.title}</h2><p>{group.text}</p></div></div>
+      <div class="chapters">{chapters.filter(c => c.data.codexReadingDay! >= group.start && c.data.codexReadingDay! <= group.end).map(chapter => <a class="chapter" href={`/blog/${chapter.id.replace(/\.(md|mdx)$/, '')}`}><span class="day">DAY {String(chapter.data.codexReadingDay).padStart(2, '0')}</span><h3>{chapter.data.title.split('｜').slice(1).join('｜')}</h3><p>{chapter.data.summary}</p><span class="read">図と要点を読む ↗</span></a>)}</div>
+    </section>)}
+    <footer><h2>この図解版について</h2><p>2026年8月25日〜9月23日の学習原稿を基に、全30章を再編集しました。Day 01・02 は長篇原稿、Day 03〜30 は保存用に復元・整理された原稿が出発点です。図は本連載のために作成しています。</p><p>ソースの照合は <code>4582c0a49815</code> を基準にしています。原稿中の歴史的な実験と現在の実装を区別し、見つからない型名やテスト名はその旨を記載しています。最新の実装を読むときは、各章の検索語から入口を探し直してください。</p></footer>
+  </div>
+</EditorialLayout>
+<style>
+  .codex-index { max-width:1060px; margin:auto; }
+  .back { display:inline-block; color:var(--muted); font-size:14px; margin-bottom:30px; }
+  header { display:grid; grid-template-columns:1.2fr 1fr; gap:50px; align-items:center; padding-bottom:48px; border-bottom:2px solid var(--ink); }
+  .eyebrow { font-size:12px; letter-spacing:.12em; color:#28635c; font-weight:600; margin-bottom:24px; }
+  h1 { font-size:clamp(38px,4.6vw,62px); line-height:1.35; font-weight:700; letter-spacing:-.04em; }
+  h1 em { font-style:normal; color:#28635c; }
+  .intro { font-size:17px; line-height:2; margin:24px 0; }
+  header img { width:100%; height:auto; max-width:390px; justify-self:end; border-radius:8px; }
+  .start { display:inline-flex; gap:45px; padding:14px 22px; background:#28635c; color:white; font-size:15px; }
+  .start:hover { background:#1c4c45; }
+  .reading-guide { display:grid; grid-template-columns:180px 1fr; gap:25px; padding:30px 0; line-height:1.9; }
+  .reading-guide strong { color:#28635c; font-size:15px; }
+  .reading-guide p { font-size:15px; }
+  .chapter-jumps { display:flex; flex-wrap:wrap; gap:12px; padding-bottom:28px; }
+  .chapter-jumps a { display:flex; gap:12px; align-items:center; border:1px solid var(--rule); padding:10px 14px; color:#28635c; }
+  .chapter-jumps span { font-size:12px; color:var(--muted); }
+  section { margin:35px 0 55px; scroll-margin-top:30px; }
+  .part-heading { display:flex; align-items:baseline; gap:22px; margin-bottom:24px; }
+  .part-heading > span { font-size:44px; color:var(--vermillion); font-weight:300; }
+  h2 { font-size:25px; font-weight:600; line-height:1.5; }
+  .part-heading p { color:var(--muted); font-size:14px; line-height:1.8; margin-top:8px; }
+  .chapters { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+  .chapter { display:flex; flex-direction:column; padding:26px; border:1px solid var(--rule); transition:background .15s; }
+  .chapter:hover { background:#e8eee8; }
+  .day { color:#28635c; font-size:12px; letter-spacing:.12em; }
+  h3 { font-size:21px; line-height:1.6; font-weight:600; margin:10px 0; }
+  .chapter p { font-size:14px; color:var(--muted); line-height:1.9; margin-bottom:22px; }
+  .read { margin-top:auto; font-size:12px; color:#28635c; }
+  footer { border-top:2px solid var(--ink); padding:28px 0; }
+  footer h2 { font-size:19px; margin-bottom:15px; }
+  footer p { font-size:14px; line-height:1.9; margin-bottom:14px; color:var(--muted); }
+  @media(max-width:700px) { header { grid-template-columns:1fr; gap:30px; } header img { max-width:320px; justify-self:center; } .chapters { grid-template-columns:1fr; } .reading-guide { grid-template-columns:1fr; gap:10px; } .part-heading { gap:14px; } h2 { font-size:22px; } .chapter { padding:22px; } .chapter-jumps { gap:8px; } }
+</style>

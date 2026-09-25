@@ -5,7 +5,7 @@ import { SITE_CONFIG } from '../../../data/site-config';
 export async function getStaticPaths({ paginate }) {
   const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
   return [...new Set(posts.map(p => p.data.category.toLowerCase()))].flatMap(category =>
-    paginate(posts.filter(p => p.data.category.toLowerCase() === category).sort((a,b) => Date.parse(b.data.date) - Date.parse(a.data.date)), { params: { category }, pageSize: SITE_CONFIG.blog.pageSize }));
+    paginate(posts.filter(p => p.data.category.toLowerCase() === category).sort((a,b) => Number(b.data.pinnedInCategory) - Number(a.data.pinnedInCategory) || Date.parse(b.data.date) - Date.parse(a.data.date)), { params: { category }, pageSize: SITE_CONFIG.blog.pageSize }));
 }
 const { page } = Astro.props;
 const { category } = Astro.params;

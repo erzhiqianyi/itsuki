@@ -5,6 +5,8 @@ import EditorialLayout from '../../layouts/EditorialLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { SITE_CONFIG } from '../../data/site-config';
 import '../../styles/transcript-review.css';
+import '../../styles/codex-reading.css';
+import CodexReadingNav from '../../components/CodexReadingNav.astro';
 
 export async function getStaticPaths() {
     const blogEntries = await getCollection('blog');
@@ -16,9 +18,10 @@ export async function getStaticPaths() {
 
     return sortedEntries.map((entry) => {
         const currentLang = entry.data.lang || 'ja';
-        const sameLangPosts = sortedEntries.filter(
-            (post) => (post.data.lang || 'ja') === currentLang
-        );
+        const sameLangPosts = entry.data.codexReadingDay
+            ? sortedEntries.filter(post => post.data.codexReadingDay)
+                .sort((a, b) => b.data.codexReadingDay! - a.data.codexReadingDay!)
+            : sortedEntries.filter(post => (post.data.lang || 'ja') === currentLang);
         const currentIndex = sameLangPosts.findIndex((p) => p.id === entry.id);
 
         return {
@@ -54,7 +57,8 @@ const {
 } = entry.data;
 
 // 计算字数与阅读时间
-const wordCount = entry.body?.match(/[\u4e00-\u9fa5]|[\u3040-\u309F]|[\u30A0-\u30FF]|\w+/g)?.length || 0;
+const textWithoutReadings = entry.body?.replace(/<rt\b[^>]*>[\s\S]*?<\/rt>/gi, '').replace(/<\/?ruby\b[^>]*>/gi, '');
+const wordCount = textWithoutReadings?.match(/[\u4e00-\u9fa5]|[\u3040-\u309F]|[\u30A0-\u30FF]|\w+/g)?.length || 0;
 const readingTime = Math.max(1, Math.ceil(wordCount / 400));
 
 const postDescription = summary;
@@ -77,11 +81,12 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
 ---
 
 <EditorialLayout title={title || date} description={postDescription} image={coverImage} article lang={lang as 'ja' | 'en'} hideHeader>
-  <div class:list={['reading-layout', { 'transcript-review': isTranscriptReview }]} id="reading-layout">
+  <div class:list={['reading-layout', { 'transcript-review': isTranscriptReview, 'codex-reading': !!entry.data.codexReadingDay }]} id="reading-layout">
     <aside class="reading-sidebar">
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="true" aria-controls="sidebar-body" aria-label={postUI.panel[lang]} title={postUI.panel[lang]}></button>
       <div class="sidebar-body" id="sidebar-body">
       <a href="/blog" class="back-link"><Icon name="lucide:arrow-left" />{postUI.back[lang]}</a>
+      {entry.data.codexReadingDay && <CodexReadingNav day={entry.data.codexReadingDay} />}
       <nav class="sidebar-pagination" aria-label={lang === 'en' ? 'Adjacent articles' : '前後の記事'}>
         {prevPost && <a href={getPostUrl(prevPost.id)}><span><Icon name="lucide:arrow-left" />{postUI.prev[lang]}</span><strong>{prevPost.data.title || prevPost.data.date}</strong></a>}
         {nextPost && <a href={getPostUrl(nextPost.id)}><span>{postUI.next[lang]}<Icon name="lucide:arrow-right" /></span><strong>{nextPost.data.title || nextPost.data.date}</strong></a>}
@@ -92,11 +97,11 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
     </aside>
     <article class="reading-article">
       <header class="reading-heading">
-        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}{hasFurigana && <button type="button" id="furigana-toggle" class="furigana-toggle" aria-pressed="true">読み方</button>}</div>
+        <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category.toLowerCase() === 'codex' ? '技術' : category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}{hasFurigana && <button type="button" id="furigana-toggle" class="furigana-toggle" aria-pressed="true">読み方</button>}</div>
         <h1>{title || date}</h1>
         {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <span>#{tag}</span>)}</p>}
       </header>
-      {coverImage && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
+      {coverImage && !entry.data.codexReadingDay && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
       {isTranscriptReview && <details class="review-mobile-toc"><summary>このページの目次</summary><nav aria-label="このページの目次">{toc.map(h => <a href={'#' + h.slug}>{h.text}</a>)}</nav></details>}
       <div class="article-content" id="blog-content" data-transcript-review={isTranscriptReview ? '' : undefined}><Content /></div>
       <nav class="reading-pagination" aria-label="記事のナビゲーション">
