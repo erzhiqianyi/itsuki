@@ -4,7 +4,7 @@ title: "Day 05｜Session・Task・Turn — 状態の寿命を見分ける"
 summary: "長く持つ状態と、一回の処理で使う状態を分けて読む。"
 date: "2026-08-29"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-05.svg"
 codexReadingDay: 5
 ---

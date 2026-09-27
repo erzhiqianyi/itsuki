@@ -4,7 +4,7 @@ title: "Day 13｜Approval — 方針と、一回の判断を分ける"
 summary: "承認方針、今回の要求に必要な確認、実際の決定を別々に読む。"
 date: "2026-09-06"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-13.svg"
 codexReadingDay: 13
 ---

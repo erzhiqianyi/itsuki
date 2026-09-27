@@ -4,7 +4,7 @@ title: "図解で読む Codex｜はじめに・全30章の読み方"
 summary: "Coding Agent はどう作られているのか。ソースのビルドから Agent Loop、ツール、状態管理、テストまでをたどる全30章の総合案内。目的に合わせた読み順と各章への入口をまとめました。"
 date: "2026-09-25"
 category: codex
-tags: [Codex, ソースコードリーディング, 図解]
+tags: ["Codex", "開発"]
 coverImage: ""
 pinnedInCategory: true
 ---

@@ -4,7 +4,7 @@ title: "Day 02｜Coding Agent を、6つの役割に分けてみる"
 summary: "入口・画面・共通メッセージ・Core・Model・Tools の役割を分ける。"
 date: "2026-08-26"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-02.svg"
 codexReadingDay: 2
 ---

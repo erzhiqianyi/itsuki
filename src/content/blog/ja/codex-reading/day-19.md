@@ -4,7 +4,7 @@ title: "Day 19｜コントリビューション — 差分を、伝わる問題�
 summary: "再現条件と根拠がそろうと、小さな発見も他の人が検証できる。"
 date: "2026-09-12"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-19.svg"
 codexReadingDay: 19
 ---

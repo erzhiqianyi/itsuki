@@ -4,7 +4,7 @@ title: "Day 29｜Protocol の変更 — 型・JSON・意味の3層で見る"
 summary: "コンパイル、通信形式、実行時の意味を別々に比べて互換性を判断する。"
 date: "2026-09-22"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-29.svg"
 codexReadingDay: 29
 ---

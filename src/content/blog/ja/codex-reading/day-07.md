@@ -4,7 +4,7 @@ title: "Day 07｜Model Client — 応答を少しずつ受け取る仕組み"
 summary: "Prompt を通信の要求に変え、届いたストリームを内部のイベントとして読む。"
 date: "2026-08-31"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-07.svg"
 codexReadingDay: 7
 ---

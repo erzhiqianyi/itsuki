@@ -6,11 +6,7 @@
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/Mh3s-v7WfR0.jpg"
 "title": "#2 GPT-6で焦った週末"
-"tags":
- - "やさしい日本語"
- - "話しことば"
- - "字幕"
- - "GPT-6"
+"tags": ["やさしい日本語", "日本語学習", "AI"]
 "summary": "台本なしで話した15分の動画を、YouTubeの自動字幕からふりかえります。全48か所の原文と言い換えを並べ、文法の修正と口語表現の選択肢を分けてまとめました。"
 ---
 

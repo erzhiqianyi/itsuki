@@ -4,7 +4,7 @@ title: "Day 14｜Sandbox — 許可を、実際の制約に変える"
 summary: "権限の設定を、実行環境が強制できる制約へ変換する。"
 date: "2026-09-07"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-14.svg"
 codexReadingDay: 14
 ---

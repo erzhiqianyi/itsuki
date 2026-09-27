@@ -4,7 +4,7 @@ title: "Day 25｜再トリアージ — 古い報告を、今の実装で問い�
 summary: "昔の再現手順・原因仮説・現在守るべき条件を切り離して評価する。"
 date: "2026-09-18"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-25.svg"
 codexReadingDay: 25
 ---

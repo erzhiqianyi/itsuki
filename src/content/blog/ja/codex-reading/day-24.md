@@ -4,7 +4,7 @@ title: "Day 24｜修正の移植 — 同じ一行でも、前提が変わる"
 summary: "古い修正を移す前に、状態の所有者と失敗時の保証を読み直す。"
 date: "2026-09-17"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-24.svg"
 codexReadingDay: 24
 ---

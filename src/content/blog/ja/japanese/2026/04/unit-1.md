@@ -5,8 +5,7 @@
 "featured": true
 "coverImage": "/assets/blog/ja/2026/04/2026-04-05.webp"
 "title": "note: unit1"
-"tags":
- - "japanese"
+"tags": ["日本語学習"]
 "summary": ""
 ---
 

@@ -4,7 +4,7 @@ title: "Day 11｜exec — コマンドが OS のプロセスになるまで"
 summary: "コマンドの文字列を、起動条件・実行中の状態・終了結果に分けて追う。"
 date: "2026-09-04"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-11.svg"
 codexReadingDay: 11
 ---

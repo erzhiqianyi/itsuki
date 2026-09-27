@@ -4,7 +4,7 @@ title: "Day 16｜TUI と App Server — 画面と処理の間にある橋"
 summary: "画面の操作は要求として渡り、返答や通知を受けて表示が変わる。"
 date: "2026-09-09"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-16.svg"
 codexReadingDay: 16
 ---

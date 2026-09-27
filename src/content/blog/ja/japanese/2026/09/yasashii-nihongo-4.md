@@ -6,11 +6,7 @@
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/QF6k-zsOyA4.jpg"
 "title": "#4 生活費が下ろせない…異国で突然カードを止められた週末"
-"tags":
- - "やさしい日本語"
- - "話しことば"
- - "字幕"
- - "生活"
+"tags": ["やさしい日本語", "日本語学習"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全47か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
 ---
 

@@ -4,7 +4,7 @@ title: "Day 09｜Compaction — 長い会話を、続けられる形にする"
 summary: "コンテキストの制約に合わせて履歴を組み替え、次の処理に必要な情報を引き継ぐ。"
 date: "2026-09-02"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-09.svg"
 codexReadingDay: 9
 ---

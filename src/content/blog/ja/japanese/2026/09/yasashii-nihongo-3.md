@@ -6,11 +6,7 @@
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/LV_rHyTQy_I.jpg"
 "title": "#1 三日坊主だったけど、もう一度YouTubeを始めます"
-"tags":
- - "やさしい日本語"
- - "話しことば"
- - "字幕"
- - "YouTube"
+"tags": ["やさしい日本語", "日本語学習", "発信"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全67か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
 ---
 

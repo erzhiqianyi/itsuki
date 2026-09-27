@@ -4,7 +4,7 @@ title: "Day 10｜Tools — 名前付きの要求を、実装へ届ける"
 summary: "ツールの説明・登録・振り分け・実行を分けると、呼び出しの道筋が見える。"
 date: "2026-09-03"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-10.svg"
 codexReadingDay: 10
 ---

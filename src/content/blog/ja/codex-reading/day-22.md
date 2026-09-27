@@ -4,7 +4,7 @@ title: "Day 22｜git bisect — 変化した地点を、半分ずつ絞る"
 summary: "同じ判定で good と bad を区別し、最初に変わった commit を探す。"
 date: "2026-09-15"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-22.svg"
 codexReadingDay: 22
 ---

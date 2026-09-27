@@ -4,7 +4,7 @@ title: "Day 27｜Failure Injection — 失敗を、狙った場所で起こす"
 summary: "失敗の位置を固定すると、回復処理を繰り返し検証できる。"
 date: "2026-09-20"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-27.svg"
 codexReadingDay: 27
 ---

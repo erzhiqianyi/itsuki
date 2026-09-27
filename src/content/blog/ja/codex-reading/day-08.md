@@ -4,7 +4,7 @@ title: "Day 08｜Context と History — 保存した情報と渡す情報"
 summary: "保持している履歴を、モデルが受け取れる形に整えて送る。"
 date: "2026-09-01"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-08.svg"
 codexReadingDay: 8
 ---

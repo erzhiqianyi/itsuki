@@ -4,7 +4,7 @@ title: "Day 18｜小さな改造 — alias は既存の処理へつなぐ"
 summary: "新しい名前を既存のコマンドへ解決し、処理を重複させない。"
 date: "2026-09-11"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-18.svg"
 codexReadingDay: 18
 ---

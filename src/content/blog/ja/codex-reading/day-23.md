@@ -4,7 +4,7 @@ title: "Day 23｜回帰テスト — 関数名より、利用者に届く結果�
 summary: "バグの症状が再発したら失敗するテストを、適切な境界に置く。"
 date: "2026-09-16"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-23.svg"
 codexReadingDay: 23
 ---

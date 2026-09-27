@@ -4,7 +4,7 @@ title: "Day 26｜State Reachability — その状態は、本当に起きる？"
 summary: "テストで作れる状態と、実際のイベントから到達できる状態を区別する。"
 date: "2026-09-19"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-26.svg"
 codexReadingDay: 26
 ---

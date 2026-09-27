@@ -26,4 +26,4 @@ python3 scripts/import-x-capture.py /absolute/path/to/browser-capture.json
 npm run build
 ```
 
-脚本按帖子 URL 去重、以日本时间分日，只覆盖带生成标记的 `-x.md`，复用已经下载的图片，并输出备份数量及失败项。完整视频和原始媒体可在取得 X 官方数据存档后再补充；无需将私信等账户数据放入网站。
+脚本按帖子 URL 去重、以日本时间分日，只覆盖带生成标记的 `-x.md`，复用已经下载的图片，并输出备份数量及失败项。重新导入时保留 Markdown 里已编辑的 `title` 与 `tags`。新日记默认标签为 `X`、`日记`，主题标签请从 `src/data/post-tags.ts` 的标签表中选择（参见 `/blog/tags` 标签地图）。完整视频和原始媒体可在取得 X 官方数据存档后再补充；无需将私信等账户数据放入网站。

@@ -16,7 +16,7 @@ const entries = await Promise.all(page.data.map(async post => ({ post, excerpt: 
 <EditorialLayout title={category ? label(category) : '記事'} hideHeader>
   <div class="post-index" data-post-index data-category={category || ''} data-base={base} data-page={page.currentPage} data-page-size={SITE_CONFIG.blog.pageSize}>
     <header class="index-title"><span class="display-type">01</span><h1>{category ? label(category) : '記事'}</h1><p data-post-total>{category ? allPosts.filter(p => p.data.category.toLowerCase() === category).length : allPosts.length} 記事</p></header>
-    <nav class="index-categories" data-post-categories aria-label="カテゴリー"><a href="/blog" aria-current={!category ? 'page' : undefined}>すべて</a>{categories.map(c => <a href={'/category/' + c} aria-current={category === c ? 'page' : undefined}>{label(c)}</a>)}<a href="/blog/featured">おすすめ</a></nav>
+    <nav class="index-categories" data-post-categories aria-label="カテゴリー"><a href="/blog" aria-current={!category ? 'page' : undefined}>すべて</a>{categories.map(c => <a href={'/category/' + c} aria-current={category === c ? 'page' : undefined}>{label(c)}</a>)}<a href="/blog/featured">おすすめ</a><a href="/blog/tags">タグ</a></nav>
     <div data-post-tools hidden>
       <button type="button" class="post-filters-toggle" aria-expanded="false" aria-controls="post-filters-panel"><span>絞り込み・並び順</span><Icon name="lucide:chevron-down" /></button>
       <div class="post-filters" id="post-filters-panel" aria-label="記事の絞り込み">

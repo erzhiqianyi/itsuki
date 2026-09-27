@@ -4,6 +4,7 @@ import { getCollection, render } from 'astro:content';
 import EditorialLayout from '../../layouts/EditorialLayout.astro';
 import { Icon } from 'astro-icon/components';
 import { SITE_CONFIG } from '../../data/site-config';
+import { tagHref } from '../../data/post-tags';
 import '../../styles/transcript-review.css';
 import '../../styles/codex-reading.css';
 import CodexReadingNav from '../../components/CodexReadingNav.astro';
@@ -99,7 +100,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
       <header class="reading-heading">
         <div class="reading-meta"><a href={'/category/' + category.toLowerCase()}>{category.toLowerCase() === 'codex' ? '技術' : category}</a><time datetime={date}>{date}</time>{isTranscriptReview ? <span>字幕でふりかえる · {reviewCount} の表現</span> : <><span>{wordCount} {postUI.stats.words[lang]}</span><span>{readingTime} {postUI.stats.minutes[lang]}</span></>}{hasFurigana && <button type="button" id="furigana-toggle" class="furigana-toggle" aria-pressed="true">読み方</button>}</div>
         <h1>{title || date}</h1>
-        {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <span>#{tag}</span>)}</p>}
+        {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <a href={tagHref(tag)}>#{tag}</a>)}</p>}
       </header>
       {coverImage && !entry.data.codexReadingDay && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
       {isTranscriptReview && <details class="review-mobile-toc"><summary>このページの目次</summary><nav aria-label="このページの目次">{toc.map(h => <a href={'#' + h.slug}>{h.text}</a>)}</nav></details>}
@@ -256,6 +257,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .reading-meta a { color:var(--vermillion); }
   .reading-heading h1 { font-size:34px; font-weight:700; line-height:1.55; margin:20px 0; overflow-wrap:anywhere; }
   .reading-tags { display:flex; flex-wrap:wrap; gap:16px; color:var(--muted); font-size:12px; }
+  .reading-tags a:hover { color:var(--vermillion); }
   .furigana-toggle { margin-left:auto; padding:3px 12px; border:1px solid var(--rule); border-radius:999px; background:var(--paper); color:var(--muted); font-size:12px; line-height:1.8; cursor:pointer; transition:color .2s ease, border-color .2s ease; }
   .furigana-toggle:hover { color:var(--vermillion); border-color:var(--vermillion); }
   .furigana-toggle[aria-pressed="true"] { color:var(--vermillion); border-color:var(--vermillion); }

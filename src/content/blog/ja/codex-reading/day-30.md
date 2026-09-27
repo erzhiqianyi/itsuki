@@ -4,7 +4,7 @@ title: "Day 30｜全体地図 — 入力・判断・実行・状態をつなぐ"
 summary: "一つの操作を、画面からモデル・ツール・履歴まで説明できれば地図がつながる。"
 date: "2026-09-23"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-30.svg"
 codexReadingDay: 30
 ---

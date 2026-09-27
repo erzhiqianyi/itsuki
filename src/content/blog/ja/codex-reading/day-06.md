@@ -4,7 +4,7 @@ title: "Day 06｜Agent Loop — 結果を受け取り、もう一度判断する
 summary: "ツールの結果や保留入力を確認し、続きが必要なら次のモデル呼び出しへ進む。"
 date: "2026-08-30"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-06.svg"
 codexReadingDay: 6
 ---

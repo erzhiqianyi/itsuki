@@ -4,7 +4,7 @@ title: "Day 01｜ソースから動かすと、コードに意味が生まれる
 summary: "まず動作を観察し、その動きを生むコードを探す。"
 date: "2026-08-25"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-01.svg"
 codexReadingDay: 1
 ---

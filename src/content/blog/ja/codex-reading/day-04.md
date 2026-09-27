@@ -4,7 +4,7 @@ title: "Day 04｜Op と EventMsg — お願いと報告を分ける"
 summary: "UI からの操作要求と、Core からの出来事の通知は別の方向に流れる。"
 date: "2026-08-28"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-04.svg"
 codexReadingDay: 4
 ---

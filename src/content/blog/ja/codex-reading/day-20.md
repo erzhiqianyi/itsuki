@@ -4,7 +4,7 @@ title: "Day 20｜Issue から読む — 成功時と失敗時の差を探す"
 summary: "同じ処理の成功経路と失敗経路を比べると、回復処理の抜けが見える。"
 date: "2026-09-13"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-20.svg"
 codexReadingDay: 20
 ---

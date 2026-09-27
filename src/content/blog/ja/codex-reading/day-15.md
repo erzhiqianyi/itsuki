@@ -4,7 +4,7 @@ title: "Day 15｜MCP — 外部の道具を、同じ作業の輪につなぐ"
 summary: "外部ツールを発見し、呼び出せる形に対応付け、結果を Agent Loop へ返す。"
 date: "2026-09-08"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-15.svg"
 codexReadingDay: 15
 ---

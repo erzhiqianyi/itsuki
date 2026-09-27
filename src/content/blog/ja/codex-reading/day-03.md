@@ -4,7 +4,7 @@ title: "Day 03｜一つの入力を、モデルとツールの往復まで追う
 summary: "文字列が型付きの入力になり、Turn の処理へ渡る境界を追う。"
 date: "2026-08-27"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-03.svg"
 codexReadingDay: 3
 ---

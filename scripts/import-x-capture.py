@@ -61,11 +61,17 @@ def main():
             if not (args.replace_initial_preview and day == '2026-09-05'): raise SystemExit(f'Refusing to overwrite {path}')
         # Preserve the editorial title stored in Markdown during subsequent imports.
         title = f'{day}｜Xの日記'
+        tags = ['X', '日記']
         if path.exists():
-            match = re.search(r'^title: (.+)$', path.read_text().split('---', 2)[1], re.M)
+            existing = path.read_text().split('---', 2)[1]
+            match = re.search(r'^title: (.+)$', existing, re.M)
             if match:
                 title = json.loads(match.group(1))
-        fronts = {'lang':'ja','date':day,'category':'journals','featured':False,'coverImage':'','title':title,'tags':['X','日記'],'summary':' / '.join(p['text'].split('\n')[0][:48] for p in posts if p['text'])[:160]}
+            # Topic tags are curated by hand after import; keep them too.
+            match = re.search(r'^tags: (\[.*\])$', existing, re.M)
+            if match:
+                tags = json.loads(match.group(1))
+        fronts = {'lang':'ja','date':day,'category':'journals','featured':False,'coverImage':'','title':title,'tags':tags,'summary':' / '.join(p['text'].split('\n')[0][:48] for p in posts if p['text'])[:160]}
         out = ['---'] + [f'{k}: {json.dumps(v,ensure_ascii=False)}' for k,v in fronts.items()] + ['---', MARKER, '']
         for p in posts:
             pid=p['url'].rsplit('/',1)[-1]

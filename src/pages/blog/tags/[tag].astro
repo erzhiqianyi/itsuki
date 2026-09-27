@@ -1,0 +1,66 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../../layouts/EditorialLayout.astro';
+import { FORMAT_TAGS, groupOfTag, tagHref } from '../../../data/post-tags';
+import { postCategoryLabel as label } from '../../../lib/post-filter';
+import '../../../styles/post-index.css';
+import '../../../styles/post-tags.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
+  const tags = [...new Set(posts.flatMap(p => p.data.tags))];
+  return tags.map(tag => ({ params: { tag }, props: { tag, posts } }));
+}
+
+const { tag, posts: allPosts } = Astro.props;
+const posts = allPosts.filter(p => p.data.tags.includes(tag)).sort((a, b) => b.data.date.localeCompare(a.data.date) || b.id.localeCompare(a.id));
+const group = groupOfTag(tag);
+
+// Tags that most often appear alongside this one, ignoring format tags (日記 / X)
+// that sit on almost every diary and would drown out the real neighbours.
+const related = new Map<string, number>();
+for (const post of posts) for (const other of post.data.tags) if (other !== tag && !FORMAT_TAGS.has(other)) related.set(other, (related.get(other) || 0) + 1);
+const neighbours = [...related].sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+const years = [...new Set(posts.map(p => p.data.date.slice(0, 4)))].sort().reverse();
+const byYear = years.map(year => ({ year, posts: posts.filter(p => p.data.date.startsWith(year)) }));
+const peak = Math.max(...byYear.map(y => y.posts.length));
+const href = (post: typeof posts[number]) => '/blog/' + post.id.replace(/\.(md|mdx)$/, '');
+---
+<EditorialLayout title={`#${tag}`} description={`「${tag}」のタグが付いた${posts.length}件の記事。`} hideHeader>
+  <div class="post-index tag-page">
+    <header class="index-title"><span class="display-type">#</span><h1>{tag}</h1><p>{posts.length} 記事</p></header>
+    <nav class="index-categories tag-trail" aria-label="パンくず"><a href="/blog">記事</a><span aria-hidden="true">/</span><a href="/blog/tags">タグ地図</a>{group && <><span aria-hidden="true">/</span><a href={'/blog/tags#region-' + group.key}>{group.label}</a></>}</nav>
+
+    <div class="tag-overview">
+      <section aria-labelledby="tag-years">
+        <h2 id="tag-years" class="filter-label">YEARS</h2>
+        <ol class="tag-years">{byYear.map(({ year, posts }) => <li><a href={'#y' + year}><span>{year}</span><span class="tag-bar" style={`--w:${Math.max(6, Math.round(posts.length / peak * 100))}%`} aria-hidden="true"></span><span class="tag-count">{posts.length}</span></a></li>)}</ol>
+      </section>
+      {neighbours.length > 0 && (
+        <section aria-labelledby="tag-related">
+          <h2 id="tag-related" class="filter-label">RELATED</h2>
+          <ul class="tag-related">{neighbours.map(([other, n]) => <li><a href={tagHref(other)}>#{other}<span>{n}</span></a></li>)}</ul>
+        </section>
+      )}
+    </div>
+
+    {byYear.map(({ year, posts }) => (
+      <section class="tag-year" id={'y' + year} aria-labelledby={'yh' + year}>
+        <h2 id={'yh' + year} class="display-type">{year}</h2>
+        <ul>
+          {posts.map(post => (
+            <li>
+              <time datetime={post.data.date}>{post.data.date.slice(5).replace('-', '.')}</time>
+              <a href={href(post)}>{post.data.title || post.data.date}</a>
+              <span class="tag-post-meta">{post.data.tags.filter(t => t !== tag && !FORMAT_TAGS.has(t)).slice(0, 3).map(t => <a href={tagHref(t)}>#{t}</a>)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+
+    <p class="tag-map-foot"><a href={'/blog?tag=' + encodeURIComponent(tag)}>記事一覧で年・月と組み合わせて絞り込む<Icon name="lucide:arrow-up-right" /></a></p>
+  </div>
+</EditorialLayout>

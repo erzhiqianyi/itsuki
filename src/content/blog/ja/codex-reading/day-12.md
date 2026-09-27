@@ -4,7 +4,7 @@ title: "Day 12｜apply_patch — 変更の意図を、ファイルへの差分�
 summary: "パッチを解析し、適用できるかを確認してから実際の変更へ進む。"
 date: "2026-09-05"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-12.svg"
 codexReadingDay: 12
 ---

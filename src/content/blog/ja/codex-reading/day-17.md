@@ -4,7 +4,7 @@ title: "Day 17｜テスト — 変更した一行を、振る舞いで確かめ�
 summary: "変更に近いテストから始め、失敗の意味を確認して検証範囲を広げる。"
 date: "2026-09-10"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-17.svg"
 codexReadingDay: 17
 ---

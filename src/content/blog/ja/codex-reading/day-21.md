@@ -4,7 +4,7 @@ title: "Day 21｜git の履歴 — 一行の変更から、設計の理由をた
 summary: "blame で手掛かりを得て、差分と周辺の変更から理由を読む。"
 date: "2026-09-14"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-21.svg"
 codexReadingDay: 21
 ---

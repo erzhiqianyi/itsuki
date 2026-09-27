@@ -4,7 +4,7 @@ title: "Day 28｜Contract Test — 境界の約束を、両側から確かめる
 summary: "要求・永続状態の変更・返答・通知が、同じ意味でつながることを検証する。"
 date: "2026-09-21"
 category: "codex"
-tags: ["Codex", "ソースコードリーディング", "図解"]
+tags: ["Codex", "開発"]
 coverImage: "/assets/codex-reading/day-28.svg"
 codexReadingDay: 28
 ---
