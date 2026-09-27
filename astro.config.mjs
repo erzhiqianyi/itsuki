@@ -3,6 +3,7 @@ import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap'; // 确保已安装此插件
 import react from '@astrojs/react'; // [!code ++]
 import icon from 'astro-icon'; // 导入插件
+import trailingSlashLinks from './src/integrations/trailing-slash-links.mjs';
 
 
 // [https://astro.build/config](https://astro.build/config)
@@ -23,5 +24,5 @@ export default defineConfig({
     },
 
     // 5. 预留：未来添加插件（如 Tailwind, React, Sitemap）的地方
-    integrations: [tailwind(), sitemap(), react(),icon()],
+    integrations: [tailwind(), sitemap(), react(),icon(), trailingSlashLinks()],
 });

@@ -39,7 +39,7 @@ if (root) {
       else query.delete(key);
     }
     const search = query.toString();
-    return `${base}${page > 1 ? `/${page}` : ''}${search ? `?${search}` : ''}${location.hash}`;
+    return `${base}${page > 1 ? `/${page}` : ''}/${search ? `?${search}` : ''}${location.hash}`;
   }
   function optionButton(value: string, label: string, key: 'year' | 'tag', selected: string) {
     const button = document.createElement('button');
@@ -89,7 +89,7 @@ if (root) {
     const fragment = document.createDocumentFragment();
     for (const post of matching.slice(start, start + pageSize)) {
       const item = template.content.cloneNode(true) as DocumentFragment;
-      const href = `/blog/${post.id}`;
+      const href = `/blog/${post.id}/`;
       item.querySelector<HTMLElement>('[data-entry-pin]')!.hidden = !(category && post.category === category && post.pinnedInCategory);
       const time = item.querySelector('time')!;
       time.dateTime = post.date;
@@ -101,7 +101,7 @@ if (root) {
       excerpt.textContent = post.excerpt;
       excerpt.hidden = !post.excerpt;
       const cat = item.querySelector<HTMLAnchorElement>('[data-entry-category]')!;
-      cat.href = `/category/${post.category}`;
+      cat.href = `/category/${post.category}/`;
       cat.textContent = postCategoryLabel(post.category);
       const arrow = item.querySelector<HTMLAnchorElement>('[data-entry-arrow]')!;
       arrow.href = href;
@@ -143,7 +143,7 @@ if (root) {
     // Category changes reset dependent filters and keep the chosen ordering.
     root!.querySelectorAll<HTMLAnchorElement>('[data-post-categories] a').forEach(link => {
       const url = new URL(link.href);
-      if (url.pathname === '/blog/featured') return;
+      if (url.pathname.replace(/\/$/, '') === '/blog/featured') return;
       url.search = filter.sort === 'asc' ? '?sort=asc' : '';
       link.href = url.pathname + url.search;
     });
