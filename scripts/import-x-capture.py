@@ -65,7 +65,7 @@ def main():
             match = re.search(r'^title: (.+)$', path.read_text().split('---', 2)[1], re.M)
             if match:
                 title = json.loads(match.group(1))
-        fronts = {'lang':'ja','date':day,'category':'journals','featured':False,'coverImage':'','title':title,'tags':['X','日記'],'summary':f'Xに投稿した{len(posts)}件の記録。' + ' / '.join(p['text'].split('\n')[0][:48] for p in posts if p['text'])[:160]}
+        fronts = {'lang':'ja','date':day,'category':'journals','featured':False,'coverImage':'','title':title,'tags':['X','日記'],'summary':' / '.join(p['text'].split('\n')[0][:48] for p in posts if p['text'])[:160]}
         out = ['---'] + [f'{k}: {json.dumps(v,ensure_ascii=False)}' for k,v in fronts.items()] + ['---', MARKER, '']
         for p in posts:
             pid=p['url'].rsplit('/',1)[-1]
