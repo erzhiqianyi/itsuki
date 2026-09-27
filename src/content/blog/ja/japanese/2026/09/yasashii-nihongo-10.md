@@ -430,4 +430,4 @@
 
 </details>
 
-<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-9">前回 · #9 目的地を決めずに、水元公園で2時間半のひとり散歩</a></nav>
+<nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-9">前回 · #9 目的地を決めずに、水元公園で2時間半のひとり散歩</a><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-11">次回 · #11 久しぶりの渋谷。にぎやかな交差点で、あまり来ない理由を話す</a></nav>
