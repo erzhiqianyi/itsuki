@@ -5,9 +5,10 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/Mh3s-v7WfR0.jpg"
-"title": "#2 GPT-6で焦った週末"
+"title": "#2 GPT-6で遊んだ週末、ちょっと焦った"
 "tags": ["やさしい日本語", "日本語学習", "AI"]
 "summary": "台本なしで話した15分の動画を、YouTubeの自動字幕からふりかえります。全48か所の原文と言い換えを並べ、文法の修正と口語表現の選択肢を分けてまとめました。"
+"youtube": {"id": "Mh3s-v7WfR0", "title": "GPT-6で遊んだ週末、ちょっと焦った"}
 ---
 
 

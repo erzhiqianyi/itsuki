@@ -5,9 +5,10 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/giK2L_yQO5k.jpg"
-"title": "#3 日本語教室の帰り道"
+"title": "#3 雨の東京を歩きながら話す、無料日本語教室とこれからの就活"
 "tags": ["やさしい日本語", "日本語学習"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全57か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
+"youtube": {"id": "giK2L_yQO5k", "title": "雨の東京を歩きながら話す、無料日本語教室とこれからの就活"}
 ---
 
 

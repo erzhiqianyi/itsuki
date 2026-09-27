@@ -1,0 +1,11 @@
+---
+// Category row shared by every article listing: /blog, categories, おすすめ, タグ.
+import { getCollection } from 'astro:content';
+import { postCategoryLabel as label } from '../lib/post-filter';
+interface Props { current?: string }
+const { current = 'all' } = Astro.props;
+const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
+const categories = [...new Set(posts.map(p => p.data.category.toLowerCase()))];
+const is = (key: string) => current === key ? 'page' : undefined;
+---
+<nav class="index-categories" data-post-categories aria-label="カテゴリー"><a href="/blog" aria-current={is('all')}>すべて</a>{categories.map(c => <a href={'/category/' + c} aria-current={is(c)}>{label(c)}</a>)}<a href="/blog/featured" aria-current={is('featured')}>おすすめ</a><a href="/blog/tags" aria-current={is('tags')}>タグ</a></nav>

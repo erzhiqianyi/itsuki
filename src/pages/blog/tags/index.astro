@@ -3,12 +3,11 @@ import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 import EditorialLayout from '../../../layouts/EditorialLayout.astro';
 import { TAG_GROUPS, tagHref } from '../../../data/post-tags';
-import { postCategoryLabel as label } from '../../../lib/post-filter';
+import PostSectionNav from '../../../components/PostSectionNav.astro';
 import '../../../styles/post-index.css';
 import '../../../styles/post-tags.css';
 
 const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
-const categories = [...new Set(posts.map(p => p.data.category.toLowerCase()))];
 const counts = new Map<string, number>();
 for (const post of posts) for (const tag of post.data.tags) counts.set(tag, (counts.get(tag) || 0) + 1);
 const known = new Set(TAG_GROUPS.flatMap(g => g.tags));
@@ -28,7 +27,7 @@ const tagTotal = groups.reduce((sum, g) => sum + g.tags.length, 0);
 <EditorialLayout title="タグ地図" description="記事のタグを、暮らし・学び・つくる・仕事・旅・表現の6つの領域に整理した地図。" hideHeader>
   <div class="post-index tag-map-page">
     <header class="index-title"><span class="display-type">01</span><h1>タグ地図</h1><p>{tagTotal} タグ · {posts.length} 記事</p></header>
-    <nav class="index-categories" aria-label="カテゴリー"><a href="/blog">すべて</a>{categories.map(c => <a href={'/category/' + c}>{label(c)}</a>)}<a href="/blog/featured">おすすめ</a><a href="/blog/tags" aria-current="page">タグ</a></nav>
+    <PostSectionNav current="tags" />
 
     <p class="tag-map-lede">書いてきたことを6つの領域に分けました。数字は記事数、線の長さはその量です。</p>
 

@@ -5,9 +5,10 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/LV_rHyTQy_I.jpg"
-"title": "#1 三日坊主だったけど、もう一度YouTubeを始めます"
+"title": "#1 三日坊主だったけど、もう一度YouTubeを始めます｜来日からもうすぐ半年"
 "tags": ["やさしい日本語", "日本語学習", "発信"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全67か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
+"youtube": {"id": "LV_rHyTQy_I", "title": "三日坊主だったけど、もう一度YouTubeを始めます｜来日からもうすぐ半年"}
 ---
 
 

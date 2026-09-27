@@ -35,6 +35,7 @@
 .transcript-review .ct-head { align-items:center; flex-wrap:wrap; border:0; padding:0; }
 .transcript-review a.ct-time { display:inline-flex; align-items:center; min-height:32px; padding:3px 8px; border-color:var(--rule); font-family:inherit; font-size:13px; text-decoration:none; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .transcript-review a.ct-time:hover { border-color:var(--vermillion); }
+.transcript-review span.ct-time { color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; white-space:nowrap; }
 .transcript-review .ct-name { font-size:17px; }
 .transcript-review .ct-label { font-family:inherit; font-size:12px; letter-spacing:.04em; }
 .transcript-review .ct-col { padding:16px; }

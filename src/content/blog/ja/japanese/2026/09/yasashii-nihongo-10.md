@@ -4,10 +4,11 @@
 "category": "Japanese"
 "featured": true
 "transcriptReview": true
-"coverImage": "/assets/blog/ja/2026/09/yasashii-nihongo-10.png"
-"title": "#10 期末テストの結果は思ったより悪かった。ポケモン30周年イベントを覗きながら振り返る"
+"coverImage": "/assets/videos/youtube/hMJS_DFJcoY.jpg"
+"title": "#10 日本語学校の期末テストで大苦戦…！？半年間のリアルな成績を公開"
 "tags": ["やさしい日本語", "日本語学習"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全39か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
+"youtube": {"id": "hMJS_DFJcoY", "title": "日本語学校の期末テストで大苦戦…！？半年間のリアルな成績を公開"}
 ---
 
 

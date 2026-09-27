@@ -3,10 +3,11 @@
 "date": "2026-09-25"
 "category": "Japanese"
 "featured": true
-"coverImage": "/assets/blog/ja/2026/09/yasashii-nihongo-9.png"
-"title": "#9 目的地を決めずに、水元公園で2時間半のひとり散歩"
+"coverImage": "/assets/videos/youtube/AWoLWkrjaRc.jpg"
+"title": "#9 東京・水元公園｜ただ歩く、贅沢な午後。水辺と森と猫に出会う散歩Vlog"
 "tags": ["やさしい日本語", "日本語学習", "散歩"]
 "summary": "動画の公開に先立ち、朗読用の原稿を記事にしました。全51文に読み方（ふりがな）をつけているので、声に出して読む練習にどうぞ。ページ上部の「読み方」ボタンで、ふりがなの表示・非表示を切り替えられます。"
+"youtube": {"id": "AWoLWkrjaRc", "title": "東京・水元公園｜ただ歩く、贅沢な午後。水辺と森と猫に出会う散歩Vlog"}
 ---
 
 ## 1. 湖畔にて

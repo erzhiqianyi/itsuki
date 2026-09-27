@@ -5,9 +5,10 @@
 "featured": true
 "transcriptReview": true
 "coverImage": "/assets/videos/youtube/TzHkL8tam7A.jpg"
-"title": "#8 来日して半年、初めての散髪。混んだ店とAIに聞いた髪型説明"
+"title": "#8 初めて日本の1400円カットに行った休日の記録"
 "tags": ["やさしい日本語", "日本語学習"]
 "summary": "YouTubeの自動字幕から、日常の日本語をふりかえります。全28か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
+"youtube": {"id": "TzHkL8tam7A", "title": "初めて日本の1400円カットに行った休日の記録"}
 ---
 
 

@@ -54,7 +54,8 @@ const {
     coverImage,
     summary,
     lang = 'ja',
-    series
+    series,
+    youtube
 } = entry.data;
 
 // 计算字数与阅读时间
@@ -86,7 +87,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
     <aside class="reading-sidebar">
       <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-expanded="true" aria-controls="sidebar-body" aria-label={postUI.panel[lang]} title={postUI.panel[lang]}></button>
       <div class="sidebar-body" id="sidebar-body">
-      <a href="/blog" class="back-link"><Icon name="lucide:arrow-left" />{postUI.back[lang]}</a>
+      <a href="/blog" class="back-link" data-smart-back="blog"><Icon name="lucide:arrow-left" /><span data-smart-back-label>{postUI.back[lang]}</span></a>
       {entry.data.codexReadingDay && <CodexReadingNav day={entry.data.codexReadingDay} />}
       <nav class="sidebar-pagination" aria-label={lang === 'en' ? 'Adjacent articles' : '前後の記事'}>
         {prevPost && <a href={getPostUrl(prevPost.id)}><span><Icon name="lucide:arrow-left" />{postUI.prev[lang]}</span><strong>{prevPost.data.title || prevPost.data.date}</strong></a>}
@@ -102,7 +103,8 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
         <h1>{title || date}</h1>
         {tags.length > 0 && <p class="reading-tags">{tags.map(tag => <a href={tagHref(tag)}>#{tag}</a>)}</p>}
       </header>
-      {coverImage && !entry.data.codexReadingDay && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
+      {youtube && <a class="article-video" href={'https://www.youtube.com/watch?v=' + youtube.id} target="_blank" rel="noopener noreferrer"><span class="article-video-cover"><img src={coverImage || `/assets/videos/youtube/${youtube.id}.jpg`} alt="" loading="eager" /><Icon name="lucide:play" /></span><span class="article-video-text"><small>YOUTUBE · 元の動画</small><strong>{youtube.title}</strong><span>YouTubeで見る<Icon name="lucide:arrow-up-right" /></span></span></a>}
+      {coverImage && !youtube && !entry.data.codexReadingDay && <details class="article-cover" open={!isTranscriptReview}><summary>{isTranscriptReview ? '動画の表紙を見る' : lang === 'en' ? 'Cover image' : '記事の写真'}<Icon name="lucide:image" /></summary><img src={coverImage} alt={title || date} data-article-image loading="lazy" /></details>}
       {isTranscriptReview && <details class="review-mobile-toc"><summary>このページの目次</summary><nav aria-label="このページの目次">{toc.map(h => <a href={'#' + h.slug}>{h.text}</a>)}</nav></details>}
       <div class="article-content" id="blog-content" data-transcript-review={isTranscriptReview ? '' : undefined}><Content /></div>
       <nav class="reading-pagination" aria-label="記事のナビゲーション">
@@ -119,6 +121,7 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   </dialog>
 </EditorialLayout>
 <script>
+  import '../../scripts/smart-back';
   const dialog = document.querySelector<HTMLDialogElement>('#article-lightbox');
   const images = Array.from(document.querySelectorAll<HTMLImageElement>('#blog-content img, [data-article-image]'));
   const display = dialog?.querySelector('img');
@@ -258,6 +261,17 @@ const getPostUrl = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}`;
   .reading-heading h1 { font-size:34px; font-weight:700; line-height:1.55; margin:20px 0; overflow-wrap:anywhere; }
   .reading-tags { display:flex; flex-wrap:wrap; gap:16px; color:var(--muted); font-size:12px; }
   .reading-tags a:hover { color:var(--vermillion); }
+  .article-video { display:grid; grid-template-columns:minmax(0,280px) minmax(0,1fr); gap:24px; align-items:center; margin:0 0 36px; padding:0 0 28px; border-bottom:1px solid var(--rule); }
+  .article-video-cover { position:relative; display:block; aspect-ratio:16/9; overflow:hidden; background:#eceee9; }
+  .article-video-cover img { display:block; width:100%; height:100%; object-fit:cover; }
+  .article-video-cover svg { position:absolute; left:50%; top:50%; width:44px; height:44px; padding:11px; transform:translate(-50%,-50%); border-radius:50%; background:var(--vermillion); color:white; fill:white; }
+  .article-video-text { display:grid; gap:8px; }
+  .article-video-text small { font:600 13px/1 'Barlow Condensed', sans-serif; color:var(--vermillion); }
+  .article-video-text strong { font-size:17px; font-weight:600; line-height:1.6; }
+  .article-video-text > span { display:inline-flex; align-items:center; gap:4px; font-size:13px; color:var(--muted); }
+  .article-video-text svg { width:14px; height:14px; }
+  .article-video:hover strong, .article-video:hover .article-video-text > span { color:var(--vermillion); }
+  @media (max-width:760px) { .article-video { grid-template-columns:minmax(0,1fr); gap:14px; } }
   .furigana-toggle { margin-left:auto; padding:3px 12px; border:1px solid var(--rule); border-radius:999px; background:var(--paper); color:var(--muted); font-size:12px; line-height:1.8; cursor:pointer; transition:color .2s ease, border-color .2s ease; }
   .furigana-toggle:hover { color:var(--vermillion); border-color:var(--vermillion); }
   .furigana-toggle[aria-pressed="true"] { color:var(--vermillion); border-color:var(--vermillion); }
