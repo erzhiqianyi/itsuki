@@ -1,0 +1,20 @@
+.archive-years { position:sticky; top:0; z-index:5; display:flex; flex-wrap:wrap; gap:6px 28px; padding:14px 0; background:var(--paper); border-bottom:1px solid var(--rule); }
+.archive-years a { display:inline-flex; align-items:baseline; gap:6px; }
+.archive-years .display-type { font-size:20px; font-weight:700; }
+.archive-years small { font-size:12px; color:var(--muted); }
+.archive-year { padding:28px 0 12px; border-bottom:2px solid var(--ink); scroll-margin-top:64px; }
+.archive-year > h2 { display:flex; align-items:baseline; gap:14px; margin-bottom:12px; }
+.archive-year > h2 .display-type { font-size:48px; font-weight:800; line-height:1; color:var(--vermillion); }
+.archive-year > h2 small { font-size:13px; font-weight:400; color:var(--muted); }
+.archive-month { display:grid; grid-template-columns:72px minmax(0,1fr); gap:24px; padding:14px 0; }
+.archive-month + .archive-month { border-top:1px solid var(--rule); }
+.archive-month h3 { font-size:20px; font-weight:700; color:var(--muted); padding-top:2px; }
+.archive-month ol { list-style:none; margin:0; padding:0; }
+.archive-month li { display:grid; grid-template-columns:52px minmax(0,1fr); gap:16px; padding:5px 0; }
+.archive-month time { font:500 15px/1.7 'Barlow Condensed', sans-serif; color:var(--muted); font-variant-numeric:tabular-nums; }
+.archive-month li a { font-size:15px; line-height:1.7; overflow-wrap:anywhere; }
+@media (max-width:760px) {
+  .archive-year > h2 .display-type { font-size:36px; }
+  .archive-month { grid-template-columns:minmax(0,1fr); gap:6px; }
+  .archive-month li { grid-template-columns:44px minmax(0,1fr); gap:12px; }
+}
