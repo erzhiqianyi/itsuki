@@ -2,7 +2,7 @@
 import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 import EditorialLayout from '../../../layouts/EditorialLayout.astro';
-import { FORMAT_TAGS, groupOfTag, tagHref } from '../../../data/post-tags';
+import { FORMAT_TAGS, areaHref, groupOfTag, tagHref } from '../../../data/post-tags';
 import { postCategoryLabel as label } from '../../../lib/post-filter';
 import '../../../styles/post-index.css';
 import '../../../styles/post-tags.css';
@@ -31,7 +31,7 @@ const href = (post: typeof posts[number]) => '/blog/' + post.id.replace(/\.(md|m
 <EditorialLayout title={`#${tag}`} description={`「${tag}」のタグが付いた${posts.length}件の記事。`} hideHeader>
   <div class="post-index tag-page">
     <header class="index-title"><span class="display-type">#</span><h1>{tag}</h1><p>{posts.length} 記事</p></header>
-    <nav class="index-categories tag-trail" aria-label="パンくず"><a href="/blog">記事</a><span aria-hidden="true">/</span><a href="/blog/tags">タグ地図</a>{group && <><span aria-hidden="true">/</span><a href={'/blog/tags#region-' + group.key}>{group.label}</a></>}</nav>
+    <nav class="index-categories tag-trail" aria-label="パンくず"><a href="/blog">記事</a><span aria-hidden="true">/</span><a href="/blog/tags">タグ地図</a>{group && <><span aria-hidden="true">/</span><a href={areaHref(group.key)}>{group.label}</a></>}</nav>
 
     <div class="tag-overview">
       <section aria-labelledby="tag-years">

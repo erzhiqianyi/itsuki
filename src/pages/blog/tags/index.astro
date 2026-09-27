@@ -2,64 +2,44 @@
 import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 import EditorialLayout from '../../../layouts/EditorialLayout.astro';
-import { TAG_GROUPS, tagHref } from '../../../data/post-tags';
 import PostSectionNav from '../../../components/PostSectionNav.astro';
+import { areaHref, tagAreas, tagHref } from '../../../data/post-tags';
 import '../../../styles/post-index.css';
 import '../../../styles/post-tags.css';
 
 const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
-const counts = new Map<string, number>();
-for (const post of posts) for (const tag of post.data.tags) counts.set(tag, (counts.get(tag) || 0) + 1);
-const known = new Set(TAG_GROUPS.flatMap(g => g.tags));
-const stray = [...counts.keys()].filter(tag => !known.has(tag));
-const groups = [...TAG_GROUPS, ...(stray.length ? [{ key: 'other', en: 'OTHER', label: 'その他', description: 'まだ地図に載っていないタグ。', tags: stray }] : [])]
-  .map(group => {
-    const tags = group.tags.filter(tag => counts.get(tag)).map(tag => ({ tag, count: counts.get(tag)! })).sort((a, b) => b.count - a.count);
-    const reach = posts.filter(post => post.data.tags.some(tag => group.tags.includes(tag))).length;
-    return { ...group, tags, reach };
-  })
-  .filter(group => group.tags.length);
-const topicGroups = groups.filter(g => g.key !== 'format');
-const formatGroup = groups.find(g => g.key === 'format');
-const max = Math.max(...topicGroups.flatMap(g => g.tags.map(t => t.count)));
-const tagTotal = groups.reduce((sum, g) => sum + g.tags.length, 0);
+const areas = tagAreas(posts);
+const topicAreas = areas.filter(a => a.key !== 'format');
+const formatArea = areas.find(a => a.key === 'format');
+const tagTotal = areas.reduce((sum, a) => sum + a.tags.length, 0);
 ---
 <EditorialLayout title="タグ地図" description="記事のタグを、暮らし・学び・つくる・仕事・旅・表現の6つの領域に整理した地図。" hideHeader>
   <div class="post-index tag-map-page">
-    <header class="index-title"><span class="display-type">01</span><h1>タグ地図</h1><p>{tagTotal} タグ · {posts.length} 記事</p></header>
+    <header class="index-title"><span class="display-type">01</span><h1>タグ地図</h1><p>{topicAreas.length} 領域 · {tagTotal} タグ · {posts.length} 記事</p></header>
     <PostSectionNav current="tags" />
 
-    <p class="tag-map-lede">書いてきたことを6つの領域に分けました。数字は記事数、線の長さはその量です。</p>
+    <p class="tag-map-lede">書いてきたことを{topicAreas.length}つの領域に分けました。領域を選ぶと、その中のタグが見られます。</p>
 
-    <div class="tag-regions">
-      {topicGroups.map(group => (
-        <section class="tag-region" aria-labelledby={'region-' + group.key}>
-          <header>
-            <span class="display-type tag-region-en" aria-hidden="true">{group.en}</span>
-            <h2 id={'region-' + group.key}>{group.label}</h2>
-            <p>{group.description}</p>
-            <span class="tag-region-reach">{group.reach} 記事</span>
-          </header>
-          <ul>
-            {group.tags.map(({ tag, count }) => (
-              <li>
-                <a href={tagHref(tag)}>
-                  <span class="tag-name">#{tag}</span>
-                  <span class="tag-count">{count}</span>
-                  <span class="tag-bar" style={`--w:${Math.max(4, Math.round(count / max * 100))}%`} aria-hidden="true"></span>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
+    <ul class="tag-areas">
+      {topicAreas.map((area, i) => (
+        <li>
+          <a class="tag-area" href={areaHref(area.key)}>
+            <span class="tag-area-top"><span class="tag-area-icon"><Icon name={'lucide:' + area.icon} /></span><span class="display-type tag-area-index" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span></span>
+            <span class="display-type tag-area-en" aria-hidden="true">{area.en}</span>
+            <strong>{area.label}</strong>
+            <span class="tag-area-count"><b class="display-type">{area.posts.length}</b> 記事<span aria-hidden="true">·</span>{area.tags.length} タグ</span>
+            <span class="tag-area-peek">{area.tags.slice(0, 3).map(t => '#' + t.tag).join('　')}</span>
+            <span class="tag-area-go">タグを見る<Icon name="lucide:arrow-right" /></span>
+          </a>
+        </li>
       ))}
-    </div>
+    </ul>
 
-    {formatGroup && (
+    {formatArea && (
       <section class="tag-formats" aria-labelledby="region-format">
-        <h2 id="region-format"><span class="display-type" aria-hidden="true">{formatGroup.en}</span>{formatGroup.label}</h2>
-        <p>{formatGroup.description}</p>
-        <div>{formatGroup.tags.map(({ tag, count }) => <a href={tagHref(tag)}>#{tag}<span>{count}</span></a>)}</div>
+        <h2 id="region-format"><span class="display-type" aria-hidden="true">{formatArea.en}</span>{formatArea.label}</h2>
+        <p>{formatArea.description}</p>
+        <div>{formatArea.tags.map(({ tag, count }) => <a href={tagHref(tag)}>#{tag}<span>{count}</span></a>)}</div>
       </section>
     )}
 

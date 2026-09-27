@@ -5,15 +5,19 @@
 // The origin list is remembered per section in sessionStorage, so it survives
 // hopping through previous/next links between detail pages.
 
+import { TAG_GROUPS } from '../data/post-tags';
+
 interface ListRule { pattern: RegExp; label: (match: RegExpMatchArray, url: URL) => string }
 
 const categoryLabels: Record<string, string> = { journals: '日記', japanese: '日本語学習', codex: '技術' };
+const areaLabels: Record<string, string> = Object.fromEntries(TAG_GROUPS.map(g => [g.key, g.label]));
 const decode = (value: string) => { try { return decodeURIComponent(value); } catch { return value; } };
 
 const LISTS: Record<string, ListRule[]> = {
   blog: [
     { pattern: /^\/blog\/featured\/?$/, label: () => 'おすすめに戻る' },
     { pattern: /^\/blog\/tags\/?$/, label: () => 'タグ地図に戻る' },
+    { pattern: /^\/blog\/tags\/area\/([^/]+)\/?$/, label: m => `${areaLabels[m[1]] || m[1]}に戻る` },
     { pattern: /^\/blog\/tags\/([^/]+)\/?$/, label: m => `#${decode(m[1])} に戻る` },
     { pattern: /^\/blog\/codex-reading\/?$/, label: () => 'シリーズ一覧に戻る' },
     { pattern: /^\/category\/([^/]+)(?:\/\d+)?\/?$/, label: m => `${categoryLabels[m[1]] || decode(m[1])}に戻る` },

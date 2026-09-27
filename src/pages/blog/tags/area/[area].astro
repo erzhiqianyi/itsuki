@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../../../layouts/EditorialLayout.astro';
+import PostSectionNav from '../../../../components/PostSectionNav.astro';
+import { FORMAT_TAGS, areaHref, tagAreas, tagHref } from '../../../../data/post-tags';
+import '../../../../styles/post-index.css';
+import '../../../../styles/post-tags.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => data.lang === 'ja');
+  const areas = tagAreas(posts);
+  return areas.map(area => ({ params: { area: area.key }, props: { area, areas } }));
+}
+
+const { area, areas } = Astro.props;
+const max = Math.max(...area.tags.map(t => t.count));
+const latest = [...area.posts].sort((a, b) => b.data.date.localeCompare(a.data.date) || b.id.localeCompare(a.id)).slice(0, 8);
+const href = (post: typeof latest[number]) => '/blog/' + post.id.replace(/\.(md|mdx)$/, '');
+---
+<EditorialLayout title={`${area.label} · タグ地図`} description={area.description} hideHeader>
+  <div class="post-index tag-area-page">
+    <header class="index-title tag-area-title"><span class="tag-area-icon"><Icon name={'lucide:' + area.icon} /></span><h1>{area.label}</h1><p>{area.posts.length} 記事 · {area.tags.length} タグ</p></header>
+    <PostSectionNav current="tags" />
+    <nav class="tag-trail" aria-label="パンくず"><a href="/blog/tags"><Icon name="lucide:arrow-left" />タグ地図</a><span class="display-type" aria-hidden="true">{area.en}</span></nav>
+    <p class="tag-map-lede">{area.description}</p>
+
+    <ul class="tag-list">
+      {area.tags.map(({ tag, count }) => (
+        <li>
+          <a href={tagHref(tag)}>
+            <span class="tag-name">#{tag}</span>
+            <span class="tag-count">{count}</span>
+            <span class="tag-bar" style={`--w:${Math.max(4, Math.round(count / max * 100))}%`} aria-hidden="true"></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {latest.length > 0 && (
+      <section class="tag-year tag-latest" aria-labelledby="area-latest">
+        <h2 id="area-latest" class="display-type">LATEST</h2>
+        <ul>
+          {latest.map(post => (
+            <li>
+              <time datetime={post.data.date}>{post.data.date.replaceAll('-', '.')}</time>
+              <a href={href(post)}>{post.data.title || post.data.date}</a>
+              <span class="tag-post-meta">{post.data.tags.filter(t => !FORMAT_TAGS.has(t)).slice(0, 3).map(t => <a href={tagHref(t)}>#{t}</a>)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <nav class="tag-area-switch" aria-label="ほかの領域">
+      {areas.map(other => (
+        <a href={areaHref(other.key)} aria-current={other.key === area.key ? 'page' : undefined}><Icon name={'lucide:' + other.icon} /><span>{other.label}</span></a>
+      ))}
+    </nav>
+  </div>
+</EditorialLayout>
