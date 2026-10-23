@@ -1,8 +1,20 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-09-27",
+  "checkedAt": "2026-10-23",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "rrypHFv1mZc",
+      "date": "2026-10-18T21:40:06+09:00",
+      "title": "やっと日本到着！ネット不通・荷物迷子・上野ネカフェ泊",
+      "duration": "5:48"
+    },
+    {
+      "id": "dm1WURrse7M",
+      "date": "2026-10-04T13:16:17+09:00",
+      "title": "都民の日は入場無料！？江戸東京博物館と本場ちゃんこ鍋を満喫した一日",
+      "duration": "13:40"
+    },
     {
       "id": "hMJS_DFJcoY",
       "date": "2026-09-26T07:28:42+09:00",
