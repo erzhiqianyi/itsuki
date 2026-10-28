@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "include": [
+    "/blog/codex-reading",
+    "/blog/codex-reading/*",
+    "/blog/ja/codex-reading",
+    "/blog/ja/codex-reading/*",
+    "/category/codex",
+    "/category/codex/*",
+    "/assets/codex-reading",
+    "/assets/codex-reading/*"
+  ],
+  "exclude": []
+}
