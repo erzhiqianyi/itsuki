@@ -1,6 +1,6 @@
 ---
 id: "speaklog"
-name: "SpeakLog — 先说出来，再慢慢改好"
+name: "SpeakLog — まず話して、少しずつ表現を磨く"
 description: "まずは外国語で話してみる。自分の言葉と、より自然な言い方を見比べながら、少しずつ表現を磨く Mac アプリ。"
 kind: "Mac App"
 href: "https://speak.erzhiqian.cc/"
