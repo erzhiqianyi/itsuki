@@ -18,7 +18,7 @@ const stats = [
   { value: projects.length, label: 'つくる', href: '/projects' },
   { value: albums.length, label: 'アルバム', href: '/photos' },
   { value: videos.length, label: '動画', href: '/videos' },
-  { value: 67, label: '俳句', href: 'https://haiku.erzhiqian.cc/' }, // 手動更新（リアルタイム連携なし）
+  { value: 73, label: '俳句', href: 'https://haiku.erzhiqian.cc/' }, // 手動更新（リアルタイム連携なし）
 ];
 const latestDate = [...posts, ...videos, ...albums].map(p => p.data.date).filter(Boolean).sort().at(-1);
 const latestPosts = await Promise.all(posts.slice(0, 3).map(async post => ({ ...post, excerpt: post.data.summary || (await render(post)).headings.filter(h => h.depth <= 3).slice(0, 5).map(h => h.text).join(' / ') })));

@@ -1,8 +1,26 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-10-23",
+  "checkedAt": "2026-11-09",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "f65iBp8IzR4",
+      "date": "2026-11-08T21:12:39+09:00",
+      "title": "Japanese Learning Journey | Mastering Verbs & Particles Through Work Experience",
+      "duration": "8:58"
+    },
+    {
+      "id": "tVBoYlFfwDw",
+      "date": "2026-11-08T00:06:38+09:00",
+      "title": "Learning Japanese Tenses & Verb Forms | From Simple Sentences to Speaking Naturally",
+      "duration": "7:24"
+    },
+    {
+      "id": "2aJL9xurMxg",
+      "date": "2026-11-06T21:36:57+09:00",
+      "title": "Japanese Basics 1: Building Complete Sentences | Japanese Growth Log EP01",
+      "duration": "7:12"
+    },
     {
       "id": "rrypHFv1mZc",
       "date": "2026-10-18T21:40:06+09:00",
