@@ -5,7 +5,7 @@ desc: "第1回は、いくつかの言葉から文を作る練習です。助詞
 image: "/assets/videos/youtube/2aJL9xurMxg.jpg"
 tags: []
 duration: "7:12"
-category: "VLOG"
+category: "日本語学習"
 date: "2026-11-06T21:36:57+09:00"
 featured: false
 type: "long"

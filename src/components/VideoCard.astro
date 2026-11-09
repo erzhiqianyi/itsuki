@@ -1,0 +1,46 @@
+---
+import { Icon } from 'astro-icon/components';
+import { type getVideoLibrary, videoImage } from '../data/video-library';
+
+interface Props {
+    item: Awaited<ReturnType<typeof getVideoLibrary>>[number];
+    category: string;
+}
+const { item, category } = Astro.props;
+const hasPlayer = item.youtubeId || item.article?.data.videoFile;
+const label = item.review
+    ? (item.article?.data.transcriptReview ? '字幕と解説' : '朗読原稿')
+    : item.article ? '関連記事つき' : item.video?.body?.trim() ? '学習資料' : undefined;
+---
+<a class:list={['video-card', { short: item.type === 'short' }]} href={item.href}>
+  <div class="cover">
+    {item.image && <img src={videoImage(item.image)} alt="" loading="lazy" decoding="async" />}
+    {hasPlayer && <span class="play" aria-hidden="true"><Icon name="lucide:play" /></span>}
+    {item.duration && <span class="duration">{item.duration}</span>}
+  </div>
+  <div class="copy">
+    <div class="meta"><span class="category">{category}</span>{label && <span>{label}</span>}<time datetime={item.date}>{item.date.slice(0, 10).replaceAll('-', '.')}</time></div>
+    <h2>{item.title}</h2>
+    <span class="action">{hasPlayer ? '視聴ページへ' : '読む'}<Icon name="lucide:arrow-right" /></span>
+  </div>
+</a>
+
+<style>
+  .video-card { display:grid; grid-template-rows:auto 1fr; min-width:0; border-bottom:1px solid var(--rule); }
+  .cover { position:relative; aspect-ratio:16/9; overflow:hidden; background:#262923; }
+  .cover img { display:block; width:100%; height:100%; object-fit:cover; }
+  .short .cover img { object-fit:contain; }
+  .play { position:absolute; left:12px; bottom:12px; display:grid; place-items:center; width:38px; height:38px; background:#111d; color:white; border-radius:50%; }
+  .play :global(svg) { width:17px; height:17px; margin-left:2px; }
+  .duration { position:absolute; right:10px; bottom:10px; padding:2px 6px; background:#111d; color:white; font-size:12px; font-variant-numeric:tabular-nums; }
+  .copy { display:flex; flex-direction:column; align-items:flex-start; padding:14px 0 18px; gap:8px; }
+  .meta { display:flex; flex-wrap:wrap; gap:5px 12px; color:var(--muted); font-size:12px; }
+  .meta .category { color:var(--vermillion); }
+  .meta time { font-variant-numeric:tabular-nums; }
+  h2 { font-size:17px; font-weight:700; line-height:1.55; overflow-wrap:anywhere; }
+  .action { display:inline-flex; align-items:center; gap:6px; color:var(--muted); margin-top:auto; padding-top:6px; font-size:12px; }
+  .action :global(svg) { width:14px; height:14px; }
+  .video-card:hover h2, .video-card:hover .action { color:var(--vermillion); }
+  .video-card:hover .play { background:var(--vermillion); }
+  .video-card:focus-visible { outline:2px solid var(--vermillion); outline-offset:5px; }
+</style>

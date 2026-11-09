@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import EditorialLayout from '../layouts/EditorialLayout.astro';
 import { photoPreview } from '../components/photo-preview';
 import { SITE_CONFIG } from '../data/site-config';
+import { videoHref } from '../data/video-library';
 const japanese = ({ data }) => !data.lang || data.lang === 'ja';
 const [posts, videos, albums] = await Promise.all([getCollection('blog', japanese), getCollection('videos', japanese), getCollection('photos', japanese)]);
 const newestFirst = (a, b) => Date.parse(b.data.date) - Date.parse(a.data.date);
@@ -71,7 +72,7 @@ const chapters = [{ number: '01', label: '記事', href: '/blog' }, { number: '0
       </section>
       <section id="motion">
         <header class="section-heading"><span class="section-number display-type" aria-hidden="true">03</span><h2>動画</h2><a href="/videos" aria-label="すべての動画を見る">すべて見る<Icon name="lucide:arrow-up-right" /></a></header>
-        {visibleVideos.map((video, index) => <a class:list={['video-entry', { 'video-secondary': index > 0 }]} href={video.data.url} target="_blank" rel="noreferrer">
+        {visibleVideos.map((video, index) => <a class:list={['video-entry', { 'video-secondary': index > 0 }]} href={videoHref(video)}>
           {index === 0 && localImage(video.data.image) ? <div class="video-image"><img src={video.data.image} alt={video.data.title} width="560" height="315" loading="lazy" /><span class="play-mark"><Icon name="lucide:play" /></span></div> : <Icon name="lucide:circle-play" />}
           <div><h3>{video.data.title}</h3><time datetime={video.data.date}>{video.data.date?.slice(0, 10).replaceAll('-', '.')}</time></div>
         </a>)}

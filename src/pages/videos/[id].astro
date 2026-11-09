@@ -1,0 +1,118 @@
+---
+import { render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import EditorialLayout from '../../layouts/EditorialLayout.astro';
+import { articleVideoLinks, getVideoLibrary, videoImage } from '../../data/video-library';
+import '../../styles/article-content.css';
+import '../../styles/transcript-review.css';
+
+interface Props {
+    item: Awaited<ReturnType<typeof getVideoLibrary>>[number];
+}
+
+export async function getStaticPaths() {
+    return (await getVideoLibrary()).map(item => ({
+        params: { id: item.href.split('/')[2] },
+        props: { item },
+    }));
+}
+
+const { item } = Astro.props;
+const { title, description, date, duration, review, article, video, youtubeId, url, lang, type } = item;
+const local = article?.data.videoFile;
+const [articlePage, videoPage] = await Promise.all([
+    article ? render(article) : undefined,
+    video?.body?.trim() ? render(video) : undefined,
+]);
+const ArticleContent = articlePage?.Content;
+const VideoContent = videoPage?.Content;
+const headings = [...(videoPage?.headings ?? []), ...(articlePage?.headings ?? [])];
+const siblingVideos = article ? articleVideoLinks(article).filter(link => link.href !== item.href) : [];
+const image = videoImage(item.image);
+const notes = headings.find(heading => heading.text === '学習ポイント' || (review && heading.depth === 2));
+const transcript = headings.find(heading => heading.text === '台本全文' || heading.text === '字幕全文');
+const isEnglish = lang === 'en';
+const noteLabel = review && !article?.data.transcriptReview ? '朗読原稿' : isEnglish ? 'Notes' : '学習ポイント';
+---
+<EditorialLayout title={title} description={description} image={image} lang={lang} article={!!(ArticleContent || VideoContent)} hideHeader>
+  <article class:list={['watch-page', { 'transcript-review': article?.data.transcriptReview }]}>
+    <a href="/videos/" class="back"><Icon name="lucide:arrow-left" />{isEnglish ? 'All videos' : '動画一覧へ'}</a>
+    <header class="watch-header">
+      <div class="meta">
+        <span>{review ? 'やさしい日本語' : isEnglish ? 'Video' : '動画'}</span>
+        <time datetime={date}>{date.slice(0, 10).replaceAll('-', '.')}</time>
+        {duration && <span>{duration}</span>}
+      </div>
+      <h1>{title}</h1>
+    </header>
+
+    {youtubeId ? (
+      <div class:list={['player', { vertical: type === 'short' }]}>
+        <iframe
+          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?playsinline=1&rel=0`}
+          title={title}
+          referrerpolicy="strict-origin-when-cross-origin"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          allowfullscreen
+        ></iframe>
+      </div>
+    ) : local ? (
+      <video class="player" controls playsinline preload="metadata" poster={image} aria-label={title}>
+        <source src={local.src} type="video/mp4" />
+        <track kind="captions" src={local.captions} srclang="ja" label="日本語" />
+        <a href={local.src}>動画を開く</a>
+      </video>
+    ) : review ? null : image && <img class="poster" src={image} alt="" />}
+
+    {(url || notes || ArticleContent) && <nav class="watch-links" aria-label={isEnglish ? 'Video links' : '動画と学習資料'}>
+      {notes && <a href={'#' + notes.slug}>{noteLabel}</a>}
+      {transcript && <a href={'#' + transcript.slug}>{transcript.text}</a>}
+      {ArticleContent && !review && <a href="#related-article">{isEnglish ? 'Related article' : '関連記事'}</a>}
+      {url && <a href={url} class="external" target="_blank" rel="noopener noreferrer">{youtubeId ? (isEnglish ? 'Watch on YouTube' : 'YouTubeで見る') : (isEnglish ? 'Open video' : '動画を開く')}<Icon name="lucide:arrow-up-right" /></a>}
+    </nav>}
+
+    {description && !review && <p class="description">{description}</p>}
+    {VideoContent && <div class="article-content reading-article"><VideoContent /></div>}
+    {ArticleContent && <section id="related-article" class="reading-article">
+      {!review && <header class="related-heading">
+        <p>{isEnglish ? 'Related article' : '関連記事'}</p>
+        <h2>{article?.data.title}</h2>
+        {siblingVideos.length > 0 && <ul class="related-videos">{siblingVideos.map(link => <li><a href={link.href}><Icon name="lucide:play" />{link.title}</a></li>)}</ul>}
+      </header>}
+      <div class="article-content"><ArticleContent /></div>
+    </section>}
+  </article>
+</EditorialLayout>
+
+<style>
+  .watch-page { width:100%; max-width:920px; margin-inline:auto; min-width:0; }
+  .back { display:inline-flex; align-items:center; gap:7px; color:var(--muted); font-size:13px; }
+  .back:hover, .watch-links a:hover { color:var(--vermillion); }
+  .back :global(svg), .watch-links :global(svg) { width:15px; height:15px; }
+  .watch-header { margin:18px 0 22px; }
+  .meta { display:flex; flex-wrap:wrap; gap:7px 16px; color:var(--muted); font-size:13px; font-variant-numeric:tabular-nums; }
+  .meta span:first-child { color:var(--vermillion); }
+  h1 { margin-top:8px; font-size:clamp(25px,4vw,38px); font-weight:800; line-height:1.28; overflow-wrap:anywhere; }
+  .player, .poster { display:block; width:100%; aspect-ratio:16/9; margin-inline:auto; background:#151714; }
+  .player { min-height:200px; }
+  video.player { height:auto; min-height:0; }
+  .player.vertical { width:min(100%,360px); aspect-ratio:9/16; }
+  .player iframe { display:block; width:100%; height:100%; min-height:inherit; border:0; }
+  .poster { object-fit:contain; }
+  .watch-links { display:flex; flex-wrap:wrap; align-items:center; gap:4px 18px; padding:10px 0; border-bottom:1px solid var(--rule); }
+  .watch-links a { display:inline-flex; align-items:center; gap:5px; padding:5px 0; min-height:34px; color:var(--ink); font-size:13px; text-decoration:underline; text-underline-offset:4px; }
+  .watch-links .external { margin-left:auto; }
+  .description, .reading-article { margin-top:28px; }
+  .description { max-width:68ch; color:var(--muted); font-size:15px; line-height:1.9; }
+  .related-heading { border-top:1px solid var(--rule); padding-top:18px; margin-bottom:24px; }
+  .related-heading > p { color:var(--vermillion); font-size:12px; font-weight:700; }
+  .related-heading h2 { font-size:clamp(20px,3vw,28px); line-height:1.45; font-weight:700; margin-top:6px; }
+  .related-videos { display:grid; gap:6px; margin-top:12px; }
+  .related-videos a { display:inline-flex; gap:7px; align-items:baseline; font-size:14px; color:var(--vermillion); text-decoration:underline; text-underline-offset:4px; }
+  .related-videos :global(svg) { flex-shrink:0; width:12px; height:12px; }
+  .article-content :global(iframe.linked-video-embed) { display:none; }
+  .article-content :global(details.video-chapter) { border-block-start:1px solid var(--rule); padding-block:10px; }
+  .article-content :global(.video-chapter > summary) { cursor:pointer; font-weight:600; padding-block:5px; }
+  .article-content :global(.video-chapter > p) { margin:12px 0; }
+  .article-content :global(.video-chapter > p > strong:first-child) { display:block; font-size:14px; color:var(--muted); }
+</style>

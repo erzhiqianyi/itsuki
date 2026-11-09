@@ -5,7 +5,7 @@ desc: "今回は「時制・状態・動詞の活用」をテーマに、日本�
 image: "/assets/videos/youtube/tVBoYlFfwDw.jpg"
 tags: []
 duration: "7:24"
-category: "VLOG"
+category: "日本語学習"
 date: "2026-11-08T00:06:38+09:00"
 featured: false
 type: "long"

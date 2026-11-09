@@ -4,7 +4,11 @@
 "category": "Japanese"
 "featured": true
 "transcriptReview": true
-"coverImage": "/assets/blog/default.webp"
+"videoFile":
+  "src": "/assets/videos/site/yasashii-nihongo-11.mp4"
+  "captions": "/assets/videos/site/yasashii-nihongo-11.ja.vtt"
+  "duration": "6:20"
+"coverImage": "/assets/videos/site/yasashii-nihongo-11.jpg"
 "title": "#11 久しぶりの渋谷。にぎやかな交差点で、あまり来ない理由を話す"
 "tags": ["やさしい日本語", "日本語学習", "散歩"]
 "summary": "動画の自動字幕から、日常の日本語をふりかえります。全33か所の原文と自然な言い方を対照し、文法の修正・話の整理・口語の言い換えを分けてまとめました。"
@@ -369,6 +373,108 @@
 | 8 | 動詞＋「のは」 | 行かない**は**不思議 | 行かない**のは**不思議 |
 | 9 | 理由を並べる「〜し」 | 遠い**けど** | 遠い**し**、人も多い**から** |
 
+</details>
+
+## 字幕全文
+
+撮影素材の自動字幕を、動画の順番で掲載しています。話し直しや認識の揺れも残っています。自然な言い方は上の対照をご覧ください。
+
+<details class="review-reference">
+<summary>0:00 · あいさつと、久しぶりの渋谷</summary>
+<p><small>0:01</small>　皆さんこんにちは。</p>
+<p><small>0:04</small>　いつきです。</p>
+<p><small>0:05</small>　今日は 9月25日、金曜日。今日は久しぶりに渋谷に来た。</p>
+<p><small>0:15</small>　さすが渋谷ねいつも賑やかですね。</p>
+<p><small>0:20</small>　あ今日は今今はこの交差点です。</p>
+<p><small>0:28</small>　渋谷の交差点。</p>
+</details>
+
+<details class="review-reference">
+<summary>0:29 · スクランブル交差点</summary>
+<p><small>0:32</small>　いやはいいつも通りに。</p>
+<p><small>0:34</small>　観光客が多いです。</p>
+<p><small>0:36</small>　私も初めて日本に来ては。</p>
+<p><small>0:42</small>　渋谷この交差点に来た写真を撮ったして、</p>
+<p><small>0:46</small>　今写真を撮る人もたくさんあるさすが渋谷ですね。</p>
+<p><small>0:54</small>　こんな感じでも今日はあとは雨かもしれません。</p>
+<p><small>0:59</small>　そして空は真っ暗になります。</p>
+</details>
+
+<details class="review-reference">
+<summary>1:05 · 交差点を渡って、今日の目的へ</summary>
+<p><small>1:05</small>　そとはなぜ渋谷の交差点はこんなに有名ですか ？</p>
+<p><small>1:12</small>　実はまだもわからない。</p>
+<p><small>1:15</small>　多分これは日本の文化文化のことでしょ。</p>
+<p><small>1:22</small>　じゃあ先は青になります。</p>
+<p><small>1:25</small>　ここに一緒に歩きましょう。</p>
+<p><small>1:32</small>　今実は今日は渋谷にいたために行き</p>
+<p><small>1:37</small>　はあの任天堂東京に行きたい。</p>
+<p><small>1:42</small>　そして渋谷のアップルの店にもう</p>
+<p><small>1:49</small>　1回新しいスマホに見に行きたいです。</p>
+<p><small>1:53</small>　こんな感じです。</p>
+</details>
+
+<details class="review-reference">
+<summary>1:56 · スマホと渋谷の人混み</summary>
+<p><small>1:56</small>　でも私は今のスマホは</p>
+<p><small>2:00</small>　去年買ったです。</p>
+<p><small>2:03</small>　今まだ使えますけど、新しい製品があれば絶対見に行けたい。</p>
+<p><small>2:09</small>　やはり渋谷がダメ。</p>
+<p><small>2:13</small>　そんなに人がたくさんあるいる。</p>
+<p><small>2:18</small>　ダメ人山人海だけです。</p>
+<p><small>2:28</small>　こんな感じです。</p>
+</details>
+
+<details class="review-reference">
+<summary>2:32 · 渋谷にあまり来ない理由</summary>
+<p><small>2:32</small>　とさっきは今渋谷のことを話して、</p>
+<p><small>2:36</small>　実は私も東京に来ても半年ぐらいけど、渋谷に</p>
+<p><small>2:44</small>　行くのはあんまり頻繁ではない。</p>
+<p><small>2:48</small>　普通は渋谷の言葉にに行かないです。</p>
+<p><small>2:56</small>　なぜならそれは少し遠いけど、人気もあります。</p>
+<p><small>3:04</small>　こんな混雑のところは私も嫌です。</p>
+<p><small>3:09</small>　あちょっと私は買い物はそんなに好きではないで渋谷にいた</p>
+<p><small>3:17</small>　あんまりここに行くでも今日は</p>
+<p><small>3:25</small>　いつも通に賑やかですね。</p>
+<p><small>3:28</small>　外国人や環境客や音がほどどん賑やかですね。</p>
+</details>
+
+<details class="review-reference">
+<summary>3:35 · 先生と「10年間」の話</summary>
+<p><small>3:35</small>　前の日本語教室との先生と話したわ。</p>
+<p><small>3:41</small>　彼女は足立区に住んでいるなので、</p>
+<p><small>3:45</small>　多分 10年間渋谷に行ったこと 10年間に渋谷も行かない。</p>
+<p><small>3:55</small>　行かなかった。</p>
+<p><small>3:56</small>　私もびっくりしましたね。</p>
+<p><small>3:59</small>　そうですね。</p>
+<p><small>4:00</small>　足君から渋谷まではそんなに遠くじゃないけど、</p>
+<p><small>4:08</small>　10年間はかなり長いね。</p>
+<p><small>4:13</small>　私も以前仕事の</p>
+<p><small>4:19</small>　住んでいる都市高州に比べては多分私は足立区に住んでいるわ。</p>
+<p><small>4:30</small>　多分あの他の遠くのところでしで</p>
+<p><small>4:36</small>　渋谷もあの投資の中心の 1つかもしれません。</p>
+<p><small>4:42</small>　10年間投資の投資にかなりは不思議ですね。</p>
+<p><small>4:48</small>　でも私も今東京に住んでいる学校は</p>
+<p><small>4:54</small>　日本に都市で住んでいるところは埼</p>
+<p><small>4:58</small>　玉県の近くこれに確かに渋谷ももし用事がないわ。</p>
+<p><small>5:06</small>　あんまりここに行かないね。</p>
+</details>
+
+<details class="review-reference">
+<summary>5:10 · 任天堂のお店と締めくくり</summary>
+<p><small>5:10</small>　でもここは年金年金堂の店がある。</p>
+<p><small>5:18</small>　もし門天堂のもの買いたい見にタイは渋谷しかないね。</p>
+<p><small>5:25</small>　ここは仕方ないです。</p>
+<p><small>5:28</small>　でもいつも賑やかなことがまず</p>
+<p><small>5:34</small>　多分今までは 3回ここに行ったことあるけど、</p>
+<p><small>5:42</small>　道は全くわからない。</p>
+<p><small>5:46</small>　全然わからない。</p>
+<p><small>5:47</small>　いつも今もアプリで道をナビゲートしています。</p>
+<p><small>5:57</small>　多分この方向です。</p>
+<p><small>6:00</small>　こんな賑やかですか私は本当に気にしていることはない。</p>
+<p><small>6:10</small>　じゃあ今日の渋谷のことはここまで</p>
+<p><small>6:14</small>　ここまで聞いてくれてありがとうございます。</p>
+<p><small>6:17</small>　じゃあまた次回</p>
 </details>
 
 <nav class="review-series" aria-label="日本語ふりかえりシリーズ"><a href="/blog/ja/japanese/2026/09/yasashii-nihongo-10">前回 · #10 期末テストの結果は思ったより悪かった。ポケモン30周年イベントを覗きながら振り返る</a></nav>

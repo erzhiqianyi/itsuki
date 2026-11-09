@@ -1,6 +1,8 @@
 import {defineCollection, z} from 'astro:content';
 import {glob} from 'astro/loaders';
 
+const youtubeVideo = z.object({ id: z.string().regex(/^[\w-]{11}$/), title: z.string() });
+
 // 1. 博客文章集合
 const blog = defineCollection({
     loader: glob({pattern: '**/[^_]*.{md,mdx}', base: "src/content/blog"}),
@@ -14,7 +16,13 @@ const blog = defineCollection({
         coverImage: z.string(),
         featured: z.boolean().default(false),
         transcriptReview: z.boolean().default(false),
-        youtube: z.object({ id: z.string(), title: z.string() }).optional(),
+        youtube: youtubeVideo.optional(),
+        relatedYoutube: z.array(youtubeVideo).default([]),
+        videoFile: z.object({
+            src: z.string(),
+            captions: z.string(),
+            duration: z.string(),
+        }).optional(),
         codexReadingDay: z.number().int().min(1).max(30).optional(),
         pinnedInCategory: z.boolean().default(false),
     }),
