@@ -1,8 +1,44 @@
 {
   "channel": "https://www.youtube.com/@Itsuki-no-Nihonggo/videos",
-  "checkedAt": "2026-11-09",
+  "checkedAt": "2026-11-17",
   "scope": "Public Videos tab, excludes Shorts and Live tab; durations from channel UI; publication dates in Asia/Tokyo",
   "videos": [
+    {
+      "id": "zX8oUAJm6fE",
+      "date": "2026-11-15T22:23:21+09:00",
+      "title": "【日本語成長記録】EP09 時間の表現と助詞「に」｜Japanese Time Expressions",
+      "duration": "7:08"
+    },
+    {
+      "id": "iGfM5OzTm7U",
+      "date": "2026-11-14T21:48:37+09:00",
+      "title": "【日本語成長記録 EP08】一文ずつ「です」で終える｜Finish Every Sentence in Japanese",
+      "duration": "8:11"
+    },
+    {
+      "id": "BobZwXdIXWM",
+      "date": "2026-11-12T23:14:47+09:00",
+      "title": "【日本語成長記録 EP07】可能・使役・受身の使い分け｜Japanese Potential, Causative & Passive",
+      "duration": "8:53"
+    },
+    {
+      "id": "D2AOequhEh8",
+      "date": "2026-11-11T22:48:25+09:00",
+      "title": "【日本語成長記録 EP06】可能形と文のつなぎ方｜Japanese Potential Form & Sentence Linking",
+      "duration": "8:10"
+    },
+    {
+      "id": "FQu58nYfz2Q",
+      "date": "2026-11-10T22:55:31+09:00",
+      "title": "【日本語成長記録 EP05】データ処理の仕事を日本語で説明する｜Japanese Grammar & IT Speaking Practice",
+      "duration": "10:55"
+    },
+    {
+      "id": "4_lAct2Wdsw",
+      "date": "2026-11-09T22:11:56+09:00",
+      "title": "【日本語成長記録】EP04 自動詞・他動詞で仕事を話す｜Japanese Verb Pairs & Speaking Practice",
+      "duration": "13:36"
+    },
     {
       "id": "f65iBp8IzR4",
       "date": "2026-11-08T21:12:39+09:00",
